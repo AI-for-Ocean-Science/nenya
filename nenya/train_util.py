@@ -1,3 +1,4 @@
+""" Code related to Nenya training """
 import os
 import sys
 import numpy as np
@@ -10,64 +11,31 @@ import h5py
 
 import torch
 import torch.backends.cudnn as cudnn
-from torchvision import transforms, datasets
-from torch.utils.data import DataLoader, Dataset
+from torchvision import transforms
+from torch.utils.data import Dataset
 
-from ulmo.nenya.models.resnet_big import SupConResNet
-from ulmo.nenya.losses import SupConLoss
+from nenya.models.resnet_big import SupConResNet
+from nenya.losses import SupConLoss
 
-from ulmo.nenya.util import TwoCropTransform, AverageMeter
-from ulmo.nenya.util import warmup_learning_rate
+from nenya.util import TwoCropTransform, AverageMeter
+from nenya.util import warmup_learning_rate
 
-from ulmo import io as ulmo_io
-import json
-
-# Reproduced here so Nenya v4 can run from pickle
-class Params():
-    """Class that loads hyperparameters from a json file.
-    Example:
-    ```
-    params = Params(json_path)
-    print(params.learning_rate)
-    params.learning_rate = 0.5  # change the value of learning_rate in params
-    ```
-    This module comes from:
-    https://github.com/cs230-stanford/cs230-code-examples/blob/master/pytorch/vision/utils.py
-    """
-
-    def __init__(self, json_path):
-        with open(json_path) as f:
-            params = json.load(f)
-            self.__dict__.update(params)
-
-    def save(self, json_path):
-        with open(json_path, 'w') as f:
-            json.dump(self.__dict__, f, indent=4)
-            
-    def update(self, json_path):
-        """Loads parameters from json file"""
-        with open(json_path) as f:
-            params = json.load(f)
-            self.__dict__.update(params)
-
-    @property
-    def dict(self):
-        """Gives dict-like access to Params instance by `params.dict['learning_rate']"""
-        return self.__dict__
+from nenya import io as nenya_io
 
     
-def option_preprocess(opt:ulmo_io.Params):
+def option_preprocess(opt:nenya_io.Params):
     """
     Set up a number of preprocessing and more including
     output folders (e.g. model_folder, latents_folder)
+
+    Object is modified in place.
+    
     Args:
         opt: (Params) json used to store the training hyper-parameters
-    Returns:
-        opt: (Params) processed opt
     """
 
     # check if dataset is path that passed required arguments
-    if opt.modis_data == True:
+    if opt.nenya_data is True:
         assert opt.data_folder is not None, "Please prove data_folder in opt.json file." 
 
     # set the path according to the environment
@@ -84,6 +52,7 @@ def option_preprocess(opt:ulmo_io.Params):
         format(opt.ssl_method, opt.ssl_model, opt.learning_rate,
                opt.weight_decay, opt.batch_size_train, opt.temp, opt.trial)
 
+    # Cosine?
     if opt.cosine:
         opt.model_name = '{}_cosine'.format(opt.model_name)
 
@@ -111,7 +80,6 @@ def option_preprocess(opt:ulmo_io.Params):
     opt.latents_folder = os.path.join('latents', opt.model_root,
                                     opt.model_name)
 
-    return opt
 
 class Demean:
     """
@@ -319,9 +287,9 @@ class GaussianBlurring:
     
         return image_blurred
         
-class ModisDataset(Dataset):
+class NenyaDataset(Dataset):
     """
-    Modis Dataset used for the training of the model.
+    Nenya Dataset used for the training of the model.
     """
     def __init__(self, data_path, transform, data_key='train'):
         self.data_path = data_path
@@ -345,16 +313,16 @@ class ModisDataset(Dataset):
         return image_transformed
 
 #@profile
-def modis_loader(opt, valid=False):
+def nenya_loader(opt, valid=False):
     """
-    This is a function used to create a MODIS data loader.
+    This is a function used to create a Nenya data loader.
     
     Args:
         opt: (Params) options for the training process.
         valid: (Bool) flag used to decide if to use the validation set.
         
     Returns:
-        loader: (Dataloader) Modis Dataloader.
+        loader: (Dataloader) Nenya Dataloader.
     """
     # Construct the Augmentations
     augment_list = []
@@ -390,9 +358,9 @@ def modis_loader(opt, valid=False):
     else:
         data_key = opt.valid_key
         batch_size = opt.batch_size_valid
-    modis_file = os.path.join(opt.data_folder, opt.images_file) 
+    data_file = os.path.join(opt.data_folder, opt.images_file) 
 
-    modis_dataset = ModisDataset(modis_file, 
+    modis_dataset = NenyaDataset(data_file, 
                                  transform=TwoCropTransform(transforms_compose), 
                                  data_key=data_key)
     sampler = None                                
@@ -438,7 +406,7 @@ def modis_loader_v2_with_blurring(opt, valid=False):
     return train_loader
 
 #@profile
-def set_model(opt, cuda_use=True): 
+def set_model(opt, cuda_use=True):
     """
     This is a function to set up the model.
     
