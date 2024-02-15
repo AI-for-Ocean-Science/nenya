@@ -13,15 +13,14 @@ from nenya.util import set_optimizer, save_model
 from nenya.util import adjust_learning_rate
 
 
-
-def main_train(opt_path: str, debug=False, restore=False, save_file=None):
-    """Train the model
+def main(opt_path: str, debug:bool=False, save_file:str=None):
+    """
+    Trains a model using the specified parameters.
 
     Args:
-        opt_path (str): Path + filename of options file
-        debug (bool): 
-        restore (bool):
-        save_file (str): 
+        opt_path (str): The path to the parameters JSON file.
+        debug (bool, optional): Whether to run in debug mode. Defaults to False.
+        save_file (str, optional): The path to save the trained model. Defaults to None.
     """
     # loading parameters json file
     opt = nenya_io.Params(opt_path)
