@@ -59,13 +59,13 @@ def fig_pca(outfile:str='fig_pca_variance.png'):
     # Horizontal line at 0
     #ax.axhline(0., color='k', ls='--')
 
-    #loc = 'upper right' if ss == 1 else 'upper left'
-    ax.legend(fontsize=15)#, loc=loc)
+    loc = 'lower left'
+    ax.legend(fontsize=17, loc=loc)
 
     # Turn on grid
     ax.grid(True, which='both', ls='--', lw=0.5)
 
-    plotting.set_fontsize(ax, 18)
+    plotting.set_fontsize(ax, 20)
 
     plt.tight_layout()#pad=0.0, h_pad=0.0, w_pad=0.3)
     plt.savefig(outfile, dpi=300)
