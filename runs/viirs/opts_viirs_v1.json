@@ -19,8 +19,8 @@
     "images_file": "VIIRS_2013_98clear_192x192_preproc_viirs_std_train.h5",
     "train_key": "train",
     "valid_key": "valid",
-    "tbl_file": "s3://modis-l2/Tables/MODIS_SSL_v4.parquet",
-    "s3_outdir": "s3://modis-l2/SSL/",
+    "tbl_file": "s3://viirs/Tables/VIIRS_2013_std_train_98.parquet",
+    "s3_outdir": "s3://viirs/Nenya/",
     "temp": 0.07,
     "cosine": true,
     "syncBN": false,
@@ -31,6 +31,6 @@
     "flip": true,
     "rotate": true,
     "demean": true,
-    "modis_data": true,
+    "nenya_data": true,
     "cuda_use": true
 }
