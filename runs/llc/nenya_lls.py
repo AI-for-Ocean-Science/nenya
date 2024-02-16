@@ -22,7 +22,11 @@ from nenya import train as nenya_train
 from IPython import embed
 
 def build_training_set(ntrain:int=300000, nvalid:int=100000,
-                       seed:int=76543):
+                       seed:int=76543, debug:bool=False):
+    if debug:
+        ntrain = 1000
+        nvalid = 1000
+
     # Init seed
     np.random.seed(seed)
     
@@ -53,6 +57,8 @@ def build_training_set(ntrain:int=300000, nvalid:int=100000,
     train_idx = np.random.choice(np.arange(train.shape[0]), ntrain, replace=False)
     valid_idx = np.random.choice(np.arange(valid.shape[0]), nvalid, replace=False)
 
+    if debug:
+        embed(header='60 of nenya_llc')
     # Select
     train = train[train_idx]
     valid = valid[valid_idx]
@@ -943,6 +949,13 @@ def parse_option():
 if __name__ == "__main__":
     # get the argument of training.
     args = parse_option()
+
+    # run the 'main_train()' function.
+    if args.func_flag == 'dataset':
+        build_training_set(debug=args.debug)
+        print("Dataset Ends.")
+        # python -u nenya_llc.py dataset --debug
+
     
     # run the 'main_train()' function.
     if args.func_flag == 'train':
