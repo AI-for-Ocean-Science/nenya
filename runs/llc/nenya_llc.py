@@ -70,9 +70,9 @@ def build_training_set(ntrain:int=300000, nvalid:int=100000,
         f.create_dataset('train', data=train)
         f.create_dataset('valid', data=valid)
         # Meta
-        dset = f.create_dataset('valid_metadata', data=valid_meta.to_numpy(dtype=str).astype('S'))
+        dset = f.create_dataset('valid_metadata', data=valid_meta.astype('S'))
         dset.attrs['columns'] = valid_clms
-        dset = f.create_dataset('train_metadata', data=train_meta.to_numpy(dtype=str).astype('S'))
+        dset = f.create_dataset('train_metadata', data=train_meta.astype('S'))
         dset.attrs['columns'] = train_clms
     
 
@@ -955,6 +955,7 @@ if __name__ == "__main__":
         build_training_set(debug=args.debug)
         print("Dataset Ends.")
         # python -u nenya_llc.py dataset --debug
+        # python -u nenya_llc.py dataset 
 
     
     # run the 'main_train()' function.
