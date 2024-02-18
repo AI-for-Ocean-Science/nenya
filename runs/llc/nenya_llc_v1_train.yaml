@@ -45,8 +45,8 @@ spec:
             pip install -e ".[dev]";
             cd runs/llc;
             aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp s3://llc/Nenya/PreProc/LLC_nenya_training.h5 ./;
-            python -u nenya_llc.py train --opt_path opts_llc.json;
-            aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp models s3://viirs/Nenya/models --recursive --force;
+            python -u nenya_llc.py train --opt_path opts_llc_v1.json;
+            aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp models s3://llc/Nenya/models --recursive --force;
         env:
           - name: "ENDPOINT_URL"
             value: "http://rook-ceph-rgw-nautiluss3.rook"
