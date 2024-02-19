@@ -54,7 +54,7 @@ spec:
             value: "rook-ceph-rgw-nautiluss3.rook"
         volumeMounts:
           - name: prp-s3-credentials
-            mountPath: "/root/.aws/credentials"
+            mountPath: "/home/jovyan/.aws/credentials"
             subPath: "credentials"
           - name: ephemeral
             mountPath: "/tmp"
