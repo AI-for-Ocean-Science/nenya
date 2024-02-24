@@ -1,10 +1,9 @@
-# Script to train a Nenya model on the 98% cloud free VIIRS data
-#  using v4 model
+# Script to train a Nenya model on LLC data
 # kubectl exec -it test-pod -- /bin/bash
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: xavier-nenya-viirs-v1-256-train
+  name: xavier-nenya-llc-v1-256-train
 spec:
   backoffLimit: 0
   template:
@@ -44,10 +43,10 @@ spec:
             git checkout pca_me; 
             git pull; 
             pip install -e ".[dev]";
-            cd runs/viirs;
-            aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp s3://viirs/PreProc/VIIRS_2013_98clear_192x192_preproc_viirs_std_train.h5 ./;
-            python -u nenya_viirs.py train --opt_path opts_viirs_v1.json;
-            aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp models s3://viirs/Nenya/models --recursive --force;
+            cd runs/llc;
+            aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp s3://llc/Nenya/PreProc/LLC_nenya_training.h5 ./;
+            python -u nenya_llc.py train --opt_path opts_llc_v1.json;
+            aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp models s3://llc/Nenya/models --recursive --force;
         env:
           - name: "ENDPOINT_URL"
             value: "http://rook-ceph-rgw-nautiluss3.rook"
