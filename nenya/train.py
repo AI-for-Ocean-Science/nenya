@@ -28,7 +28,7 @@ def main(opt_path: str, debug:bool=False, save_file:str=None):
         opt.epochs = 2
     option_preprocess(opt)
 
-    # Save opts                                    
+    # Save opts
     opt.save(os.path.join(opt.model_folder, 
                           os.path.basename(opt_path)))
     

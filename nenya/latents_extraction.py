@@ -1,4 +1,5 @@
-from __future__ import print_function
+""" Extract latents from a model """
+
 
 import time
 import os
@@ -10,11 +11,11 @@ from tqdm.auto import trange
 import torch
 import tqdm
 
-from ulmo.io import Params
 from ulmo.utils import id_collate
+from ulmo import io as ulmo_io
 
-from ulmo.nenya.train_util import option_preprocess
-from ulmo.nenya.train_util import modis_loader, set_model
+from nenya.train_util import option_preprocess
+from nenya.train_util import set_model
 
 from IPython import embed
 
@@ -62,6 +63,7 @@ def build_loader(data_file, dataset, batch_size=1, num_workers=1,
     """
     This function is used to create the data loader for the latents
     creating (evaluation) process.
+
     Args: 
         data_file: (str) path of data file.
         dataset: (str) key of the used data in data_file.
@@ -101,26 +103,55 @@ def calc_latent(model, image_tensor, using_gpu):
     return latents_numpy
 
 
-def model_latents_extract(opt, modis_data_file, modis_partition, 
-                          model_path, save_path, save_key,
+def prep(opt):
+    """
+    Prepare the environment for latent extraction.
+
+    Args:
+        opt (object): An object containing the options for the extraction.
+
+    Returns:
+        tuple: A tuple containing the model base name and a list of existing latent files.
+    """
+    # Grab the model from s3
+    model_file = os.path.join(opt.s3_outdir,
+        opt.model_folder, 'last.pth')
+    model_base = os.path.basename(model_file)
+    if not os.path.isfile(model_base):
+        print(f"Grabbing model: {model_file}")
+        ulmo_io.download_file_from_s3(model_base, model_file)
+    else:
+        print(f"Model was already downloaded: {model_base}")
+
+    # Grab existing for clobber
+    latents_path = os.path.join(opt.s3_outdir, opt.latents_folder)
+    latent_files = ulmo_io.list_of_bucket_files(latents_path)
+    existing_files = [os.path.basename(ifile) for ifile in latent_files]
+
+    # Return
+    return model_base, existing_files
+
+def model_latents_extract(opt, data_file, 
+                          model_path, 
                           remove_module=True, loader=None,
-                          allowed_indices=None):
+                          partitions=('train', 'valid'),
+                          allowed_indices=None,
+                          debug:bool=False):
     """
     This function is used to obtain the latents of input data.
+    And write them to disk
     
     Args:
         opt: (Parameters) parameters used to create the model.
-        modis_data_file: (str) path of modis_data_file.
-        modis_partition: (str) key of the h5py file [e.g. 'train', 'valid'].
+        data_file: (str) path of data_file.
         model_path: (string) path of the saved model file.
         save_path: (string or None) path for saving the latents.
-        save_key: (string or None) path for the key of the saved latents.
+        partitions: (list) list of keys in the h5py file [e.g. 'train', 'valid'].
         loader: (torch.utils.data.DataLoader, optional) Use this DataLoader, if provided
-        save_path: (str or None) path for saving the latents.
-        save_key: (str or None) path for the key of the saved latents.
+        allowed_indices: (np.ndarray) Set of images that can be grabbed
 
     Returns:
-        np.ndarray: latents_numpy
+        latent_dict: (dict) dictionary of latents for each partition.
     """
     using_gpu = torch.cuda.is_available()
     model, _ = set_model(opt, cuda_use=using_gpu)
@@ -138,30 +169,40 @@ def model_latents_extract(opt, modis_data_file, modis_partition,
         model.load_state_dict(model_dict['model'])
     print("Model loaded")
 
-    # TODO -- Get this right on the ssl_full branch-- 
     # Create Data Loader for evaluation
-    #batch_size_eval, num_workers_eval = opt.batch_size_eval, opt.num_workers_eval
     batch_size_eval, num_workers_eval = opt.batch_size_valid, opt.num_workers
 
-    # Data
-    if loader is None:
-        _, loader = build_loader(modis_data_file, modis_partition, 
-                                 batch_size_eval, num_workers_eval,
-                                 allowed_indices=allowed_indices)
 
-    print("Beginning to evaluate")
-    model.eval()
-    with torch.no_grad():
-        latents_numpy = [calc_latent(
-            model, data[0], using_gpu) for data in tqdm.tqdm(
-                loader, total=len(loader), unit='batch', 
-                desc='Computing latents')]
-    
-    # Save
-    if save_path is not None:
-        with h5py.File(save_path, 'w') as file:
-            file.create_dataset(save_key, data=np.concatenate(latents_numpy))
-        print("Wrote: {}".format(save_path))
+    # Loop on partitions
+    latent_dict = {}
+    for partition in partitions:
+        # parition exists?
+        with h5py.File(data_file, 'r') as f:
+            if partition in f.keys():
+                print(f"Working on: {partition}")
+            else:
+                print(f"Partition {partition} not found in {data_file}")
+                continue 
+        # Data
+        _, loader = build_loader(data_file, partition, 
+                                    batch_size_eval, num_workers_eval,
+                                    allowed_indices=allowed_indices)
+        # Debug?
+        if debug:
+            total = 2
+        else:
+            total = len(loader)
 
-    return np.concatenate(latents_numpy)
+        print("Beginning to evaluate")
+        model.eval()
+        with torch.no_grad():
+            latents_numpy = [calc_latent(
+                model, data[0], using_gpu) for data in tqdm.tqdm(
+                    loader, total=total, unit='batch', 
+                    desc='Computing latents')]
+
+        latent_dict[partition] = np.concatenate(latents_numpy)
+
+    #return np.concatenate(latents_numpy)
+    return latent_dict
     

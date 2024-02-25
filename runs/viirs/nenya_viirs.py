@@ -1,14 +1,11 @@
 """ Nenya Analayis of VIIRS -- 
 """
-from operator import mod
 import os
 from typing import IO
 import numpy as np
 
-import time
 import h5py
 import numpy as np
-from tqdm.auto import trange
 import argparse
 
 import pandas
@@ -19,7 +16,12 @@ from tqdm import tqdm
 from matplotlib import pyplot as plt
 import seaborn as sns
 
+from ulmo import io as ulmo_io
+
 from nenya import train as nenya_train
+from nenya import latents_extraction
+from nenya import io as nenya_io
+from nenya.train_util import option_preprocess
 
 from IPython import embed
 
@@ -36,11 +38,11 @@ def train(opt_path:str, debug:bool=False, save_file:str=None):
     nenya_train.main(opt_path, debug=debug, save_file=save_file)
         
 
-def main_ssl_evaluate(opt_path, preproc='_std', debug=False, 
+def evaluate(opt_path, preproc='_std', debug=False, 
                   clobber=False):
     """
-    This function is used to obtain the SSL latents of the trained models
-    for all of MODIS
+    This function is used to obtain the latents of the trained model
+    for all of VIIRS
 
     Args:
         opt_path: (str) option file path.
@@ -51,36 +53,14 @@ def main_ssl_evaluate(opt_path, preproc='_std', debug=False,
             If true, over-write any existing file
     """
     # Parse the model
-    opt = option_preprocess(ulmo_io.Params(opt_path))
-    model_file = os.path.join(opt.s3_outdir,
-        opt.model_folder, 'last.pth')
+    opt = nenya_io.Params(opt_path)
+    option_preprocess(opt)
 
-    # Grab the model
-    print(f"Grabbing model: {model_file}")
-    model_base = os.path.basename(model_file)
-    ulmo_io.download_file_from_s3(model_base, model_file)
-    
-    # Data files
-    all_pp_files = ulmo_io.list_of_bucket_files('modis-l2', 'PreProc')
-    pp_files = []
-    for ifile in all_pp_files:
-        if preproc in ifile:
-            pp_files.append(ifile)
+    # Prep
+    model_base, existing_files = latents_extraction.prep(opt)
 
-    # Loop on files
-    if debug:
-        pp_files = pp_files[0:1]
-
-    latents_path = os.path.join(opt.s3_outdir, opt.latents_folder)
-    # Grab existing for clobber
-    if not clobber:
-        parse_s3 = ulmo_io.urlparse(opt.s3_outdir)
-        existing_files = [os.path.basename(ifile) for ifile in ulmo_io.list_of_bucket_files('modis-l2',
-                                                      prefix=os.path.join(parse_s3.path[1:],
-                                                                        opt.latents_folder))
-                          ]
-    else:
-        existing_files = []
+    # Data afiles
+    pp_files = ['s3://viirs/PreProc/VIIRS_2013_98clear_192x192_preproc_viirs_std_train.h5']
 
     for ifile in pp_files:
         print(f"Working on {ifile}")
@@ -91,13 +71,15 @@ def main_ssl_evaluate(opt_path, preproc='_std', debug=False,
         if latents_file in existing_files and not clobber:
             print(f"Not clobbering {latents_file} in s3")
             continue
-        s3_file = os.path.join(latents_path, latents_file) 
+        s3_file = os.path.join(opt.latents_folder, latents_file) 
 
         # Download
-        s3_preproc_file = f's3://modis-l2/PreProc/{data_file}'
         if not os.path.isfile(data_file):
-            ulmo_io.download_file_from_s3(data_file, s3_preproc_file)
+            ulmo_io.download_file_from_s3(data_file, s3_file)
+        else:
+            print(f"Data file already downloaded: {data_file}")
 
+        '''
         # Ready to write
         latents_hf = h5py.File(latents_file, 'w')
 
@@ -124,6 +106,16 @@ def main_ssl_evaluate(opt_path, preproc='_std', debug=False,
         print("Extraction of Latents of valid set is done.")
 
         # Close
+        latents_hf.close()
+        '''
+
+        # Extract
+        latent_dict = latents_extraction.model_latents_extract(
+            opt, data_file, model_base, debug=debug)
+        # Save
+        latents_hf = h5py.File(latents_file, 'w')
+        for partition in latent_dict.keys():
+            latents_hf.create_dataset(partition, data=latent_dict[partition])
         latents_hf.close()
 
         # Push to s3
@@ -898,12 +890,19 @@ if __name__ == "__main__":
     # get the argument of training.
     args = parse_option()
     
-    # run the 'main_train()' function.
+    # Train the model
     if args.func_flag == 'train':
         print("Training Starts.")
         train(args.opt_path, debug=args.debug)
         print("Training Ends.")
         # python -u nenya_viirs.py train --opt_path opts_viirs_v1.json 
+
+    # Evaluate
+    if args.func_flag == 'evaluate':
+        print("Evaluation Starts.")
+        evaluate(args.opt_path, debug=args.debug)
+        print("Evaluation Ends.")
+        # python -u nenya_viirs.py evaluate --opt_path opts_viirs_v1.json 
 
     # python ssl_modis_v4.py --func_flag extract_new --ncpu 20 --local --years 2020 --debug
     if args.func_flag == 'extract_new':
