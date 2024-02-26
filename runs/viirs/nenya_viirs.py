@@ -75,7 +75,7 @@ def evaluate(opt_path, preproc='_std', debug=False,
 
         # Download
         if not os.path.isfile(data_file):
-            ulmo_io.download_file_from_s3(data_file, s3_file)
+            ulmo_io.download_file_from_s3(data_file, ifile)
         else:
             print(f"Data file already downloaded: {data_file}")
 

@@ -39,7 +39,12 @@ spec:
         command: ["/bin/bash", "-c"]
             #command: ["sh", "-c", "sleep infinity"]
         args:
-          - cd nenya; 
+          - cd ulmo;
+            git fetch;
+            git pull; 
+            pip install -e ".[dev]";
+            cd ..;
+            cd nenya; 
             git fetch;
             git checkout pca_me; 
             git pull; 
