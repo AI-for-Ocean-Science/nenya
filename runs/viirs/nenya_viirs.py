@@ -71,7 +71,8 @@ def evaluate(opt_path, preproc='_std', debug=False,
         if latents_file in existing_files and not clobber:
             print(f"Not clobbering {latents_file} in s3")
             continue
-        s3_file = os.path.join(opt.latents_folder, latents_file) 
+
+        s3_file = os.path.join(opt.s3_outdir, opt.latents_folder, latents_file) 
 
         # Download
         if not os.path.isfile(data_file):
