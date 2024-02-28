@@ -29,10 +29,16 @@ from IPython import embed
 
 def fig_pca(outfile:str='fig_pca_variance.png'): 
 
-    # Load PCA
-    d = np.load('../Analysis/pca_latents_MODIS_SST.npz')
+    # Load PCAs
+    ds = []
+    datasets = ['MODIS_SST', 'VIIRS_SST']
+    #datasets = ['MODIS_SST']
+    for dataset in datasets:
+        d = np.load(f'../Analysis/pca_latents_{dataset}.npz')
+        ds.append(d)
 
-    # Fit?
+    # Fit
+    d = ds[0]
     xs = np.arange(len(d['explained_variance'])) + 1
     exponent = -0.5
     ys = d['explained_variance'][10] * (xs/xs[10])**(exponent) 
@@ -42,8 +48,9 @@ def fig_pca(outfile:str='fig_pca_variance.png'):
 
 
     ax = plt.subplot(gs[0])
-    ax.plot(xs, d['explained_variance'], 'ob',
-            label='Explained Variance')
+    for ss, d in enumerate(ds):
+        ax.plot(xs, d['explained_variance'], 'o', label=datasets[ss])
+        #ax.plot(xs, d['explained_variance'], 'o', label='Explained Variance')
     ax.plot(xs, ys, '--', color='g', label=f'Power law: {exponent}')
     # Label
     ax.set_ylabel('Variance explained per mode')
@@ -59,13 +66,13 @@ def fig_pca(outfile:str='fig_pca_variance.png'):
     # Horizontal line at 0
     #ax.axhline(0., color='k', ls='--')
 
-    loc = 'lower left'
-    ax.legend(fontsize=17, loc=loc)
+    #loc = 'upper right' if ss == 1 else 'upper left'
+    ax.legend(fontsize=15)#, loc=loc)
 
     # Turn on grid
     ax.grid(True, which='both', ls='--', lw=0.5)
 
-    plotting.set_fontsize(ax, 20)
+    plotting.set_fontsize(ax, 18)
 
     plt.tight_layout()#pad=0.0, h_pad=0.0, w_pad=0.3)
     plt.savefig(outfile, dpi=300)
@@ -81,21 +88,6 @@ def main(flg):
     if flg & (2**19):
         fig_pca()
 
-    # Example spectra
-    if flg & (2**20):
-        fig_emulator_rmse('L23', 3, [512, 512, 512, 256])
-        #fig_emulator_rmse(['L23_NMF', 'L23_PCA'], [3, 3])
-
-    # L23 IHOP performance vs. perc error
-    if flg & (2**21):
-        fig_mcmc_fit()#use_quick=True)
-
-    # L23 IHOP performance vs. perc error
-    if flg & (2**22):
-        #fig_rmse_vs_sig()
-        fig_rmse_vs_sig(decomp='nmf')
-
-
 # Command line execution
 if __name__ == '__main__':
     import sys
@@ -104,14 +96,6 @@ if __name__ == '__main__':
         flg = 0
 
         flg += 2 ** 19  # PCA veriance
-        #flg += 2 ** 20  # RMSE of emulators
-        #flg += 2 ** 21  # Single MCMC fit (example)
-        #flg += 2 ** 22  # RMSE of L23 fits
-
-        #flg += 2 ** 2  # 4 -- Indiv
-        #flg += 2 ** 3  # 8 -- Coeff
-        #flg += 2 ** 4  # 16 -- Fit CDOM
-        #flg += 2 ** 5  # 32 -- Explained variance
         
     else:
         flg = sys.argv[1]
