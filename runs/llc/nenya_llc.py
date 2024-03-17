@@ -163,5 +163,14 @@ if __name__ == "__main__":
         # python -u nenya_llc.py dataset 
 
     
-    # Train python -u nenya_llc.py evaluate --opt_path opts_llc_v1.json 
+    # Train 
+    if args.func_flag == 'train':
+        print("Training Starts.")
+        train(args.opt_path, debug=args.debug)
+        print("Training Ends.")
+        # python -u nenya_llc.py train --opt_path opts_llc_v1.json 
+
+    # Evaluate
+    if args.func_flag == 'evaluate':
+        evaluate(args.opt_path, debug=args.debug)
         # python -u nenya_llc.py evaluate --opt_path opts_llc_v1.json 
