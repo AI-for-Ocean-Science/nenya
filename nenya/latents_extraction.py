@@ -16,6 +16,7 @@ from ulmo import io as ulmo_io
 
 from nenya.train_util import option_preprocess
 from nenya.train_util import set_model
+from nenya import io as nenya_io
 
 from IPython import embed
 
@@ -56,6 +57,53 @@ class HDF5RGBDataset(torch.utils.data.Dataset):
         metadata = None
         return data, metadata
 
+
+def main(opt_path:str, pp_files:list, clobber:bool=False, debug:bool=False):
+    # Parse the model
+    opt = nenya_io.Params(opt_path)
+    option_preprocess(opt)
+
+    # Prep
+    model_base, existing_files = prep(opt)
+
+    # Data afiles
+    #pp_files = ['s3://viirs/PreProc/VIIRS_2013_98clear_192x192_preproc_viirs_std_train.h5']
+
+    for ifile in pp_files:
+        print(f"Working on {ifile}")
+        data_file = os.path.basename(ifile)
+
+        # Setup
+        latents_file = data_file.replace('_preproc', '_latents')
+        if latents_file in existing_files and not clobber:
+            print(f"Not clobbering {latents_file} in s3")
+            continue
+
+        s3_file = os.path.join(opt.s3_outdir, opt.latents_folder, latents_file) 
+
+        # Download
+        if not os.path.isfile(data_file):
+            ulmo_io.download_file_from_s3(data_file, ifile)
+        else:
+            print(f"Data file already downloaded: {data_file}")
+
+        # Extract
+        latent_dict = model_latents_extract(
+            opt, data_file, model_base, debug=debug)
+        # Save
+        latents_hf = h5py.File(latents_file, 'w')
+        for partition in latent_dict.keys():
+            latents_hf.create_dataset(partition, data=latent_dict[partition])
+        latents_hf.close()
+
+        # Push to s3
+        print("Uploading to s3..")
+        ulmo_io.upload_file_to_s3(latents_file, s3_file)
+
+        # Remove data file
+        if not debug:
+            os.remove(data_file)
+            print(f'{data_file} removed')
 
 def build_loader(data_file, dataset, batch_size=1, num_workers=1,
                  allowed_indices=None):
