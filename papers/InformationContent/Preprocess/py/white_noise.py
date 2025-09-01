@@ -26,8 +26,8 @@ def main(ntrain=150000, nvalid=50000, seed=1234, size=64):
 
     odict = info_defs.grab_paths(dataset)
     with h5py.File(odict['preproc_file'], 'w') as f:
-        f.create_dataset('train', data=all_images[:ntrain])
-        f.create_dataset('valid', data=all_images[ntrain:ntrain+nvalid])
+        f.create_dataset('train', data=all_images[:ntrain], dtype=np.float32, compression='gzip')
+        f.create_dataset('valid', data=all_images[ntrain:ntrain+nvalid], dtype=np.float32, compression='gzip')
         
         # Add metadata
         f.attrs['dataset'] = dataset
