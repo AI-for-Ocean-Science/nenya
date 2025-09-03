@@ -1,0 +1,9 @@
+{
+    "field_size": 64,
+    "nrepeat": 1,
+    "downscale": false,
+    "inpaint": false,
+    "fixed_km": 144.0,
+    "median": false,
+    "only_inpaint": false
+}
