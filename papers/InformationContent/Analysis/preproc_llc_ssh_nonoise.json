@@ -4,6 +4,7 @@
     "downscale": false,
     "inpaint": false,
     "fixed_km": 144.0,
+    "resize": true,
     "median": false,
     "only_inpaint": false
 }

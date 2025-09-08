@@ -50,7 +50,10 @@ def ex_ssh(n_train:int=150000, n_valid:int=50000):
     # Instantiate the AIOS_DataSet
     aios_ds = load_dataset('LLC4320_SSH')
 
-    tbl_file = os.path.join(local_tables_path, 'LLC_uniform_SSH.parquet')
+    tbl_file = os.path.join(local_tables_path, 
+                            'LLC_uniform_SSH.parquet')
+    out_file = os.path.join(local_preproc_path,
+                            'LLC_uniform_SSH.h5')
 
     if not os.path.exists(tbl_file):
         # Generate a table
@@ -72,15 +75,15 @@ def ex_ssh(n_train:int=150000, n_valid:int=50000):
         # Load
         llc_table = tbl_io.load_main_table(tbl_file)
 
-    # Extract time
-
-    
     # Load options
     pp_dict = pp_io.load_options('preproc_llc_ssh_nonoise.json')
 
     # Run me
     llc_table = ex_ogcm.extract_llc(
-        llc_table, aios_ds, pp_dict, n_cores=15, debug=True)
+        llc_table, aios_ds, pp_dict, out_file, n_cores=15, debug=True)
+
+    # Write new table (there is some loss during extraction)
+    tbl_io.write_main_table(llc_table, tbl_file)
 
 
 # Command line execution
