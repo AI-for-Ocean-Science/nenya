@@ -44,7 +44,7 @@ def ex_noise():
         map_fn, n_cores=15)
 
 # Extract SSH data
-def ex_ssh(n_train:int=150000, n_valid:int=50000):
+def ex_ssh(n_train:int=170000, n_valid:int=60000):
     """ Extract SSH data from LLC and prepare for training """
 
     # Instantiate the AIOS_DataSet
