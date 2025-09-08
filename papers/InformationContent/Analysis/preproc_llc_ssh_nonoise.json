@@ -1,6 +1,7 @@
 {
     "field_size": 64,
     "nrepeat": 1,
+    "resize": true,
     "downscale": false,
     "inpaint": false,
     "fixed_km": 144.0,
