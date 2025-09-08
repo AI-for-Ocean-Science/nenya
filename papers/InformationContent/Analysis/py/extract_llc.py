@@ -44,7 +44,7 @@ def ex_noise():
         map_fn, n_cores=15)
 
 # Extract SSH data
-def ex_ssh(n_train:int=150000, n_valid:int=50000):
+def ex_ssh(n_train:int=170000, n_valid:int=60000):
     """ Extract SSH data from LLC and prepare for training """
 
     # Instantiate the AIOS_DataSet
@@ -73,15 +73,15 @@ def ex_ssh(n_train:int=150000, n_valid:int=50000):
         # Load
         llc_table = tbl_io.load_main_table(tbl_file)
 
-    # Extract time
-
-    
     # Load options
     pp_dict = pp_io.load_options('preproc_llc_ssh_nonoise.json')
 
     # Run me
     llc_table = ex_ogcm.extract_llc(
         llc_table, aios_ds, pp_dict, out_file, n_cores=15, debug=True)
+
+    # Write new table (there is some loss during extraction)
+    tbl_io.write_main_table(llc_table, tbl_file)
 
 
 # Command line execution
