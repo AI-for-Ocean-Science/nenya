@@ -17,6 +17,11 @@ import info_defs
 
 pdict = info_defs.grab_paths('LLC_SST')
 
+# Hard code as needed
+
+if 'OS_OGCM' not in os.environ.keys():
+    os.environ['OS_OGCM'] = '/orcd/data/abodner/002/abigail/swot/nenya_data'
+
 local_llc_path = os.path.join(os.getenv('OS_OGCM'), 'LLC')
 local_tables_path = os.path.join(local_llc_path, 'Info', 'Tables')
 local_orig_preproc_path = os.path.join(local_llc_path, 'Nenya', 'PreProc')
