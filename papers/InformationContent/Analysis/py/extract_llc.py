@@ -78,7 +78,8 @@ def ex_ssh(n_train:int=170000, n_valid:int=60000):
 
     # Run me
     llc_table = ex_ogcm.extract_llc(
-        llc_table, aios_ds, pp_dict, out_file, n_cores=15, debug=True)
+        llc_table, aios_ds, pp_dict, out_file, 
+        n_cores=15, debug=True, zarr_path='/orcd/data/abodner/003/LLC4320/LLC4320')
 
     # Write new table (there is some loss during extraction)
     tbl_io.write_main_table(llc_table, tbl_file)
