@@ -20,6 +20,8 @@ def pca_latents(dataset:str):
         key = None
     elif dataset == 'VIIRS_SST_2km':
         key = None
+    elif dataset == 'VIIRS_SST_sub':
+        key = None
     elif 'LLC_SST' in dataset:
         key = None
     elif dataset == 'MNIST':
@@ -27,6 +29,8 @@ def pca_latents(dataset:str):
     elif dataset == 'SWOT_L3':
         key = None
     elif dataset == 'ImageNet':
+        key = None
+    elif dataset == 'WNoise':
         key = None
     else:
         raise IOError("Bad dataset: {}".format(dataset))
@@ -42,18 +46,18 @@ if __name__ == '__main__':
     #pca_latents('MODIS_SST')
 
     #  VIIRS SST
-    pca_latents('VIIRS_SST')
+    #pca_latents('VIIRS_SST')
     #pca_latents('VIIRS_SST_2km')
+    #pca_latents('VIIRS_SST_sub')
 
     #  LLC SST
     #pca_latents('LLC_SST_nonoise')
     #pca_latents('LLC_SST_noise')
 
-    # MNIST
+    # Natural
     #pca_latents('MNIST')
-
-    # ImageNet
     #pca_latents('ImageNet')
+    pca_latents('WNoise')
 
     # SWOT L3
     #pca_latents('SWOT_L3')

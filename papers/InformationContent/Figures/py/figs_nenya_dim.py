@@ -79,8 +79,11 @@ def fig_pca(outfile:str='fig_pca_variance.png',
 
     # Load PCAs
     if datasets is None:
-        datasets = ['MODIS_SST', #'MODIS_SST_2km_sub',
+        datasets = ['MODIS_SST', 
+                    'MODIS_SST_2km',
                 'VIIRS_SST', 
+                'VIIRS_SST_2km', 
+                'VIIRS_SST_sub', 
                 'LLC_SST_nonoise', 
                 'SWOT_L3', 
                 #'SWOT_SSR', 
@@ -345,7 +348,7 @@ def main(flg):
 
     # PCA variaince
     if flg == 2:
-        #fig_pca(show_cum_point=0.99)
+        fig_pca(show_cum_point=0.99)
         fig_pca(outfile='fig_pca_noise.png',
             datasets=['MODIS_SST', 'MODIS_SST_2km', 'LLC_SST_nonoise', 'LLC_SST_noise'],
             show_cum_point=0.99)
