@@ -137,5 +137,8 @@ def grab_paths(dataset:str):
     else:
         raise ValueError(f"Dataset {dataset} not supported for Nenya.")
 
+    # Add pca/ to pca_file
+    out_dict['pca_file'] = os.path.join('pca', out_dict['pca_file'])
+
     # Return
     return out_dict
