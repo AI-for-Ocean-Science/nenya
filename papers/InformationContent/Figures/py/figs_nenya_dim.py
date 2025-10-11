@@ -45,7 +45,10 @@ cdict['MNIST'] = '#7f7f7f'  # Gray
 cdict['SWOT_L3'] = '#d62728'  # Red
 # Black
 cdict['ImageNet'] = '#000000'  # Black
+# Yellow
+cdict['WNoise'] = '#bcbd22'  # Yellow
 
+'''
 def dataset_path(dataset:str):
     if dataset == 'SWOT':
         path = os.path.join(os.getenv('SWOT_PNGs'),
@@ -66,6 +69,14 @@ def dataset_path(dataset:str):
     else:
         raise ValueError(f"Dataset {dataset} not supported for learning curve plotting.")
     return path
+'''
+
+def grab_clr(dataset:str):
+    if 'SST' in dataset:
+        clr = cdict[dataset.split('_')[0]]
+    else:
+        clr = cdict[dataset]
+    return clr
 
 def fig_pca(outfile:str='fig_pca_variance.png',
             datasets:list=None, cumulative:bool=False,
@@ -87,6 +98,7 @@ def fig_pca(outfile:str='fig_pca_variance.png',
                 'LLC_SST_nonoise', 
                 'SWOT_L3', 
                 #'SWOT_SSR', 
+                'WNoise',
                 'MNIST',
                 'ImageNet',
                 ]
@@ -94,12 +106,9 @@ def fig_pca(outfile:str='fig_pca_variance.png',
     clrs = []
     ds = []
     for dataset in datasets:
-        if 'SST' in dataset:
-            clr = cdict[dataset.split('_')[0]]
-        else:
-            clr = cdict[dataset]
+        clr = grab_clr(dataset)
         
-        pca_file = f'../Analysis/pca_latents_{dataset}.npz'
+        pca_file = f'../Analysis/pca/pca_latents_{dataset}.npz'
         print(f"Loading PCA file: {pca_file}")
         d = np.load(pca_file)
         ds.append(d)
@@ -176,11 +185,11 @@ def fig_pca(outfile:str='fig_pca_variance.png',
 
 
 
-def fig_learning_curves(outfile:str=f'fig_learning_curves.png'):
+def fig_learning_curves(outfile:str='fig_learning_curves.png'):
     """Plot the learning curves for SWOT, VIIRS, MODIS and MNIST datasets."""
     
     # Define the datasets
-    datasets = ['VIIRS', 'MODIS', 'MNIST', 'SWOT_L3']
+    datasets = ['VIIRS_SST', 'MODIS_SST', 'MNIST', 'SWOT_L3', 'WNoise']
     
     # Create a figure
     fig = plt.figure(figsize=(10, 10))
@@ -189,7 +198,7 @@ def fig_learning_curves(outfile:str=f'fig_learning_curves.png'):
 
     for ss, dataset in enumerate(datasets):
         print(f'Processing dataset: {dataset}')
-        clr = cdict[dataset]
+        clr = grab_clr(dataset)
         #path = dataset_path(dataset)
         pdict = info_defs.grab_paths(dataset)
         opt = params.Params('../Analysis/'+pdict['opts_file'])
