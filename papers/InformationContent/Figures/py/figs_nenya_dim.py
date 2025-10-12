@@ -82,7 +82,32 @@ def fig_pca(outfile:str='fig_pca_variance.png',
             datasets:list=None, cumulative:bool=False,
             frac_remain:bool=False,
             show_cum_point:float=None,
+            xmnx:tuple=None,
             exponent:float=-0.5): 
+    """
+    Generate and save a PCA variance explained plot.
+    This function creates a plot to visualize the variance explained by PCA components
+    for a given set of datasets. It supports cumulative variance, fractional remaining
+    variance, and power-law fitting.
+    Args:
+        outfile (str): The output file path for the saved plot. Defaults to 'fig_pca_variance.png'.
+        datasets (list): A list of dataset names to include in the plot. If None, a default
+            list of datasets is used. Defaults to None.
+        cumulative (bool): If True, plot the cumulative variance explained. Defaults to False.
+        frac_remain (bool): If True, plot the fractional remaining variance. Defaults to False.
+        show_cum_point (float): If provided, marks the point on the plot where the cumulative
+            variance reaches this value. Defaults to None.
+        xmnx (tuple): Sets xlim of the x-axis if provided. Defaults to None.
+        exponent (float): The exponent for the power-law fit line. Defaults to -0.5.
+    Returns:
+        None: The function saves the plot to the specified output file.
+    Notes:
+        - The function expects PCA data files to be located in the '../Analysis/pca/' directory
+            with filenames formatted as 'pca_latents_<dataset>.npz'.
+        - The datasets are color-coded, and different line styles are used to distinguish
+            between dataset types.
+        - The plot is saved in log-log scale with grid lines enabled.
+    """
     # Cumulative?
     if cumulative:
         if 'variance' in outfile:
@@ -176,6 +201,10 @@ def fig_pca(outfile:str='fig_pca_variance.png',
 
     # Turn on grid
     ax.grid(True, which='both', ls='--', lw=0.5)
+
+    # xlim?
+    if xmnx is not None:
+        ax.set_xlim(xmnx)
 
     rsp_utils.set_fontsize(ax, 18)
 
@@ -357,6 +386,8 @@ def main(flg):
 
     # PCA variaince
     if flg == 2:
+        fig_pca(show_cum_point=0.99, outfile='fig_pca_variance_zoomin.png',
+                xmnx=(30, 300))
         fig_pca(show_cum_point=0.99)
         fig_pca(outfile='fig_pca_noise.png',
             datasets=['MODIS_SST', 'MODIS_SST_2km', 'LLC_SST_nonoise', 'LLC_SST_noise'],
