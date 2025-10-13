@@ -323,8 +323,8 @@ def fig_eigenimages(dataset:str, cmap:str, Nimages:int=9,
     plt.savefig(outfile, dpi=300)
     print(f"Saved: {outfile}")
 
-def fig_eigenmatches(dataset:str, cmap:str, Nimages:int=9, 
-                     partition:str='train',
+def fig_eigenmatches(dataset:str, cmap:str, Nmodes:int=9, 
+                     partition:str='train', last_ones:bool=False,
                     outroot:str='fig_eigenmatches'):
 
     outfile = f'{outroot}_{dataset}.png'
@@ -344,7 +344,7 @@ def fig_eigenmatches(dataset:str, cmap:str, Nimages:int=9,
     fig = plt.figure(figsize=(6,6))
     gs = gridspec.GridSpec(3,3)
 
-    for ss in range(Nimages):
+    for ss in range(Nmodes):
         eigenmode = d['M'][ss, :]
         # Closest
         query_vector = eigenmode.reshape(1, -1)
@@ -365,7 +365,7 @@ def fig_eigenmatches(dataset:str, cmap:str, Nimages:int=9,
                      yticklabels=[], cmap=cmap, cbar=False) 
                      #cbar_kws={'label': clbl})# 'fontsize': 20})
         # Title
-        title = f'Eigenmatch {ss+1} sim={similarities[0]:.2f}'
+        title = f'Eigenmatch: mode={ss+1} sim={similarities[0]:.2f}'
         ax.set_title(title, fontsize=12)
 
     #rsp_utils.set_fontsize(ax, 18)
@@ -399,7 +399,8 @@ def main(flg):
 
     # Eigenmodes
     if flg == 4:
-        fig_eigenmatches('MODIS_SST', 'jet')
+        #fig_eigenmatches('MODIS_SST', 'jet')
+        fig_eigenmatches('MODIS_SST', 'jet', last_few=True)
 
 
     # SWOT learning curve

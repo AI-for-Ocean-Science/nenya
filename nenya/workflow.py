@@ -1,9 +1,9 @@
 """ utilities for nenya analysis
 """
 import os
-from importlib import reload
 import numpy as np
 import h5py
+from sklearn.metrics.pairwise import cosine_similarity
 
 
 from wrangler.plotting import cutout
@@ -81,6 +81,36 @@ def train(opts_file:str, load_epoch:int=None, debug:bool=False):
     """
     # Train the model
     train_main(opts_file, debug=debug, load_epoch=load_epoch)
+
+def find_eigenmatches(pca_file:str, latents_file:str, nmodes:int,
+                     partition:str='train', from_mode:int=0):
+
+    # Load the PCA model
+    d = np.load(pca_file)
+
+    # Grab the latents
+    with h5py.File(latents_file, 'r') as f:
+        latents = f[partition][:]
+
+    indices, sims = [], []
+    for tt in range(nmodes):
+        # Increment
+        ss = from_mode + tt
+        #
+        eigenmode = d['M'][ss, :]
+        # Closest
+        query_vector = eigenmode.reshape(1, -1)
+        similarities = cosine_similarity(query_vector, latents)[0]
+        # Sort
+        sorted_indices = np.argsort(-similarities)
+        similarities = similarities[sorted_indices]
+        # Save
+        indices.append(sorted_indices[0])
+        sims.append(similarities[0])
+
+    # Return
+    return indices, sims
+
 
 def find_eigenmodes(opt_path:str, pca_file:str, image_shape:tuple, output_file:str, 
                     Neigenmodes:int=10, use_gpu:bool=False, clamp_value:float=None, 

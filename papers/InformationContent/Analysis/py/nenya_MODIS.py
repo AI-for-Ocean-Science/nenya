@@ -4,7 +4,6 @@ from importlib import reload
 import os
 
 
-from nenya import latents_extraction
 from nenya import workflow
 import info_defs
 
