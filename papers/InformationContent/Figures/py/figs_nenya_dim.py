@@ -214,11 +214,13 @@ def fig_pca(outfile:str='fig_pca_variance.png',
 
 
 
-def fig_learning_curves(outfile:str='fig_learning_curves.png'):
+def fig_learning_curves(outfile:str='fig_learning_curves.png',
+                        show_train:bool=False):
     """Plot the learning curves for SWOT, VIIRS, MODIS and MNIST datasets."""
     
     # Define the datasets
-    datasets = ['VIIRS_SST', 'MODIS_SST', 'MNIST', 'SWOT_L3', 'WNoise']
+    datasets = ['VIIRS_SST', 'MODIS_SST', 'MNIST', 'SWOT_L3', 
+                'WNoise', 'ImageNet']
     
     # Create a figure
     fig = plt.figure(figsize=(10, 10))
@@ -230,7 +232,7 @@ def fig_learning_curves(outfile:str='fig_learning_curves.png'):
         clr = grab_clr(dataset)
         #path = dataset_path(dataset)
         pdict = info_defs.grab_paths(dataset)
-        opt = params.Params('../Analysis/'+pdict['opts_file'])
+        opt = params.Params('../Analysis/opts/'+pdict['opts_file'])
         params.option_preprocess(opt)
         #embed(header=f"Learning curves for {dataset}")
         losses_train, losses_valid = nenya_io.losses_filenames(opt)
@@ -249,19 +251,20 @@ def fig_learning_curves(outfile:str='fig_learning_curves.png'):
             lbl0 = f'{dataset} validation'
             lbl1 = f'{dataset} training'
         else:
-            lbl0 = None
-            lbl1 = f'{dataset}'
-        ax.plot(np.arange(loss_valid.size)+1, loss_valid, label=lbl0, lw=3, color=clr, ls='--')
-        ax.plot(np.arange(loss_train.size)+1, loss_train, label=lbl1, lw=3, color=clr)
+            lbl0 = f'{dataset} validation'
+            lbl1 = None
+        ax.plot(np.arange(loss_valid.size)+1, loss_valid, label=lbl0, lw=3, color=clr)
+        if show_train:
+            ax.plot(np.arange(loss_train.size)+1, loss_train, label=lbl1, lw=3, color=clr, ls='--')
 
         
     ax.set_xlabel('Epochs')
-    ax.set_ylabel('Loss (log scale)')
+    ax.set_ylabel('Loss')
     ax.set_yscale('log')
 
     ax.legend(fontsize=15, loc='upper right')
 
-    rsp_utils.set_fontsize(ax, 21.)
+    rsp_utils.set_fontsize(ax, 24.)
     
     plt.tight_layout()
     plt.savefig(outfile, dpi=300)
