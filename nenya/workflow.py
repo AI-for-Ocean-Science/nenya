@@ -84,6 +84,27 @@ def train(opts_file:str, load_epoch:int=None, debug:bool=False):
 
 def find_eigenmatches(pca_file:str, latents_file:str, nmodes:int,
                      partition:str='train', from_mode:int=0):
+    """
+    Find the closest latent vectors to the eigenmodes of a PCA model.
+
+    This function loads a PCA model and a set of latent vectors, and for a specified
+    number of modes, it computes the most similar latent vector to each eigenmode
+    using cosine similarity.
+
+    Args:
+        pca_file (str): Path to the PCA model file (in `.npz` format).
+        latents_file (str): Path to the file containing latent vectors (in `.h5` format).
+        nmodes (int): Number of eigenmodes to process.
+        partition (str, optional): Dataset partition to use from the latent file 
+            (e.g., 'train', 'test'). Defaults to 'train'.
+        from_mode (int, optional): Starting mode index for processing eigenmodes. 
+            Defaults to 0.
+
+    Returns:
+        Tuple[List[int], List[float]]: A tuple containing:
+            - indices (List[int]): Indices of the closest latent vectors for each eigenmode.
+            - sims (List[float]): Cosine similarity scores of the closest latent vectors.
+    """
 
     # Load the PCA model
     d = np.load(pca_file)
@@ -112,25 +133,37 @@ def find_eigenmatches(pca_file:str, latents_file:str, nmodes:int,
     return indices, sims
 
 
-def find_eigenmodes(opt_path:str, pca_file:str, image_shape:tuple, output_file:str, 
-                    Neigenmodes:int=10, use_gpu:bool=False, clamp_value:float=None, 
-                    local_model_path:str=None, base_model_name:str='last.pth',
-                    num_iterations:int=1000,
-                    tv_weight:float=0.0, show:bool=False,
-                    debug:bool=False):
+def find_eigenmodes(opt_path:str, pca_file:str, image_shape:tuple, 
+                    output_file:str, Neigenmodes:int=10, use_gpu:bool=False, 
+                    clamp_value:float=None, local_model_path:str=None, 
+                    base_model_name:str='last.pth', num_iterations:int=1000, 
+                    tv_weight:float=0.0, show:bool=False, debug:bool=False):
     """
-    Find and visualize the specified eigenmode of a model.
+    Generate and save eigenmodes using a pre-trained model and PCA data.
 
     Args:
-        model_file (str): Path to the model file.
+        opt_path (str): Path to the configuration file for the model.
         pca_file (str): Path to the PCA file containing eigenmodes.
-        eigenmode (int): Index of the eigenmode to visualize. Defaults to 0.
-        output_file (str): Path to save the output visualization.
-        n_samples (int, optional): Number of samples to use for visualization. Defaults to 1000.
-        debug (bool, optional): Flag to enable debug mode. Defaults to False.
+        image_shape (tuple): Shape of the output images (height, width).
+        output_file (str): Path to save the generated eigenmodes and similarities.
+        Neigenmodes (int, optional): Number of eigenmodes to generate. Defaults to 10.
+        use_gpu (bool, optional): Whether to use GPU for computation. Defaults to False.
+        clamp_value (float, optional): Value to clamp the generated images. Defaults to None.
+        local_model_path (str, optional): Path to the local model directory. Defaults to None.
+        base_model_name (str, optional): Name of the base model file. Defaults to 'last.pth'.
+        num_iterations (int, optional): Number of iterations for eigenmode generation. Defaults to 1000.
+        tv_weight (float, optional): Total variation regularization weight. Defaults to 0.0.
+        show (bool, optional): Whether to display the generated images. Defaults to False.
+        debug (bool, optional): Whether to enable debug mode. Defaults to False.
 
     Returns:
-        None
+        None: The function saves the generated eigenmodes and similarities to the specified output file.
+    Notes:
+        - The function loads a pre-trained model and PCA data to generate eigenmodes.
+        - Eigenmodes are generated with optional total variation regularization and clamping.
+        - If `show` is True, the generated images are displayed during the process.
+        - If `debug` is True, debugging information is displayed, and the process is interactive.
+        - The generated eigenmodes and their similarities are saved in `.npz` format.
     """
     # Load model
     opt = params.Params(opt_path)
