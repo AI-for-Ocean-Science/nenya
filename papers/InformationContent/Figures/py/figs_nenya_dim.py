@@ -431,6 +431,7 @@ def main(flg):
     # Learning curves
     if flg == 1:
         fig_learning_curves()
+        fig_learning_curves(outfile='fig_learning_curves.pdf')
 
     # PCA variaince
     if flg == 2:
