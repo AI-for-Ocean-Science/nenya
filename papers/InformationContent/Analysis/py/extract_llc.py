@@ -2,15 +2,20 @@
 
 import os
 import numpy as np
+from importlib.resources import files
 
+import h5py
 import extract_utils
 
 from wrangler.ogcm import llc
 from wrangler.tables import io as tbl_io
 from wrangler.preproc import io as pp_io
-from wrangler.extract import ogcm as ex_ogcm
+from wrangler.extract import ex_ogcm
+from wrangler import utils as wr_utils
 from wrangler.datasets.loader import load_dataset
 
+from fronts import io as fronts_io
+from fronts.dbof import io as dbof_io
 from fronts.train import datasets
 
 from IPython import embed
@@ -51,10 +56,11 @@ def ex_noise():
         map_fn, n_cores=15)
 
 # Extract SSH data
-def ex_ssh(n_train:int=170000, n_valid:int=60000):
+def ex_ssh():
     """ Extract SSH data from LLC and prepare for training """
 
-    dbof_dev_json_file = 'llc4320_dbof_dev.json'
+    dbof_dev_json_file = os.path.join(files('fronts.runs.dbof.dev'), 'llc4320_dbof_dev.json')
+
     dbof_config = {
         "name": "LLC4320_SSH",
         "description": "A small test set for Jake to try out the DBOF model training",
@@ -70,49 +76,42 @@ def ex_ssh(n_train:int=170000, n_valid:int=60000):
         "targets": []
     }
 
-    datasets.generate_from_dbof(
+    # Generate the individual train, valid files
+    meta_tbl = datasets.generate_from_dbof(
             dbof_dev_json_file, 
-            'DBOF_train_config_jake_test.json',
+            dbof_config,
             path_outdir=local_preproc_path,
-            skip_test=True, skip_valid=True, clobber=True)
+            skip_test=True, clobber=True)
 
-    # Instantiate the AIOS_DataSet
-    aios_ds = load_dataset('LLC4320_SSH')
+    # Fuss about
+    dbof_dict = fronts_io.loadjson(dbof_dev_json_file)
+    dbof_table = dbof_io.load_main_table(dbof_dict)
 
-    tbl_file = os.path.join(local_tables_path, 'LLC_uniform_SSH.parquet')
-    out_file = os.path.join(local_preproc_path, 'LLC_uniform_SSH.h5')
+    # Grab the entries in meta_tbl using UID
+    idx = wr_utils.match_ids(meta_tbl.UID.values, dbof_table.UID.values, require_in_match=True)
+    llc_table = dbof_table.iloc[idx].copy()
 
-    if not os.path.exists(tbl_file):
-        # Generate a table
-        llc_table = llc.build_table(debug=False, resol=0.5, minmax_lat=(-100., 57.))
+    # Load up h5 files
+    train_file = os.path.join(local_preproc_path, f"{dbof_config['name']}_train.h5")
+    valid_file = os.path.join(local_preproc_path, f"{dbof_config['name']}_valid.h5")
 
-        # Grab random rows
-        idx_tv = np.random.choice(llc_table.index, n_train+n_valid, replace=False)
-        llc_table = llc_table.loc[idx_tv].copy()
-        llc_table.reset_index(inplace=True, drop=True)
+    # Concatenate
+    with h5py.File(train_file, 'r') as f:
+        train_ssh = f['inputs'][:,0,:,:]
+    with h5py.File(valid_file, 'r') as f:
+        valid_ssh = f['inputs'][:,0,:,:]
 
-        tv_idx = np.ones(n_train+n_valid, dtype=int)
-        tv_idx[n_train:] = 0
-        llc_table['pp_type'] = tv_idx
+    tbl_file = os.path.join(local_tables_path, 'LLC_random_SSH.parquet')
+    out_file = os.path.join(local_preproc_path, 'LLC_random_SSH.h5')
 
-        # Write
-        tbl_io.write_main_table(llc_table, tbl_file)
-    else:
-        print(f'Loading existing table: {tbl_file}')
-        # Load
-        llc_table = tbl_io.load_main_table(tbl_file)
-
-    # Load options
-    pp_dict = pp_io.load_options('preproc_llc_ssh_nonoise.json')
-
-    # Run me
-    llc_table = ex_ogcm.extract_llc(
-        llc_table, aios_ds, pp_dict, out_file, 
-        n_cores=15, debug=True, zarr_path='/orcd/data/abodner/003/LLC4320/LLC4320')
-
-    # Write new table (there is some loss during extraction)
+    # Write
     tbl_io.write_main_table(llc_table, tbl_file)
-
+    with h5py.File(out_file, 'w') as f:
+        f.create_dataset('train', data=train_ssh)
+        f.create_dataset('valid', data=valid_ssh)
+        f.attrs['n_train'] = dbof_config['ntrain']
+        f.attrs['n_valid'] = dbof_config['nvalid']
+        f.attrs['image_shape'] = train_ssh.shape[1:]
 
 # Command line execution
 if __name__ == '__main__':
