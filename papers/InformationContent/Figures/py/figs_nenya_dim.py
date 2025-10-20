@@ -377,6 +377,51 @@ def fig_eigenmatches(dataset:str, cmap:str, Nmodes:int=9,
     plt.savefig(outfile, dpi=300)
     print(f"Saved: {outfile}")
 
+def fig_Pk():
+    datasets = ['MODIS_SST', 'MODIS_SST_2km',
+        'VIIRS_SST', 'VIIRS_SST_2km', 'VIIRS_SST_sub', 
+        'LLC_SST_nonoise', 'SWOT_L3', 
+        'WNoise', 'MNIST', 'ImageNet']
+
+    plt.figure(figsize=(8,6))
+    ax = plt.gca()
+
+    for dataset in datasets:
+        pdict = info_defs.grab_paths(dataset)
+        pk_file = os.path.join('../Analysis', pdict['Pk_file'])
+        if not os.path.exists(pk_file):
+            print(f"Pk file for {dataset} not found, skipping -- {pk_file}")
+            continue
+        # Load
+        data = np.load(pk_file)
+        k = data['wavenumber']
+        power = data['power']
+        wavelength = data['wavelength']
+
+        if 'sub' in dataset:
+            ls = '--' 
+        elif '_noise' in dataset:
+            ls = '--' 
+        elif '2km' in dataset:
+            ls = ':' 
+        else:
+            ls = '-'
+        clr = grab_clr(dataset)
+        ax.loglog(wavelength, power, label=dataset, color=clr, ls=ls)
+
+    plt.xlabel('Wavelength (km)')
+    plt.ylabel('Power')
+    plt.title('Power Spectra for Various Datasets')
+    ax.legend(fontsize=12)
+    plt.grid(True, ls="--")
+    plt.tight_layout()
+    rsp_utils.set_fontsize(ax, 18)
+    
+    plt.savefig('Pk_all_datasets.png', dpi=300)
+    plt.close()
+    print(f'Wrote: Pk_all_datasets.png')
+
+
 def main(flg):
     if flg== 'all':
         flg= np.sum(np.array([2 ** ii for ii in range(25)]))
@@ -404,6 +449,11 @@ def main(flg):
     if flg == 4:
         #fig_eigenmatches('MODIS_SST', 'jet')
         fig_eigenmatches('MODIS_SST', 'jet', last_few=True)
+
+    # Eigenmodes
+    if flg == 5:
+        #fig_eigenmatches('MODIS_SST', 'jet')
+        fig_Pk()
 
 
     # SWOT learning curve
