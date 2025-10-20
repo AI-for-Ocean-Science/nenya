@@ -11,6 +11,8 @@ from wrangler.preproc import io as pp_io
 from wrangler.extract import ogcm as ex_ogcm
 from wrangler.datasets.loader import load_dataset
 
+from fronts.train import datasets
+
 from IPython import embed
 
 import info_defs
@@ -51,6 +53,28 @@ def ex_noise():
 # Extract SSH data
 def ex_ssh(n_train:int=170000, n_valid:int=60000):
     """ Extract SSH data from LLC and prepare for training """
+
+    dbof_dev_json_file = 'llc4320_dbof_dev.json'
+    dbof_config = {
+        "name": "LLC4320_SSH",
+        "description": "A small test set for Jake to try out the DBOF model training",
+        "DBOF": "DBOF_dev",
+        "dataset": "LLC4320",
+        "sampling": {
+            "type": "random", 
+        },
+        "inputs": ["SSH"],
+        "ntest": 0,
+        "ntrain": 150000,
+        "nvalid": 50000,
+        "targets": []
+    }
+
+    datasets.generate_from_dbof(
+            dbof_dev_json_file, 
+            'DBOF_train_config_jake_test.json',
+            path_outdir=local_preproc_path,
+            skip_test=True, skip_valid=True, clobber=True)
 
     # Instantiate the AIOS_DataSet
     aios_ds = load_dataset('LLC4320_SSH')
