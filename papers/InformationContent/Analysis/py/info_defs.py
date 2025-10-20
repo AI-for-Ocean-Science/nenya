@@ -60,6 +60,7 @@ def grab_paths(dataset:str):
                                 'train_MODIS_2021_128x128_latents.h5')
         out_dict['opts_file'] = 'opts_nenya_modis.json'
         out_dict['pca_file'] = 'pca_latents_MODIS_SST.npz'
+        out_dict['dx'] = 1.1
     elif dataset == 'MODIS_SST_2km':
         if 'OS_SST' in os.environ:
             path = os.path.join(os.getenv('OS_SST'), 'MODIS_L2', 'Info')
@@ -80,6 +81,7 @@ def grab_paths(dataset:str):
                                 'train_VIIRS_N21_2024_latents.h5')
         out_dict['opts_file'] = 'opts_nenya_viirs.json'
         out_dict['pca_file'] = 'pca_latents_VIIRS_SST.npz'
+        out_dict['dx'] = 0.75
     elif dataset == 'VIIRS_SST_2km':
         if 'OS_SST' in os.environ:
             path = os.path.join(os.getenv('OS_SST'), 'VIIRS', 'Info')
@@ -100,6 +102,7 @@ def grab_paths(dataset:str):
                                 'train_VIIRS_N21_2024_sub_latents.h5')
         out_dict['opts_file'] = 'opts_nenya_viirs_sub.json'
         out_dict['pca_file'] = 'pca_latents_VIIRS_SST_sub.npz'
+        out_dict['dx'] = 0.75
     elif dataset == 'orig_VIIRS_SST_2km':
             out_dict['pca_file'] = 'pca_latents_orig_VIIRS_SST_2km.npz'
     elif 'LLC_SST' in dataset:
@@ -124,6 +127,7 @@ def grab_paths(dataset:str):
             out_dict['pca_file'] = 'pca_latents_LLC_SST_nonoise.npz'
         else:
             out_dict['pca_file'] = 'pca_latents_LLC_SST_noise.npz'
+        out_dict['dx'] = 144./64
     elif dataset == 'SWOT_L3':
         if 'OS_SSH' in os.environ:
             path = os.path.join(os.getenv('OS_SSH'), 'SWOT_L3', 'Info')
@@ -134,11 +138,20 @@ def grab_paths(dataset:str):
                                 'SWOT_L3_250m_latents.h5')
         out_dict['opts_file'] = 'opts_nenya_swot_l3.json'
         out_dict['pca_file'] = 'pca_latents_SWOT_L3.npz'
+        out_dict['dx'] = 0.25
     else:
         raise ValueError(f"Dataset {dataset} not supported for Nenya.")
 
     # Add pca/ to pca_file
     out_dict['pca_file'] = os.path.join('pca', out_dict['pca_file'])
+
+    # Auto-generate Pk
+    out_dict['Pk_file'] = os.path.join('Pk', f'Pk_{dataset}.npz')
+    out_dict['Pk_plot'] = os.path.join('Pk', f'Pk_{dataset}.png')
+
+    # dx
+    if 'dx' not in out_dict.keys():
+        out_dict['dx'] = 2.
 
     # Return
     return out_dict
