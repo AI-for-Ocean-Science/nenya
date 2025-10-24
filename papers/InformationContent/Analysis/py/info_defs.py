@@ -128,28 +128,16 @@ def grab_paths(dataset:str):
         else:
             out_dict['pca_file'] = 'pca_latents_LLC_SST_noise.npz'
         out_dict['dx'] = 144./64
-    elif 'LLC_SSH' in dataset:
+    elif 'LLC_SSHa' in dataset:
         if 'OS_OGCM' in os.environ:
             path = os.path.join(os.getenv('OS_OGCM'), 'LLC', 'Info')
             out_dict['path'] = path
-            if 'nonoise' in dataset:
-                out_dict['preproc_file'] = os.path.join(path, 'PreProc', 'LLC_random_SSH.h5')
-                out_dict['latents_file'] = os.path.join(path, 'latents', 'LLC_SSH_nonoise',
+            out_dict['preproc_file'] = os.path.join(path, 'PreProc', 'LLC_random_SSHa.h5')
+            out_dict['latents_file'] = os.path.join(path, 'latents', 'LLC_SSHa',
                                 'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm',
                                 'train_llc_nonoise_latents.h5')
-            else:
-                out_dict['preproc_file'] = os.path.join(path, 'PreProc', 'LLC_random_SSH.h5')
-                out_dict['latents_file'] = os.path.join(path, 'latents', 'LLC_SSH_noise',
-                                'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm',
-                                'train_llc_noise_latents.h5')
-        if 'nonoise' in dataset:
-            out_dict['opts_file'] = 'opts_nenya_llc.json'
-        else:
-            out_dict['opts_file'] = 'opts_nenya_llc_noise.json'
-        if 'nonoise' in dataset:
-            out_dict['pca_file'] = 'pca_latents_LLC_SSH_nonoise.npz'
-        else:
-            out_dict['pca_file'] = 'pca_latents_LLC_SSH_noise.npz'
+        out_dict['opts_file'] = 'opts_nenya_llc_ssha.json'
+        out_dict['pca_file'] = 'pca_latents_LLC_SSHa_nonoise.npz'
         out_dict['dx'] = 144./64
     elif dataset == 'SWOT_L3':
         if 'OS_SSH' in os.environ:
@@ -167,6 +155,7 @@ def grab_paths(dataset:str):
 
     # Add pca/ to pca_file
     out_dict['pca_file'] = os.path.join('pca', out_dict['pca_file'])
+    out_dict['opts_file'] = os.path.join('opts', out_dict['opts_file'])
 
     # Auto-generate Pk
     out_dict['Pk_file'] = os.path.join('Pk', f'Pk_{dataset}.npz')
