@@ -6,7 +6,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: xavier-nenya-llc-nonoise-train
+  name: xavier-nenya-llc-ssha-train
 spec:
   backoffLimit: 0
   template:
