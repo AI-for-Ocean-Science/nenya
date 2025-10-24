@@ -62,14 +62,14 @@ def ex_ssh():
     dbof_dev_json_file = os.path.join(files('fronts.runs.dbof.dev'), 'llc4320_dbof_dev.json')
 
     dbof_config = {
-        "name": "LLC4320_SSH",
-        "description": "A small test set for Jake to try out the DBOF model training",
+        "name": "LLC4320_SSHa",
+        "description": "LLC SSH for the Information Content paper",
         "DBOF": "DBOF_dev",
         "dataset": "LLC4320",
         "sampling": {
             "type": "random", 
         },
-        "inputs": ["SSH"],
+        "inputs": ["SSHa"],
         "ntest": 0,
         "ntrain": 150000,
         "nvalid": 50000,
@@ -101,8 +101,8 @@ def ex_ssh():
     with h5py.File(valid_file, 'r') as f:
         valid_ssh = f['inputs'][:,0,:,:]
 
-    tbl_file = os.path.join(local_tables_path, 'LLC_random_SSH.parquet')
-    out_file = os.path.join(local_preproc_path, 'LLC_random_SSH.h5')
+    tbl_file = os.path.join(local_tables_path, 'LLC_random_SSHa.parquet')
+    out_file = os.path.join(local_preproc_path, 'LLC_random_SSHa.h5')
 
     # Write
     tbl_io.write_main_table(llc_table, tbl_file)
