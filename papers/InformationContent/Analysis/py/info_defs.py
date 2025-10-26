@@ -1,5 +1,18 @@
 import os
 
+all_datasets = ['MODIS_SST', 
+                    'MODIS_SST_2km',
+                'VIIRS_SST', 
+                'VIIRS_SST_2km', 
+                'VIIRS_SST_sub', 
+                'LLC_SST_nonoise', 
+                'SWOT_L3', 
+                #'SWOT_SSR', 
+                'WNoise',
+                'MNIST',
+                'ImageNet',
+                ]
+
 def grab_paths(dataset:str):
 
     out_dict = {}

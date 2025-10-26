@@ -160,7 +160,8 @@ def pca_preproc_dataset(
     dataset: str,
     key: str = 'train',
     max_samples: int = 150000,
-    n_components: int = 256
+    n_components: int = 256,
+    clobber: bool = False
 ):
     """
     Perform PCA on a preprocessed dataset.
@@ -181,6 +182,10 @@ def pca_preproc_dataset(
     
     # Output file
     output_file = os.path.join('pca', f'pca_preproc_{dataset}.npz')
+    if os.path.exists(output_file) and not clobber:
+        print(f"Output file already exists: {output_file}")
+        print("Use clobber=True to overwrite.\n")
+        return
     
     print(f"Dataset: {dataset}")
     print(f"Input file: {preproc_file}")
@@ -212,9 +217,14 @@ def pca_preproc_dataset(
 
 # Main execution
 if __name__ == '__main__':
-    
+
     # Example: Process MNIST
-    pca_preproc_dataset('MNIST', key='train', max_samples=150000, n_components=256)
+    #pca_preproc_dataset('MNIST', key='train', max_samples=150000, n_components=256)
+
+    for dataset in info_defs.all_datasets:
+        pca_preproc_dataset(dataset, key='train', max_samples=150000, n_components=256)
+        
+    
     
     # Example: Process MODIS SST
     # pca_preproc_dataset('MODIS_SST', key='train', max_samples=150000, n_components=256)

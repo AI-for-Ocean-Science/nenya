@@ -115,19 +115,7 @@ def fig_pca(outfile:str='fig_pca_variance.png',
 
     # Load PCAs
     if datasets is None:
-        datasets = ['MODIS_SST', 
-                    'MODIS_SST_2km',
-                'VIIRS_SST', 
-                'VIIRS_SST_2km', 
-                'VIIRS_SST_sub', 
-                'LLC_SST_nonoise', 
-                'SWOT_L3', 
-                #'SWOT_SSR', 
-                'WNoise',
-                'MNIST',
-                'ImageNet',
-                ]
-    #datasets = ['MODIS_SST']
+        datasets = info_defs.all_datasets
     clrs = []
     ds = []
     for dataset in datasets:
