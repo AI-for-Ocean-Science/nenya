@@ -78,6 +78,18 @@ def grab_clr(dataset:str):
         clr = cdict[dataset]
     return clr
 
+def grab_ls(dataset:str):
+    if 'sub' in dataset:
+        ls = '--' 
+    elif '_noise' in dataset:
+        ls = '--' 
+    elif '2km' in dataset:
+        ls = ':' 
+    else:
+        ls = '-'
+
+    return ls
+
 def fig_pca(outfile:str='fig_pca_variance.png',
             datasets:list=None, cumulative:bool=False,
             frac_remain:bool=False,
@@ -136,14 +148,7 @@ def fig_pca(outfile:str='fig_pca_variance.png',
 
     ax = plt.subplot(gs[0])
     for ss, d in enumerate(ds):
-        if 'sub' in datasets[ss]:
-            ls = '--' 
-        elif '_noise' in datasets[ss]:
-            ls = '--' 
-        elif '2km' in datasets[ss]:
-            ls = ':' 
-        else:
-            ls = '-'
+        ls = grab_ls(datasets[ss])
         # Cumulative?
         cumsum = 1-np.cumsum(d['explained_variance'])
         if cumulative:
@@ -200,6 +205,123 @@ def fig_pca(outfile:str='fig_pca_variance.png',
     plt.savefig(outfile, dpi=300)
     print(f"Saved: {outfile}")
 
+
+def fig_true_pca(outfile:str='fig_true_pca.png',
+            datasets:list=None, cumulative:bool=False,
+            frac_remain:bool=False,
+            show_cum_point:float=None,
+            xmnx:tuple=None,
+            exponent:float=-0.5): 
+    """
+    Generate and save a PCA variance explained plot.
+    This function creates a plot to visualize the variance explained by PCA components
+    for a given set of datasets. It supports cumulative variance, fractional remaining
+    variance, and power-law fitting.
+    Args:
+        outfile (str): The output file path for the saved plot. Defaults to 'fig_pca_variance.png'.
+        datasets (list): A list of dataset names to include in the plot. If None, a default
+            list of datasets is used. Defaults to None.
+        cumulative (bool): If True, plot the cumulative variance explained. Defaults to False.
+        frac_remain (bool): If True, plot the fractional remaining variance. Defaults to False.
+        show_cum_point (float): If provided, marks the point on the plot where the cumulative
+            variance reaches this value. Defaults to None.
+        xmnx (tuple): Sets xlim of the x-axis if provided. Defaults to None.
+        exponent (float): The exponent for the power-law fit line. Defaults to -0.5.
+    Returns:
+        None: The function saves the plot to the specified output file.
+    Notes:
+        - The function expects PCA data files to be located in the '../Analysis/pca/' directory
+            with filenames formatted as 'pca_latents_<dataset>.npz'.
+        - The datasets are color-coded, and different line styles are used to distinguish
+            between dataset types.
+        - The plot is saved in log-log scale with grid lines enabled.
+    """
+    # Cumulative?
+    if cumulative:
+        if 'variance' in outfile:
+            outfile = outfile.replace('variance', 'cumulative')
+
+    # Load PCAs
+    if datasets is None:
+        datasets = info_defs.all_datasets
+    clrs = []
+    ds = []
+    for dataset in datasets:
+        clr = grab_clr(dataset)
+        
+        pca_file = f'../Analysis/pca/pca_preproc_{dataset}.npz'
+        print(f"Loading PCA file: {pca_file}")
+        d = np.load(pca_file)
+        ds.append(d)
+        #
+        clrs.append(clr)
+
+    #embed(header='PCA Variance Explained 89')
+
+    # 
+    fig = plt.figure(figsize=(8,6))
+    gs = gridspec.GridSpec(1,1)
+
+    ax = plt.subplot(gs[0])
+    for ss, d in enumerate(ds):
+        #if datasets[ss] == 'ImageNet':
+        #    embed(header='true pca; 268')
+        ls = grab_ls(datasets[ss])
+        # Cumulative?
+        cumsum = 1-np.cumsum(d['explained_variance_ratio'])
+        if cumulative:
+            yvals = cumsum
+        elif frac_remain:
+            cumsum = 1-np.cumsum(d['explained_variance_ratio'])
+            yvals = d['explained_variance'] / cumsum
+        else:
+            yvals = d['explained_variance_ratio']
+        ax.plot(np.arange(d['explained_variance_ratio'].size)+1, 
+                yvals,  label=datasets[ss].replace('_','/'),
+                color=clrs[ss], ls=ls)
+        # Add cum point
+        if show_cum_point is not None:
+            imin = np.argmin(np.abs((1-cumsum) - show_cum_point))
+            ax.plot(imin+1, yvals[imin], 'x', color=clrs[ss])
+
+            
+        if ss == 0:
+            xs = np.arange(d['explained_variance_ratio'].size)+1
+
+    ys = d['explained_variance_ratio'][10] * (xs/xs[10])**(exponent) 
+    ax.plot(xs, ys, '--', color='gray', label=f'Power law: {exponent}')
+    # Label
+    if cumulative:
+        ax.set_ylabel('Cumulative Variance explained per mode')
+    else:
+        ax.set_ylabel('Variance explained per mode')
+    ax.set_xlabel('Number of PCA components')
+    #
+    #ax.set_xlim(0,10.)
+    ax.legend()
+    ax.set_xscale('log')
+    ax.set_yscale('log')
+
+    # Minor ticks
+    ax.minorticks_on()
+    # Horizontal line at 0
+    #ax.axhline(0., color='k', ls='--')
+
+    #loc = 'upper right' if ss == 1 else 'upper left'
+    ax.legend(fontsize=13, loc='lower left')
+
+    # Turn on grid
+    ax.grid(True, which='both', ls='--', lw=0.5)
+
+    # xlim?
+    if xmnx is not None:
+        ax.set_xlim(xmnx)
+
+    rsp_utils.set_fontsize(ax, 18)
+
+    plt.tight_layout()#pad=0.0, h_pad=0.0, w_pad=0.3)
+    plt.savefig(outfile, dpi=300)
+    print(f"Saved: {outfile}")
 
 
 def fig_learning_curves(outfile:str='fig_learning_curves.png',
@@ -421,7 +543,7 @@ def main(flg):
         fig_learning_curves()
         fig_learning_curves(outfile='fig_learning_curves.pdf')
 
-    # PCA variaince
+    # PCA variance
     if flg == 2:
         fig_pca(show_cum_point=0.99, outfile='fig_pca_variance_zoomin.png',
                 xmnx=(30, 300))
@@ -444,6 +566,9 @@ def main(flg):
         #fig_eigenmatches('MODIS_SST', 'jet')
         fig_Pk()
 
+    # PCA variance
+    if flg == 6:
+        fig_true_pca(show_cum_point=0.99)
 
     # SWOT learning curve
     if flg == 30:
