@@ -295,7 +295,7 @@ def fig_true_pca(outfile:str='fig_true_pca.png',
         ax.set_ylabel('Cumulative Variance explained per mode')
     else:
         ax.set_ylabel('Variance explained per mode')
-    ax.set_xlabel('Number of PCA components')
+    ax.set_xlabel('Number of True PCA components')
     #
     #ax.set_xlim(0,10.)
     ax.legend()
@@ -517,16 +517,24 @@ def fig_Pk():
         else:
             ls = '-'
         clr = grab_clr(dataset)
-        ax.loglog(wavelength, power, label=dataset, color=clr, ls=ls)
+        ax.loglog(wavelength, power*k, label=dataset, 
+                  color=clr, ls=ls)
 
     plt.xlabel('Wavelength (km)')
-    plt.ylabel('Power')
-    plt.title('Power Spectra for Various Datasets')
-    ax.legend(fontsize=12)
+    plt.ylabel(r'Power Spectrum per log bin: $k \, P(k)$')
+    #plt.title('Power Spectra for Various Datasets')
+    ax.legend(fontsize=12, loc='upper left')
     plt.grid(True, ls="--")
     plt.tight_layout()
+
+    # Add wave number on the top axis
+    ax_top = ax.secondary_xaxis('top', functions=(lambda x: 1e3/x, lambda x: 1e3/x))
+    ax_top.set_xlabel('Wavenumber (cycles/km)')
+
     rsp_utils.set_fontsize(ax, 18)
+    rsp_utils.set_fontsize(ax_top, 18)
     
+    plt.tight_layout()
     plt.savefig('Pk_all_datasets.png', dpi=300)
     plt.close()
     print(f'Wrote: Pk_all_datasets.png')
