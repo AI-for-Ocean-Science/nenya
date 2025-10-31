@@ -24,6 +24,8 @@ def pca_latents(dataset:str):
         key = None
     elif 'LLC_SST' in dataset:
         key = None
+    elif 'LLC_SSHa' in dataset:
+        key = None
     elif dataset == 'MNIST':
         key = None
     elif dataset == 'SWOT_L3':
@@ -53,11 +55,12 @@ if __name__ == '__main__':
     #  LLC SST
     #pca_latents('LLC_SST_nonoise')
     #pca_latents('LLC_SST_noise')
+    pca_latents('LLC_SSHa')
 
     # Natural
     #pca_latents('MNIST')
     #pca_latents('ImageNet')
-    pca_latents('WNoise')
+    #pca_latents('WNoise')
 
     # SWOT L3
     #pca_latents('SWOT_L3')

@@ -39,14 +39,15 @@ cdict = {}
 cdict['MODIS'] = '#1f77b4'  # Blue
 cdict['VIIRS'] = '#ff7f0e'  # Orange
 cdict['LLC'] = '#2ca02c'  # Green
+cdict['LLC_SSHa'] = '#9467bd'  # Purple
 # Gray
 cdict['MNIST'] = '#7f7f7f'  # Gray
 # Red
 cdict['SWOT_L3'] = '#d62728'  # Red
 # Black
 cdict['ImageNet'] = '#000000'  # Black
-# Yellow
-cdict['WNoise'] = '#bcbd22'  # Yellow
+# Brown
+cdict['WNoise'] = '#8c564b'  # Brown
 
 '''
 def dataset_path(dataset:str):
@@ -131,9 +132,10 @@ def fig_pca(outfile:str='fig_pca_variance.png',
     clrs = []
     ds = []
     for dataset in datasets:
+        pdict = info_defs.grab_paths(dataset)
         clr = grab_clr(dataset)
         
-        pca_file = f'../Analysis/pca/pca_latents_{dataset}.npz'
+        pca_file = f'../Analysis/{pdict['pca_file']}'
         print(f"Loading PCA file: {pca_file}")
         d = np.load(pca_file)
         ds.append(d)
@@ -177,7 +179,7 @@ def fig_pca(outfile:str='fig_pca_variance.png',
         ax.set_ylabel('Cumulative Variance explained per mode')
     else:
         ax.set_ylabel('Variance explained per mode')
-    ax.set_xlabel('Number of PCA components')
+    ax.set_xlabel('Number of PCA components (Latent Space)')
     #
     #ax.set_xlim(0,10.)
     ax.legend()
@@ -329,20 +331,22 @@ def fig_learning_curves(outfile:str='fig_learning_curves.png',
     """Plot the learning curves for SWOT, VIIRS, MODIS and MNIST datasets."""
     
     # Define the datasets
-    datasets = ['VIIRS_SST', 'MODIS_SST', 'MNIST', 'SWOT_L3', 
-                'WNoise', 'ImageNet']
+    #datasets = ['VIIRS_SST', 'MODIS_SST', 'MNIST', 'SWOT_L3', 
+    #            'WNoise', 'ImageNet']
+    datasets = info_defs.all_datasets
     
     # Create a figure
-    fig = plt.figure(figsize=(10, 10))
+    fig = plt.figure(figsize=(12, 10))
     plt.clf()
     ax = plt.gca()
 
     for ss, dataset in enumerate(datasets):
         print(f'Processing dataset: {dataset}')
         clr = grab_clr(dataset)
+        ls = grab_ls(dataset)
         #path = dataset_path(dataset)
         pdict = info_defs.grab_paths(dataset)
-        opt = params.Params('../Analysis/opts/'+pdict['opts_file'])
+        opt = params.Params('../Analysis/'+pdict['opts_file'])
         params.option_preprocess(opt)
         #embed(header=f"Learning curves for {dataset}")
         losses_train, losses_valid = nenya_io.losses_filenames(opt)
@@ -361,9 +365,9 @@ def fig_learning_curves(outfile:str='fig_learning_curves.png',
             lbl0 = f'{dataset} validation'
             lbl1 = f'{dataset} training'
         else:
-            lbl0 = f'{dataset} validation'
+            lbl0 = f'{dataset}'
             lbl1 = None
-        ax.plot(np.arange(loss_valid.size)+1, loss_valid, label=lbl0, lw=3, color=clr)
+        ax.plot(np.arange(loss_valid.size)+1, loss_valid, label=lbl0, lw=3, color=clr, ls=ls)
         if show_train:
             ax.plot(np.arange(loss_train.size)+1, loss_train, label=lbl1, lw=3, color=clr, ls='--')
 
@@ -371,6 +375,7 @@ def fig_learning_curves(outfile:str='fig_learning_curves.png',
     ax.set_xlabel('Epochs')
     ax.set_ylabel('Loss')
     ax.set_yscale('log')
+    ax.grid()
 
     ax.legend(fontsize=15, loc='upper right')
 
@@ -549,16 +554,16 @@ def main(flg):
     # Learning curves
     if flg == 1:
         fig_learning_curves()
-        fig_learning_curves(outfile='fig_learning_curves.pdf')
+        #fig_learning_curves(outfile='fig_learning_curves.pdf')
 
-    # PCA variance
+    # PCA variance on latent space
     if flg == 2:
-        fig_pca(show_cum_point=0.99, outfile='fig_pca_variance_zoomin.png',
-                xmnx=(30, 300))
+        #fig_pca(show_cum_point=0.99, outfile='fig_pca_variance_zoomin.png',
+        #        xmnx=(30, 300))
         fig_pca(show_cum_point=0.99)
-        fig_pca(outfile='fig_pca_noise.png',
-            datasets=['MODIS_SST', 'MODIS_SST_2km', 'LLC_SST_nonoise', 'LLC_SST_noise'],
-            show_cum_point=0.99)
+        #fig_pca(outfile='fig_pca_noise.png',
+        #    datasets=['MODIS_SST', 'MODIS_SST_2km', 'LLC_SST_nonoise', 'LLC_SST_noise'],
+        #    show_cum_point=0.99)
 
     # Eigenmodes
     if flg == 3:
