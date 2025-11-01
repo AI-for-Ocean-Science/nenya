@@ -127,6 +127,21 @@ def generate_eigenmode_with_regularization(model, target_latent:np.ndarray,
 
 def find_eigenmatches(pca_file:str, latents_file:str, modes:list,
                       nimages:int=1, partition:str='train'): 
+    """
+    Finds the closest latent vectors to specified PCA eigenmodes based on cosine similarity.
+
+    Args:
+        pca_file (str): Path to the .npz file containing PCA eigenmodes.
+        latents_file (str): Path to the .h5 file containing latent vectors.
+        modes (list): List of PCA mode indices to match against.
+        nimages (int, optional): Number of closest matches to return for each mode. Defaults to 1.
+        partition (str, optional): Dataset partition to use (e.g., 'train', 'test'). Defaults to 'train'.
+
+    Returns:
+        tuple: A tuple containing:
+            - image_idx (numpy.ndarray): Indices of the closest latent vectors for each mode.
+            - sv_sim (numpy.ndarray): Cosine similarity scores of the closest latent vectors for each mode.
+    """
 
     # Load
     d = np.load(pca_file)
@@ -135,8 +150,8 @@ def find_eigenmatches(pca_file:str, latents_file:str, modes:list,
 
     image_idx = np.zeros((nimages, len(modes)), dtype=int)
     sv_sim = np.zeros((nimages, len(modes)))
-    for ss in modes:
-        eigenmode = d['M'][ss, :]
+    for ss, mode in enumerate(modes):
+        eigenmode = d['M'][mode, :]
         # Closest
         query_vector = eigenmode.reshape(1, -1)
         similarities = cosine_similarity(query_vector, latents)[0]

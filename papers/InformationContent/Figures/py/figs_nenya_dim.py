@@ -451,24 +451,28 @@ def fig_eigenmatches(dataset:str, cmap:str, Nmodes:int=9,
 
     # Load the PCA model
     pdict = info_defs.grab_paths(dataset)
+    pca_file = '../Analysis/'+pdict['pca_file']
 
     # Open the preproc file
     preproc_file = pdict['preproc_file']
     preproc = h5py.File(preproc_file, 'r')
 
     if last_ones:
-        modes=np.arange(-Nmodes,0)
+        d = np.load(pca_file)
+        cumsum = 1-np.cumsum(d['explained_variance'])
+        imin = np.argmin(np.abs((1-cumsum) - 0.99))
+        modes=imin+np.arange(-Nmodes,0)
     else:
         modes=np.arange(Nmodes)
     image_idx, similarities = nenya_pca.find_eigenmatches(
-        '../Analysis/'+pdict['pca_file'], pdict['latents_file'],
+        pca_file, pdict['latents_file'],
         modes=modes)
 
 
     fig = plt.figure(figsize=(6,6))
     gs = gridspec.GridSpec(3,3)
 
-    for ss in range(Nmodes):
+    for ss,mode in enumerate(modes):
         # Grab the image
         img = preproc[partition][image_idx[0, ss]]
         if img.ndim == 3:
@@ -481,8 +485,8 @@ def fig_eigenmatches(dataset:str, cmap:str, Nmodes:int=9,
                      yticklabels=[], cmap=cmap, cbar=False) 
                      #cbar_kws={'label': clbl})# 'fontsize': 20})
         # Title
-        title = f'Eigenmatch: mode={ss+1} sim={similarities[0, ss]:.2f}'
-        ax.set_title(title, fontsize=12)
+        title = f'Ematch: mode={mode+1} sim={similarities[0, ss]:.2f}'
+        ax.set_title(title, fontsize=10)
 
     #rsp_utils.set_fontsize(ax, 18)
 
@@ -670,9 +674,9 @@ def main(flg):
 
     # Eigenmodes
     if flg == 4:
-        #fig_eigenmatches('MODIS_SST', 'jet')
-        fig_eigenmatches('MODIS_SST', 'jet', last_ones=True,
-                         outroot='fig_last_eigenmatches')
+        fig_eigenmatches('MODIS_SST', 'jet')
+        #fig_eigenmatches('MODIS_SST', 'jet', last_ones=True,
+        #                 outroot='fig_last_eigenmatches')
 
     # Eigenmodes
     if flg == 5:
