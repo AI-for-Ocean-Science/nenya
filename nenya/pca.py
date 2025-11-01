@@ -124,3 +124,29 @@ def generate_eigenmode_with_regularization(model, target_latent:np.ndarray,
     generated_image = generated_image.squeeze(0)  # Remove batch dimension
     #
     return generated_image, cosine_sim.detach().cpu().numpy()[0]
+
+def find_eigenmatches(pca_file:str, latents_file:str, modes:list,
+                      nimages:int=1, partition:str='train'): 
+
+    # Load
+    d = np.load(pca_file)
+    with h5py.File(latents_file, 'r') as f:
+        latents = f[partition][:]
+
+    image_idx = np.zeros((nimages, len(modes)), dtype=int)
+    sv_sim = np.zeros((nimages, len(modes)))
+    for ss in modes:
+        eigenmode = d['M'][ss, :]
+        # Closest
+        query_vector = eigenmode.reshape(1, -1)
+        similarities = cosine_similarity(query_vector, latents)[0]
+        # Sort
+        sorted_indices = np.argsort(-similarities)
+        similarities = similarities[sorted_indices]
+
+        # Save em
+        image_idx[:, ss] = sorted_indices[:nimages]
+        sv_sim[:, ss] = similarities[:nimages]
+
+    # Return
+    return image_idx, sv_sim

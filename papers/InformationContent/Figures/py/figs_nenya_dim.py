@@ -25,6 +25,7 @@ from nenya import plotting as nenya_plotting
 from nenya import params 
 from nenya import io as nenya_io
 from nenya import analysis
+from nenya import pca as nenya_pca
 
 mpl.rcParams['font.family'] = 'stixgeneral'
 
@@ -442,37 +443,34 @@ def fig_eigenimages(dataset:str, cmap:str, Nimages:int=9,
     print(f"Saved: {outfile}")
 
 def fig_eigenmatches(dataset:str, cmap:str, Nmodes:int=9, 
-                     partition:str='train', last_ones:bool=False,
-                    outroot:str='fig_eigenmatches'):
+                     partition:str='train', 
+                     last_ones:bool=False,
+                     outroot:str='fig_eigenmatches'):
 
     outfile = f'{outroot}_{dataset}.png'
 
     # Load the PCA model
     pdict = info_defs.grab_paths(dataset)
-    d = np.load(f'../Analysis/{pdict['pca_file']}')
-
-    # Grab the latents
-    with h5py.File(pdict['latents_file'], 'r') as f:
-        latents = f[partition][:]
 
     # Open the preproc file
     preproc_file = pdict['preproc_file']
     preproc = h5py.File(preproc_file, 'r')
 
+    if last_ones:
+        modes=np.arange(-Nmodes,0)
+    else:
+        modes=np.arange(Nmodes)
+    image_idx, similarities = nenya_pca.find_eigenmatches(
+        '../Analysis/'+pdict['pca_file'], pdict['latents_file'],
+        modes=modes)
+
+
     fig = plt.figure(figsize=(6,6))
     gs = gridspec.GridSpec(3,3)
 
     for ss in range(Nmodes):
-        eigenmode = d['M'][ss, :]
-        # Closest
-        query_vector = eigenmode.reshape(1, -1)
-        similarities = cosine_similarity(query_vector, latents)[0]
-        # Sort
-        sorted_indices = np.argsort(-similarities)
-        similarities = similarities[sorted_indices]
-
         # Grab the image
-        img = preproc[partition][sorted_indices[0]]
+        img = preproc[partition][image_idx[0, ss]]
         if img.ndim == 3:
             img = img[0,...]
 
@@ -483,7 +481,7 @@ def fig_eigenmatches(dataset:str, cmap:str, Nmodes:int=9,
                      yticklabels=[], cmap=cmap, cbar=False) 
                      #cbar_kws={'label': clbl})# 'fontsize': 20})
         # Title
-        title = f'Eigenmatch: mode={ss+1} sim={similarities[0]:.2f}'
+        title = f'Eigenmatch: mode={ss+1} sim={similarities[0, ss]:.2f}'
         ax.set_title(title, fontsize=12)
 
     #rsp_utils.set_fontsize(ax, 18)
@@ -545,6 +543,107 @@ def fig_Pk():
     print(f'Wrote: Pk_all_datasets.png')
 
 
+def fig_multi_eigenmatches(
+    dataset:str, cmap:str, Nmodes:int=9, 
+    partition:str='train', nimages:int=9,
+    outroot:str='fig_multi_eigenmatches'):
+
+
+    # Load the PCA model
+    pdict = info_defs.grab_paths(dataset)
+
+    # Open the preproc file
+    preproc_file = pdict['preproc_file']
+    preproc = h5py.File(preproc_file, 'r')
+
+    image_idx, similarities = nenya_pca.find_eigenmatches(
+        '../Analysis/'+pdict['pca_file'], pdict['latents_file'],
+        modes=np.arange(Nmodes), nimages=nimages)
+
+    modes = np.arange(Nmodes)
+    
+    for mode in modes:
+
+        outfile = f'{outroot}_{dataset}_mode{mode+1}.png'
+        fig = plt.figure(figsize=(6,6))
+        gs = gridspec.GridSpec(3,3)
+
+        for ss in range(nimages):
+            # Grab the image
+            img = preproc[partition][image_idx[ss, mode]]
+            if img.ndim == 3:
+                img = img[0,...]
+
+            ax = plt.subplot(gs[ss]) 
+            _ = sns.heatmap(np.flipud(img), xticklabels=[], 
+                        #vmin=vmnx[0], vmax=vmnx[1], 
+                        ax=ax,
+                        yticklabels=[], cmap=cmap, cbar=False) 
+                        #cbar_kws={'label': clbl})# 'fontsize': 20})
+            # Title
+            title = f'sim={similarities[ss, mode]:.2f}'
+            ax.set_title(title, fontsize=12)
+
+        #rsp_utils.set_fontsize(ax, 18)
+        # Plot title
+        fig.suptitle(f'Eigematches mode={mode+1} for {dataset}', fontsize=16)
+
+        plt.tight_layout()#pad=0.0, h_pad=0.0, w_pad=0.3)
+        plt.savefig(outfile, dpi=300)
+        print(f"Saved: {outfile}")
+
+def fig_Pk():
+    datasets = ['MODIS_SST', 'MODIS_SST_2km',
+        'VIIRS_SST', 'VIIRS_SST_2km', 'VIIRS_SST_sub', 
+        'LLC_SST_nonoise', 'SWOT_L3', 
+        'WNoise', 'MNIST', 'ImageNet']
+
+    plt.figure(figsize=(8,6))
+    ax = plt.gca()
+
+    for dataset in datasets:
+        pdict = info_defs.grab_paths(dataset)
+        pk_file = os.path.join('../Analysis', pdict['Pk_file'])
+        if not os.path.exists(pk_file):
+            print(f"Pk file for {dataset} not found, skipping -- {pk_file}")
+            continue
+        # Load
+        data = np.load(pk_file)
+        k = data['wavenumber']
+        power = data['power']
+        wavelength = data['wavelength']
+
+        if 'sub' in dataset:
+            ls = '--' 
+        elif '_noise' in dataset:
+            ls = '--' 
+        elif '2km' in dataset:
+            ls = ':' 
+        else:
+            ls = '-'
+        clr = grab_clr(dataset)
+        ax.loglog(wavelength, power*k, label=dataset, 
+                  color=clr, ls=ls)
+
+    plt.xlabel('Wavelength (km)')
+    plt.ylabel(r'Power Spectrum per log bin: $k \, P(k)$')
+    #plt.title('Power Spectra for Various Datasets')
+    ax.legend(fontsize=12, loc='upper left')
+    plt.grid(True, ls="--")
+    plt.tight_layout()
+
+    # Add wave number on the top axis
+    ax_top = ax.secondary_xaxis('top', functions=(lambda x: 1e3/x, lambda x: 1e3/x))
+    ax_top.set_xlabel('Wavenumber (cycles/km)')
+
+    rsp_utils.set_fontsize(ax, 18)
+    rsp_utils.set_fontsize(ax_top, 18)
+    
+    plt.tight_layout()
+    plt.savefig('Pk_all_datasets.png', dpi=300)
+    plt.close()
+    print(f'Wrote: Pk_all_datasets.png')
+
 def main(flg):
     if flg== 'all':
         flg= np.sum(np.array([2 ** ii for ii in range(25)]))
@@ -572,7 +671,8 @@ def main(flg):
     # Eigenmodes
     if flg == 4:
         #fig_eigenmatches('MODIS_SST', 'jet')
-        fig_eigenmatches('MODIS_SST', 'jet', last_few=True)
+        fig_eigenmatches('MODIS_SST', 'jet', last_ones=True,
+                         outroot='fig_last_eigenmatches')
 
     # Eigenmodes
     if flg == 5:
@@ -589,6 +689,9 @@ def main(flg):
         #fig_learning_curve('VIIRS')
         #fig_learning_curve('MODIS')
         fig_learning_curve('MNIST')
+
+    if flg == 31:
+        fig_multi_eigenmatches('MODIS_SST', 'jet')
 
     # SWOT UMAP gallery
     if flg == 40:
