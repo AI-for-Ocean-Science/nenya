@@ -50,28 +50,6 @@ cdict['ImageNet'] = '#000000'  # Black
 # Brown
 cdict['WNoise'] = '#8c564b'  # Brown
 
-'''
-def dataset_path(dataset:str):
-    if dataset == 'SWOT':
-        path = os.path.join(os.getenv('SWOT_PNGs'),
-                        'models', 'SWOT',
-                        'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm')
-    elif dataset == 'VIIRS':
-        path = os.path.join(os.getenv('OS_SST'), 'VIIRS', 'Info',
-                        'models', 'VIIRS_N21',
-                        'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm')
-    elif dataset == 'MODIS':
-        path = os.path.join(os.getenv('OS_SST'), 'MODIS_L2', 'Info',
-                        'models', 'MODIS_2021',
-                        'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm')
-    elif dataset == 'MNIST':
-        path = os.path.join(os.getenv('OS_DATA'), 'Natural', 'MNIST', 'Info',
-                        'models', 'MNIST',
-                        'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm')
-    else:
-        raise ValueError(f"Dataset {dataset} not supported for learning curve plotting.")
-    return path
-'''
 
 def grab_clr(dataset:str):
     if 'SST' in dataset:
@@ -254,7 +232,13 @@ def fig_true_pca(outfile:str='fig_true_pca.png',
         
         pca_file = f'../Analysis/pca/pca_preproc_{dataset}.npz'
         print(f"Loading PCA file: {pca_file}")
-        d = np.load(pca_file)
+        try:
+            d = np.load(pca_file)
+        except:
+            print(f"PCA file for {dataset} not found, skipping -- {pca_file}")
+            ds.append(None)
+            clrs.append(None)
+            continue
         ds.append(d)
         #
         clrs.append(clr)
@@ -267,6 +251,8 @@ def fig_true_pca(outfile:str='fig_true_pca.png',
 
     ax = plt.subplot(gs[0])
     for ss, d in enumerate(ds):
+        if d is None:
+            continue
         #if datasets[ss] == 'ImageNet':
         #    embed(header='true pca; 268')
         ls = grab_ls(datasets[ss])
@@ -292,7 +278,7 @@ def fig_true_pca(outfile:str='fig_true_pca.png',
             xs = np.arange(d['explained_variance_ratio'].size)+1
 
     ys = d['explained_variance_ratio'][10] * (xs/xs[10])**(exponent) 
-    ax.plot(xs, ys, '--', color='gray', label=f'Power law: {exponent}')
+    #ax.plot(xs, ys, '--', color='gray', label=f'Power law: {exponent}')
     # Label
     if cumulative:
         ax.set_ylabel('Cumulative Variance explained per mode')
