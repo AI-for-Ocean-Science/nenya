@@ -69,7 +69,7 @@ def grab_paths(dataset:str):
         if 'OS_DATA' in os.environ:
             path = os.path.join(os.getenv('OS_DATA'), 'Natural', 'Pk', 'Info')
             out_dict['path'] = path
-            out_dict['preproc_file'] = os.path.join(path, 'PreProc', 'power_law_n2_64x64.h5')
+            out_dict['preproc_file'] = os.path.join(path, 'PreProc', 'power_law_n4_64x64.h5')
             out_dict['latents_file'] = os.path.join(path, 'latents', 'Pk4',
                                 'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm',
                                 'wnoise_latents.h5')
