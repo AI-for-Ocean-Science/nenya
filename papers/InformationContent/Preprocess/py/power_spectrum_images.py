@@ -353,7 +353,7 @@ if __name__ == '__main__':
         verify=args.verify
     )
 
-def run(option:int)
+def run(option:int):
 
     if option == 2:
         # n=-2
