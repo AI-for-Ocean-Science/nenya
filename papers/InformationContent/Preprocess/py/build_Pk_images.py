@@ -84,6 +84,6 @@ if __name__ == '__main__':
     if len(sys.argv) == 1:
         flg = -1
     else:
-        flg = sys.argv[1]
+        flg = int(sys.argv[1])
 
     run(flg)
