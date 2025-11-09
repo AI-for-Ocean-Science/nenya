@@ -26,7 +26,7 @@ def run(option:int):
 
         print("\n" + "="*60 + "\n")
 
-    if option == 2:
+    if option == 4:
         # n=-4
         print("Example 2: Generating dataset with n=3.0 (smoother images)")
         print("-" * 60)
@@ -82,7 +82,7 @@ if __name__ == '__main__':
     import sys
 
     if len(sys.argv) == 1:
-        flg = 0
+        flg = -1
     else:
         flg = sys.argv[1]
 
