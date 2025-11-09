@@ -11,6 +11,8 @@ all_datasets = ['MODIS_SST',
                 'SWOT_L3', 
                 #'SWOT_SSR', 
                 'WNoise',
+                'Pk2',
+                'Pk4',
                 'MNIST',
                 'ImageNet',
                 ]
@@ -53,6 +55,26 @@ def grab_paths(dataset:str):
                                 'wnoise_latents.h5')
         out_dict['opts_file'] = 'opts_nenya_wnoise.json'
         out_dict['pca_file'] = 'pca_latents_WNoise.npz'
+    elif dataset == 'Pk2':
+        if 'OS_DATA' in os.environ:
+            path = os.path.join(os.getenv('OS_DATA'), 'Natural', 'Pk', 'Info')
+            out_dict['path'] = path
+            out_dict['preproc_file'] = os.path.join(path, 'PreProc', 'power_law_n2_64x64.h5')
+            out_dict['latents_file'] = os.path.join(path, 'latents', 'Pk2',
+                                'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm',
+                                'wnoise_latents.h5')
+        out_dict['opts_file'] = 'opts_nenya_Pk2.json'
+        out_dict['pca_file'] = 'pca_latents_Pk2.npz'
+    elif dataset == 'Pk4':
+        if 'OS_DATA' in os.environ:
+            path = os.path.join(os.getenv('OS_DATA'), 'Natural', 'Pk', 'Info')
+            out_dict['path'] = path
+            out_dict['preproc_file'] = os.path.join(path, 'PreProc', 'power_law_n2_64x64.h5')
+            out_dict['latents_file'] = os.path.join(path, 'latents', 'Pk4',
+                                'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm',
+                                'wnoise_latents.h5')
+        out_dict['opts_file'] = 'opts_nenya_Pk4.json'
+        out_dict['pca_file'] = 'pca_latents_Pk4.npz'
     elif dataset == 'orig_MODIS_SST_2km':
         if 'OS_SST' in os.environ:
             path = os.path.join(os.getenv('OS_SST'), 'MODIS_L2', 'Nenya')

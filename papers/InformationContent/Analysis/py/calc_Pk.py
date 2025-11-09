@@ -8,10 +8,11 @@ from nenya import pk as nenya_pk
 
 import info_defs
 
-datasets = ['MODIS_SST', 'MODIS_SST_2km',
-        'VIIRS_SST', 'VIIRS_SST_2km', 'VIIRS_SST_sub', 
-        'LLC_SST_nonoise', 'SWOT_L3', 
-        'WNoise', 'MNIST', 'ImageNet']
+#datasets = ['MODIS_SST', 'MODIS_SST_2km',
+#        'VIIRS_SST', 'VIIRS_SST_2km', 'VIIRS_SST_sub', 
+#        'LLC_SST_nonoise', 'SWOT_L3', 
+#        'WNoise', 'MNIST', 'ImageNet']
+datasets = info_defs.all_datasets
 
 def calc_one(dataset:str, clobber:bool=False):
 
@@ -83,4 +84,5 @@ def plot_em_all_in_one():
 
     
 if __name__ == "__main__":
-    plot_em_all_in_one()
+    calc_all()
+    #plot_em_all_in_one()

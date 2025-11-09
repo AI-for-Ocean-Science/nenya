@@ -534,7 +534,7 @@ def fig_Pk():
 
 
 def fig_multi_eigenmatches(
-    dataset:str, cmap:str, Nmodes:int=9, 
+    dataset:str, cmap:str, modes:list=np.arange(9),
     partition:str='train', nimages:int=9,
     outroot:str='fig_multi_eigenmatches'):
 
@@ -548,11 +548,9 @@ def fig_multi_eigenmatches(
 
     image_idx, similarities = nenya_pca.find_eigenmatches(
         '../Analysis/'+pdict['pca_file'], pdict['latents_file'],
-        modes=np.arange(Nmodes), nimages=nimages)
+        modes=modes, nimages=nimages)
 
-    modes = np.arange(Nmodes)
-    
-    for mode in modes:
+    for tt, mode in enumerate(modes):
 
         outfile = f'{outroot}_{dataset}_mode{mode+1}.png'
         fig = plt.figure(figsize=(6,6))
@@ -560,7 +558,7 @@ def fig_multi_eigenmatches(
 
         for ss in range(nimages):
             # Grab the image
-            img = preproc[partition][image_idx[ss, mode]]
+            img = preproc[partition][image_idx[ss, tt]]
             if img.ndim == 3:
                 img = img[0,...]
 
@@ -571,7 +569,7 @@ def fig_multi_eigenmatches(
                         yticklabels=[], cmap=cmap, cbar=False) 
                         #cbar_kws={'label': clbl})# 'fontsize': 20})
             # Title
-            title = f'sim={similarities[ss, mode]:.2f}'
+            title = f'sim={similarities[ss, tt]:.2f}'
             ax.set_title(title, fontsize=12)
 
         #rsp_utils.set_fontsize(ax, 18)
@@ -734,6 +732,11 @@ def main(flg):
         #    datasets=['MODIS_SST', 'VIIRS',
         #              'LLC_SST', 'SWOT_L3'])
     
+
+    # Team brainstorming
+    if flg == 60:
+        # 103
+        fig_multi_eigenmatches('MODIS_SST', 'jet', modes=[103-1])
 
 
 # Command line execution
