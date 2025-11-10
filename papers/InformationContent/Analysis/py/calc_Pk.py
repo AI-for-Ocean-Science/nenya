@@ -81,8 +81,9 @@ def plot_em_all_in_one():
     plt.tight_layout()
     plt.savefig('Pk_all_datasets.png', dpi=300)
     plt.close()
+    print("Saved combined power spectrum plot as 'Pk_all_datasets.png'")
 
     
 if __name__ == "__main__":
-    calc_all()
-    #plot_em_all_in_one()
+    #calc_all()
+    plot_em_all_in_one()
