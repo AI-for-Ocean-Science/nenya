@@ -19,7 +19,7 @@ if os.path.exists('README.md'):
     with open('README.md') as readme:
         setup_keywords['long_description'] = readme.read()
 setup_keywords['provides'] = [setup_keywords['name']]
-setup_keywords['requires'] = ['Python (>3.10.0)']
+setup_keywords['requires'] = ['Python (>3.11.0)']
 setup_keywords['install_requires'] = [
     'torch',  
     'torchvision', 'seaborn', 'smart-open[s3]', 'pyarrow',
