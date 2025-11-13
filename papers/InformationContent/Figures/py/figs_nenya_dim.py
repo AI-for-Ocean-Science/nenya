@@ -111,6 +111,8 @@ def fig_pca(outfile:str='fig_pca_variance.png',
     clrs = []
     ds = []
     for dataset in datasets:
+        if dataset in ['Pk2', 'Pk4']:
+            continue
         pdict = info_defs.grab_paths(dataset)
         clr = grab_clr(dataset)
         
@@ -486,8 +488,12 @@ def fig_Pk():
         'LLC_SST_nonoise', 'SWOT_L3', 
         'WNoise', 'MNIST', 'ImageNet']
 
-    plt.figure(figsize=(8,6))
-    ax = plt.gca()
+    plt.figure(figsize=(12,6))
+    # two panels 
+    gs = gridspec.GridSpec(1,2)
+    ax_pix = plt.subplot(gs[0])
+    ax_phys = plt.subplot(gs[1])
+
 
     for dataset in datasets:
         pdict = info_defs.grab_paths(dataset)
@@ -510,22 +516,31 @@ def fig_Pk():
         else:
             ls = '-'
         clr = grab_clr(dataset)
-        ax.loglog(wavelength, power*k, label=dataset, 
-                  color=clr, ls=ls)
 
-    plt.xlabel('Wavelength (km)')
-    plt.ylabel(r'Power Spectrum per log bin: $k \, P(k)$')
+        # Pixel
+        dx = pdict['dx'] if 'dx' in pdict else 1.0
+        ax_pix.loglog(wavelength/dx, power*k*dx, label=dataset,
+                    color=clr, ls=ls)
+
+        # Physical
+        if dataset in info_defs.natural_datasets:
+            print(f"Skipping natural dataset for physical Pk plot: {dataset}")
+            continue
+        ax_phys.loglog(wavelength, power*k, 'o', label=dataset, 
+                  color=clr, ls=ls, markersize=2.5)
+
     #plt.title('Power Spectra for Various Datasets')
-    ax.legend(fontsize=12, loc='upper left')
-    plt.grid(True, ls="--")
-    plt.tight_layout()
+    for ax in [ax_pix, ax_phys]:
+        ax.legend(fontsize=12, loc='upper left')
+        ax.set_xlabel('Wavelength (km)')
+        ax.set_ylabel(r'Power Spectrum per log bin: $k \, P(k)$')
 
     # Add wave number on the top axis
-    ax_top = ax.secondary_xaxis('top', functions=(lambda x: 1e3/x, lambda x: 1e3/x))
+    ax_top = ax_phys.secondary_xaxis('top', functions=(lambda x: 1e3/x, lambda x: 1e3/x))
     ax_top.set_xlabel('Wavenumber (cycles/km)')
 
-    rsp_utils.set_fontsize(ax, 18)
-    rsp_utils.set_fontsize(ax_top, 18)
+    for ax in [ax_pix, ax_phys, ax_top]:
+        rsp_utils.set_fontsize(ax, 18)
     
     plt.tight_layout()
     plt.savefig('Pk_all_datasets.png', dpi=300)
@@ -579,58 +594,6 @@ def fig_multi_eigenmatches(
         plt.tight_layout()#pad=0.0, h_pad=0.0, w_pad=0.3)
         plt.savefig(outfile, dpi=300)
         print(f"Saved: {outfile}")
-
-def fig_Pk():
-    datasets = ['MODIS_SST', 'MODIS_SST_2km',
-        'VIIRS_SST', 'VIIRS_SST_2km', 'VIIRS_SST_sub', 
-        'LLC_SST_nonoise', 'SWOT_L3', 
-        'WNoise', 'MNIST', 'ImageNet']
-
-    plt.figure(figsize=(8,6))
-    ax = plt.gca()
-
-    for dataset in datasets:
-        pdict = info_defs.grab_paths(dataset)
-        pk_file = os.path.join('../Analysis', pdict['Pk_file'])
-        if not os.path.exists(pk_file):
-            print(f"Pk file for {dataset} not found, skipping -- {pk_file}")
-            continue
-        # Load
-        data = np.load(pk_file)
-        k = data['wavenumber']
-        power = data['power']
-        wavelength = data['wavelength']
-
-        if 'sub' in dataset:
-            ls = '--' 
-        elif '_noise' in dataset:
-            ls = '--' 
-        elif '2km' in dataset:
-            ls = ':' 
-        else:
-            ls = '-'
-        clr = grab_clr(dataset)
-        ax.loglog(wavelength, power*k, label=dataset, 
-                  color=clr, ls=ls)
-
-    plt.xlabel('Wavelength (km)')
-    plt.ylabel(r'Power Spectrum per log bin: $k \, P(k)$')
-    #plt.title('Power Spectra for Various Datasets')
-    ax.legend(fontsize=12, loc='upper left')
-    plt.grid(True, ls="--")
-    plt.tight_layout()
-
-    # Add wave number on the top axis
-    ax_top = ax.secondary_xaxis('top', functions=(lambda x: 1e3/x, lambda x: 1e3/x))
-    ax_top.set_xlabel('Wavenumber (cycles/km)')
-
-    rsp_utils.set_fontsize(ax, 18)
-    rsp_utils.set_fontsize(ax_top, 18)
-    
-    plt.tight_layout()
-    plt.savefig('Pk_all_datasets.png', dpi=300)
-    plt.close()
-    print(f'Wrote: Pk_all_datasets.png')
 
 def main(flg):
     if flg== 'all':

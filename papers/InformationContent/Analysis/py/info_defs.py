@@ -17,6 +17,13 @@ all_datasets = ['MODIS_SST',
                 'ImageNet',
                 ]
 
+natural_datasets = ['WNoise',
+                    'Pk2',
+                    'Pk4',
+                    'MNIST',
+                    'ImageNet',
+                    ]
+
 def grab_paths(dataset:str):
 
     out_dict = {}
