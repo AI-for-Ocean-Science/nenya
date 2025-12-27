@@ -41,14 +41,18 @@ cdict['MODIS'] = '#1f77b4'  # Blue
 cdict['VIIRS'] = '#ff7f0e'  # Orange
 cdict['LLC'] = '#2ca02c'  # Green
 cdict['LLC_SSHa'] = '#9467bd'  # Purple
-# Gray
-cdict['MNIST'] = '#7f7f7f'  # Gray
 # Red
 cdict['SWOT_L3'] = '#d62728'  # Red
 # Black
 cdict['ImageNet'] = '#000000'  # Black
+# Silver
+cdict['WNoise'] = '#C0C0C0'
 # Brown
-cdict['WNoise'] = '#8c564b'  # Brown
+cdict['Pk2'] = '#8c564b'  # Brown
+# Tan
+cdict['Pk4'] = '#D2B48C'
+# Gray
+cdict['MNIST'] = '#7f7f7f'  # Gray
 
 
 def grab_clr(dataset:str):
@@ -483,19 +487,15 @@ def fig_eigenmatches(dataset:str, cmap:str, Nmodes:int=9,
     print(f"Saved: {outfile}")
 
 def fig_Pk():
-    datasets = ['MODIS_SST', 'MODIS_SST_2km',
-        'VIIRS_SST', 'VIIRS_SST_2km', 'VIIRS_SST_sub', 
-        'LLC_SST_nonoise', 'SWOT_L3', 
-        'WNoise', 'MNIST', 'ImageNet']
 
+    # go
     plt.figure(figsize=(12,6))
-    # two panels 
+    # two panels: Natural (left), Remote Sensing (right)
     gs = gridspec.GridSpec(1,2)
-    ax_pix = plt.subplot(gs[0])
-    ax_phys = plt.subplot(gs[1])
+    ax_natural = plt.subplot(gs[0])
+    ax_remote = plt.subplot(gs[1])
 
-
-    for dataset in datasets:
+    for dataset in info_defs.all_datasets:
         pdict = info_defs.grab_paths(dataset)
         pk_file = os.path.join('../Analysis', pdict['Pk_file'])
         if not os.path.exists(pk_file):
@@ -508,40 +508,65 @@ def fig_Pk():
         wavelength = data['wavelength']
 
         if 'sub' in dataset:
-            ls = '--' 
+            ls = '--'
         elif '_noise' in dataset:
-            ls = '--' 
+            ls = '--'
         elif '2km' in dataset:
-            ls = ':' 
+            ls = ':'
         else:
             ls = '-'
         clr = grab_clr(dataset)
 
-        # Pixel
+        # Pixel units
         dx = pdict['dx'] if 'dx' in pdict else 1.0
-        ax_pix.loglog(wavelength/dx, power*k*dx, label=dataset,
-                    color=clr, ls=ls)
 
-        # Physical
+        # Plot to appropriate panel
         if dataset in info_defs.natural_datasets:
-            print(f"Skipping natural dataset for physical Pk plot: {dataset}")
-            continue
-        ax_phys.loglog(wavelength, power*k, 'o', label=dataset, 
-                  color=clr, ls=ls, markersize=2.5)
+            ax_natural.loglog(wavelength/dx, power*k*dx, label=dataset,
+                        color=clr, ls=ls)
+        else:
+            ax_remote.loglog(wavelength, power*k, label=dataset,
+                      color=clr, ls=ls)
 
-    #plt.title('Power Spectra for Various Datasets')
-    for ax in [ax_pix, ax_phys]:
-        ax.legend(fontsize=12, loc='upper left')
-        ax.set_xlabel('Wavelength (km)')
-        ax.set_ylabel(r'Power Spectrum per log bin: $k \, P(k)$')
+    # Add power-law reference curves on the left panel (Natural Images)
+    # Use wavelength range from the natural panel
+    wv_ref = np.logspace(0.5, 2, 50)  # wavelengths in pixels
+    k_ref = 1.0 / wv_ref
+    # Normalize to a reference point
+    norm_idx = len(wv_ref) // 2
+    norm_val = 1e-3  # arbitrary normalization for visibility
 
-    # Add wave number on the top axis
-    ax_top = ax_phys.secondary_xaxis('top', functions=(lambda x: 1e3/x, lambda x: 1e3/x))
+    # k^-2 power law: P(k) ~ k^-2, so k*P(k) ~ k^-1 ~ wavelength^1
+    pk2_power = norm_val * (wv_ref / wv_ref[norm_idx])**1
+    ax_natural.loglog(wv_ref, pk2_power, ':', color=cdict['Pk2'],
+                      label=r'$k^{-2}$', lw=2)
+
+    # k^-4 power law: P(k) ~ k^-4, so k*P(k) ~ k^-3 ~ wavelength^3
+    pk4_power = norm_val * (wv_ref / wv_ref[norm_idx])**3
+    ax_natural.loglog(wv_ref, pk4_power, ':', color=cdict['Pk4'],
+                      label=r'$k^{-4}$', lw=2)
+
+    # Labels and formatting
+    ax_natural.set_title('Natural Images', fontsize=16)
+    ax_natural.legend(fontsize=12, loc='lower right')
+    ax_natural.set_xlabel('Wavelength (pixels)')
+    ax_natural.set_ylabel(r'Power Spectrum per log bin: $k \, P(k)$')
+
+    ax_remote.set_title('Remote Sensing', fontsize=16)
+    ax_remote.legend(fontsize=12, loc='upper left')
+    ax_remote.set_xlabel('Wavelength (km)')
+    ax_remote.set_ylabel(r'Power Spectrum per log bin: $k \, P(k)$')
+
+    # Add wave number on the top axis for remote sensing panel
+    ax_top = ax_remote.secondary_xaxis('top', functions=(lambda x: 1e3/x, lambda x: 1e3/x))
     ax_top.set_xlabel('Wavenumber (cycles/km)')
 
-    for ax in [ax_pix, ax_phys, ax_top]:
+    ax_top2 = ax_natural.secondary_xaxis('top', functions=(lambda x: 1e3/x, lambda x: 1e3/x))
+    ax_top2.set_xlabel('Wavenumber (cycles/km)')
+
+    for ax in [ax_natural, ax_remote, ax_top, ax_top2]:
         rsp_utils.set_fontsize(ax, 18)
-    
+
     plt.tight_layout()
     plt.savefig('Pk_all_datasets.png', dpi=300)
     plt.close()
