@@ -549,23 +549,26 @@ def fig_Pk():
     # Labels and formatting
     ax_natural.set_title('Natural Images', fontsize=16)
     ax_natural.legend(fontsize=12, loc='lower right')
-    ax_natural.set_xlabel('Wavelength (pixels)')
+    ax_natural.set_xlabel('Size (pixels)')
     ax_natural.set_ylabel(r'Power Spectrum per log bin: $k \, P(k)$')
+    ax_natural.grid()
 
     ax_remote.set_title('Remote Sensing', fontsize=16)
     ax_remote.legend(fontsize=12, loc='upper left')
     ax_remote.set_xlabel('Wavelength (km)')
     ax_remote.set_ylabel(r'Power Spectrum per log bin: $k \, P(k)$')
+    ax_remote.grid()
 
     # Add wave number on the top axis for remote sensing panel
     ax_top = ax_remote.secondary_xaxis('top', functions=(lambda x: 1e3/x, lambda x: 1e3/x))
     ax_top.set_xlabel('Wavenumber (cycles/km)')
 
     ax_top2 = ax_natural.secondary_xaxis('top', functions=(lambda x: 1e3/x, lambda x: 1e3/x))
-    ax_top2.set_xlabel('Wavenumber (cycles/km)')
+    ax_top2.set_xlabel('Wavenumber (cycles/pixels)')
 
     for ax in [ax_natural, ax_remote, ax_top, ax_top2]:
         rsp_utils.set_fontsize(ax, 18)
+        
 
     plt.tight_layout()
     plt.savefig('Pk_all_datasets.png', dpi=300)

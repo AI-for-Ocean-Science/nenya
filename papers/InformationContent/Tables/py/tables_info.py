@@ -24,14 +24,14 @@ def mktab_datasets(outfile='tab_datasets.tex', sub=False, local=True):
     tbfil.write('\\begin{table*}\n')
     tbfil.write('\\centering\n')
     tbfil.write('\\caption{Datasets\\label{tab:datasets}}\n')
-    tbfil.write('\\begin{tabular}{cccccccccc}\n')
+    tbfil.write('\\begin{tabular}{ccccccccccc}\n')
     tbfil.write('\\hline \n')
-    tbfil.write('Name & Source & \\npix & km pix$^{-1}$ & Processing \\\\ \n')
-    #tbfil.write('(deg) & (deg) & & (K) \n') 
+    tbfil.write('Name & Type & Source & \\npix & km pix$^{-1}$ & Processing \\\\ \n')
+    #tbfil.write('(deg) & (deg) & & (K) \n')
     tbfil.write('\\\\ \n')
     tbfil.write('\\hline \n')
 
-    # Loop me 
+    # Loop me
     for dataset in info_defs.all_datasets:
         pdict = info_defs.grab_paths(dataset)
 
@@ -39,12 +39,28 @@ def mktab_datasets(outfile='tab_datasets.tex', sub=False, local=True):
         cdataset = dataset.replace('_', '\\_')
         slin = f'{cdataset}'
 
-        # Sensor
+        # Type (SST, SSH, etc.)
+        if 'SST' in dataset:
+            slin += ' & SST'
+        elif 'SSHa' in dataset or 'SWOT' in dataset:
+            slin += ' & SSH'
+        elif dataset == 'WNoise':
+            slin += ' & Noise'
+        elif dataset in ['Pk2', 'Pk4']:
+            slin += ' & Power-law'
+        elif dataset == 'MNIST':
+            slin += ' & Digits'
+        elif dataset == 'ImageNet':
+            slin += ' & Natural'
+        else:
+            slin += ' &'
+
+        # Sensor/Source
         if 'SST' in dataset:
             slin += f' & {dataset.split("_")[0]}'
         elif 'SWOT' in dataset:
             slin += ' & SWOT'
-        else: 
+        else:
             slin += ' &'
 
         # Npix
@@ -106,13 +122,18 @@ def mktab_datasets(outfile='tab_datasets.tex', sub=False, local=True):
     # End
     tbfil.write('\\hline \n')
     tbfil.write('\\end{tabular} \n')
-    #tbfil.write('\\end{minipage} \n')
     tbfil.write('\\\\ \n')
-    #tbfil.write('Notes: The \\DT\\ value listed here is measured from the inner $40 \\times 40$\,pixel$^2$ region of the cutout. \\\\ \n')
-    #tbfil.write('LL is the log-likelihood metric calculated from the \\ulmo\\ algorithm. \\\\ \n')
-    #tbfil.write('$U_{0,\\rm all}, U_{1,\\rm all}$ are the UMAP values for the UMAP analysis on the full dataset. \\\\ \n')
-    #tbfil.write('$U_0, U_1$ are the UMAP values for the UMAP analysis in the \\DT\\ bin for this cutout. \\\\ \n')
-    #tbfil.write('{$^b$}Assumes $\\nu=1$GHz, $n_e = 4 \\times 10^{-3} \\cm{-3}$, $z_{\\rm DLA} = 1$, $z_{\\rm source} = 2$.\\\\ \n')
+    # Table note describing processing steps
+    tbfil.write('\\begin{minipage}{0.9\\textwidth}\n')
+    tbfil.write('\\small\n')
+    tbfil.write('\\textbf{Processing abbreviations:} ')
+    tbfil.write('crop $N$ = random crop to $N \\times N$ pixels; ')
+    tbfil.write('jit $M$ = random spatial jitter up to $M$ pixels; ')
+    tbfil.write('flip = random horizontal/vertical flip; ')
+    tbfil.write('rot = random 90$^\\circ$ rotation; ')
+    tbfil.write('noise $\\sigma$ = additive Gaussian noise with standard deviation $\\sigma$; ')
+    tbfil.write('demean = subtract mean value from each cutout.\n')
+    tbfil.write('\\end{minipage}\n')
     tbfil.write('\\end{table*} \n')
 
     tbfil.close()
