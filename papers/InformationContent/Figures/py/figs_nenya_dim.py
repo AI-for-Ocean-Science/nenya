@@ -629,39 +629,6 @@ def main(flg):
     else:
         flg= int(flg)
 
-    # Learning curves
-    if flg == 1:
-        fig_learning_curves()
-        #fig_learning_curves(outfile='fig_learning_curves.pdf')
-
-    # PCA variance on latent space
-    if flg == 2:
-        #fig_pca(show_cum_point=0.99, outfile='fig_pca_variance_zoomin.png',
-        #        xmnx=(30, 300))
-        fig_pca(show_cum_point=0.99)
-        #fig_pca(outfile='fig_pca_noise.png',
-        #    datasets=['MODIS_SST', 'MODIS_SST_2km', 'LLC_SST_nonoise', 'LLC_SST_noise'],
-        #    show_cum_point=0.99)
-
-    # Eigenmodes
-    if flg == 3:
-        fig_eigenimages('MNIST', 'Greys')
-
-    # Eigenmodes
-    if flg == 4:
-        fig_eigenmatches('MODIS_SST', 'jet')
-        #fig_eigenmatches('MODIS_SST', 'jet', last_ones=True,
-        #                 outroot='fig_last_eigenmatches')
-
-    # Eigenmodes
-    if flg == 5:
-        #fig_eigenmatches('MODIS_SST', 'jet')
-        fig_Pk()
-
-    # PCA variance
-    if flg == 6:
-        fig_true_pca(show_cum_point=0.99)
-
     # SWOT learning curve
     if flg == 30:
         #fig_learning_curve('SWOT')
@@ -728,6 +695,41 @@ def main(flg):
     if flg == 60:
         # 103
         fig_multi_eigenmatches('MODIS_SST', 'jet', modes=[103-1])
+
+    # Paper figures
+
+    # Learning curves
+    if flg == 1:
+        fig_learning_curves()
+        #fig_learning_curves(outfile='fig_learning_curves.pdf')
+
+    # PCA variance on latent space
+    if flg == 2:
+        #fig_pca(show_cum_point=0.99, outfile='fig_pca_variance_zoomin.png',
+        #        xmnx=(30, 300))
+        fig_pca(show_cum_point=0.99)
+        #fig_pca(outfile='fig_pca_noise.png',
+        #    datasets=['MODIS_SST', 'MODIS_SST_2km', 'LLC_SST_nonoise', 'LLC_SST_noise'],
+        #    show_cum_point=0.99)
+
+    # Eigenmodes
+    if flg == 3:
+        fig_eigenimages('MNIST', 'Greys')
+
+    # Eigenmodes
+    if flg == 4:
+        fig_eigenmatches('MODIS_SST', 'jet')
+        #fig_eigenmatches('MODIS_SST', 'jet', last_ones=True,
+        #                 outroot='fig_last_eigenmatches')
+
+    # Eigenmodes
+    if flg == 5:
+        #fig_eigenmatches('MODIS_SST', 'jet')
+        fig_Pk()
+
+    # PCA variance
+    if flg == 6:
+        fig_true_pca(show_cum_point=0.99)
 
 
 # Command line execution

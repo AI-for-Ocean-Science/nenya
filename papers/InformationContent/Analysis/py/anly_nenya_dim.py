@@ -59,7 +59,7 @@ if __name__ == '__main__':
     #  LLC SST
     #pca_latents('LLC_SST_nonoise')
     #pca_latents('LLC_SST_noise')
-    #pca_latents('LLC_SSHa')
+    pca_latents('LLC_SSHa')
 
     # Natural
     #pca_latents('MNIST')
