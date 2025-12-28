@@ -1,6 +1,7 @@
 """  Module for Tables for the SSL paper """
 # Imports
 import os, sys
+import json
 
 import h5py
 
@@ -57,8 +58,48 @@ def mktab_datasets(outfile='tab_datasets.tex', sub=False, local=True):
         else:
             slin += f'& ...'
 
-        # Processing
-        
+        # Processing - load from JSON opts file
+        opts_file = os.path.join('../Analysis', pdict['opts_file'])
+        processing_str = '& ...'
+        if os.path.exists(opts_file):
+            try:
+                with open(opts_file, 'r') as f:
+                    opts = json.load(f)
+
+                # Build processing string from JSON parameters
+                proc_parts = []
+
+                # Random crop and jitter
+                if 'random_cropjitter' in opts and opts['random_cropjitter']:
+                    crop_dim, jitter = opts['random_cropjitter']
+                    proc_parts.append(f'crop {crop_dim}')
+                    if jitter > 0:
+                        proc_parts.append(f'jit {jitter}')
+
+                # Flip
+                if opts.get('flip', False):
+                    proc_parts.append('flip')
+
+                # Rotate
+                if opts.get('rotate', False):
+                    proc_parts.append('rot')
+
+                # Gaussian noise
+                if 'gauss_noise' in opts and opts['gauss_noise'] > 0:
+                    proc_parts.append(f'noise {opts["gauss_noise"]}')
+
+                # Demean
+                if opts.get('demean', False):
+                    proc_parts.append('demean')
+
+                if proc_parts:
+                    processing_str = f'& {", ".join(proc_parts)}'
+            except (json.JSONDecodeError, KeyError, FileNotFoundError) as e:
+                # If there's an error reading the file, keep the default '...'
+                pass
+
+        slin += processing_str
+
         tbfil.write(slin)
         tbfil.write('\\\\ \n')
 
