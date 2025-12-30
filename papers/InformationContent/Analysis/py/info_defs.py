@@ -17,6 +17,10 @@ all_datasets = ['MODIS_SST',
                 'ImageNet',
                 ]
 
+primary_remote_datasets = ['MODIS_SST', 
+                'VIIRS_SST', 
+                'SWOT_L3'] 
+
 natural_datasets = ['WNoise',
                     'Pk2',
                     'Pk4',

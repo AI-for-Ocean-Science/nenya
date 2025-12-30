@@ -14,6 +14,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from matplotlib import pyplot as plt
 import matplotlib as mpl
 import matplotlib.gridspec as gridspec
+import matplotlib.patheffects as patheffects
 
 import seaborn as sns
 
@@ -74,12 +75,108 @@ def grab_ls(dataset:str):
 
     return ls
 
+def fig_pca_2panel(outfile:str='fig_pca_2panel.png',
+                   cumulative:bool=False,
+                   show_cum_point:float=None,
+                   xmnx:tuple=None,
+                   exponent:float=-0.5):
+    """
+    Generate a 2-panel PCA variance explained plot.
+
+    Panel 1 (left): Natural Images - MNIST + ImageNet
+    Panel 2 (right): Remote Sensing - MODIS_SST + ImageNet
+
+    Args:
+        outfile (str): The output file path for the saved plot.
+        cumulative (bool): If True, plot the cumulative variance explained.
+        show_cum_point (float): If provided, marks the point where cumulative
+            variance reaches this value.
+        xmnx (tuple): Sets xlim of the x-axis if provided.
+        exponent (float): The exponent for the power-law fit line.
+    """
+    # Define datasets for each panel
+    natural_datasets_panel = info_defs.natural_datasets
+    remote_datasets_panel = info_defs.primary_remote_datasets
+    remote_datasets_panel += ['ImageNet']
+
+    # Cumulative filename adjustment
+    if cumulative:
+        if 'variance' in outfile:
+            outfile = outfile.replace('variance', 'cumulative')
+
+    # Create figure with 2 panels
+    fig = plt.figure(figsize=(14, 6))
+    gs = gridspec.GridSpec(1, 2)
+
+    panels = [
+        (natural_datasets_panel, 'Natural Images'),
+        (remote_datasets_panel, 'Remote Sensing')
+    ]
+
+    for panel_idx, (datasets, title) in enumerate(panels):
+        ax = plt.subplot(gs[panel_idx])
+
+        # Load and plot each dataset
+        for ss, dataset in enumerate(datasets):
+            pdict = info_defs.grab_paths(dataset)
+            clr = grab_clr(dataset)
+            ls = grab_ls(dataset)
+
+            pca_file = f'../Analysis/{pdict["pca_file"]}'
+            print(f"Loading PCA file: {pca_file}")
+            d = np.load(pca_file)
+
+            # Calculate y values
+            cumsum = 1 - np.cumsum(d['explained_variance'])
+            if cumulative:
+                yvals = cumsum
+            else:
+                yvals = d['explained_variance']
+
+            xs = np.arange(d['explained_variance'].size) + 1
+            ax.plot(xs, yvals, label=dataset.replace('_', '/'),
+                    color=clr, ls=ls, lw=2)
+
+            # Add cumulative point marker
+            if show_cum_point is not None:
+                imin = np.argmin(np.abs((1 - cumsum) - show_cum_point))
+                ax.plot(imin + 1, yvals[imin], 'x', color=clr, markersize=10)
+
+        # Add power-law reference line
+        xs_ref = np.arange(d['explained_variance'].size) + 1
+        ys = d['explained_variance'][10] * (xs_ref / xs_ref[10])**(exponent)
+        ax.plot(xs_ref, ys, '--', color='gray', label=f'Power law: {exponent}')
+
+        # Labels and formatting
+        ax.set_title(title, fontsize=18)
+        if cumulative:
+            ax.set_ylabel('Cumulative Variance explained per mode')
+        else:
+            ax.set_ylabel('Variance explained per mode')
+        ax.set_xlabel('Number of PCA components (Latent Space)')
+
+        ax.set_xscale('log')
+        ax.set_yscale('log')
+        ax.minorticks_on()
+        ax.legend(fontsize=13, loc='lower left')
+        ax.grid(True, which='both', ls='--', lw=0.5)
+
+        if xmnx is not None:
+            ax.set_xlim(xmnx)
+
+        rsp_utils.set_fontsize(ax, 16)
+
+    plt.tight_layout()
+    plt.savefig(outfile, dpi=300)
+    print(f"Saved: {outfile}")
+
+
 def fig_pca(outfile:str='fig_pca_variance.png',
             datasets:list=None, cumulative:bool=False,
             frac_remain:bool=False,
             show_cum_point:float=None,
             xmnx:tuple=None,
-            exponent:float=-0.5): 
+            exponent:float=-0.5):
     """
     Generate and save a PCA variance explained plot.
     This function creates a plot to visualize the variance explained by PCA components
@@ -115,8 +212,8 @@ def fig_pca(outfile:str='fig_pca_variance.png',
     clrs = []
     ds = []
     for dataset in datasets:
-        if dataset in ['Pk2', 'Pk4']:
-            continue
+        #if dataset in ['Pk2', 'Pk4']:
+        #    continue
         pdict = info_defs.grab_paths(dataset)
         clr = grab_clr(dataset)
         
@@ -264,6 +361,7 @@ def fig_true_pca(outfile:str='fig_true_pca.png',
         ls = grab_ls(datasets[ss])
         # Cumulative?
         cumsum = 1-np.cumsum(d['explained_variance_ratio'])
+        #embed(header='267 of figs')
         if cumulative:
             yvals = cumsum
         elif frac_remain:
@@ -486,6 +584,85 @@ def fig_eigenmatches(dataset:str, cmap:str, Nmodes:int=9,
     plt.savefig(outfile, dpi=300)
     print(f"Saved: {outfile}")
 
+def fig_example_images(outfile:str='fig_example_images.png',
+                       idx:int=0):
+    """
+    Generate a 4-panel figure showing example images from VIIRS_SST, SWOT_L3,
+    ImageNet, and LLC_SST datasets.
+
+    Args:
+        outfile (str): The output file path for the saved plot.
+        idx (int): Index of the image to show from each dataset.
+    """
+    datasets = ['VIIRS_SST', 'SWOT_L3', 'ImageNet', 'LLC_SST_nonoise']
+    titles = ['VIIRS SST', 'SWOT L3', 'ImageNet', 'LLC SST']
+    cmaps = ['jet', 'RdBu_r', 'gray', 'jet']  # gray for ImageNet if single-channel
+    cbar_labels = ['SST (K)', 'SSHa (m)', 'Intensity', 'SST (K)']
+
+    # Physical scales (km) - from info_defs
+    # VIIRS: 0.75 km/pixel, 64 pixels -> 48 km
+    # SWOT: 0.25 km/pixel, 64 pixels -> 16 km
+    # LLC: 144/64 km/pixel, 64 pixels -> 144 km
+    scales = {
+        'VIIRS_SST': 0.75 * 192,  # 48 km
+        'SWOT_L3': 0.25 * 128,    # 16 km
+        'LLC_SST_nonoise': (144./64) * 64,  # 144 km
+        'ImageNet': None
+    }
+
+    fig, axes = plt.subplots(2, 2, figsize=(10, 8))
+
+    for ax, dataset, title, cmap, cbar_lbl in zip(axes.flatten(), datasets, titles, cmaps, cbar_labels):
+        pdict = info_defs.grab_paths(dataset)
+        preproc_file = pdict['preproc_file']
+
+        with h5py.File(preproc_file, 'r') as f:
+            img = f['train'][idx]
+
+        # Handle different image formats
+        if img.ndim == 3:
+            if img.shape[0] == 1:
+                # Single channel, squeeze
+                img = img[0, ...]
+            elif img.shape[0] == 3:
+                # RGB image (C, H, W) -> (H, W, C)
+                img = np.transpose(img, (1, 2, 0))
+                # Normalize to [0, 1] for display
+                img = (img - img.min()) / (img.max() - img.min())
+
+        # Plot
+        if img.ndim == 2:
+            orig = None if dataset == 'ImageNet' else 'lower'
+            im = ax.imshow(img, cmap=cmap, origin=orig)
+            cbar = plt.colorbar(im, ax=ax, fraction=0.046, pad=0.02)
+            cbar.set_label(cbar_lbl, fontsize=16)
+            cbar.ax.tick_params(labelsize=12)
+        else:
+            embed(header='637 of figs')
+
+        ax.set_title(title, fontsize=16)
+        ax.set_xticks([])
+        ax.set_yticks([])
+
+        # Add physical scale bar for SST and SWOT
+        scale_km = scales[dataset]
+        if scale_km is not None:
+            npix = img.shape[0]
+            # Add scale bar (10 km or appropriate fraction)
+            bar_km = 10 if scale_km < 50 else (50 if scale_km < 150 else 50)
+            bar_pix = bar_km / (scale_km / npix)
+            # Position scale bar
+            x0, y0 = 5, 5
+            ax.plot([x0, x0 + bar_pix], [y0, y0], 'k-', lw=3)
+            ax.text(x0 + bar_pix/2, y0 + 3, f'{bar_km} km',
+                    ha='center', va='bottom', fontsize=14,
+                    color='black', fontweight='bold')
+
+    plt.tight_layout(pad=0.5, h_pad=0.5, w_pad=0.5)
+    plt.savefig(outfile, dpi=300, bbox_inches='tight')
+    print(f"Saved: {outfile}")
+
+
 def fig_Pk():
 
     # go
@@ -707,7 +884,16 @@ def main(flg):
     if flg == 2:
         #fig_pca(show_cum_point=0.99, outfile='fig_pca_variance_zoomin.png',
         #        xmnx=(30, 300))
-        fig_pca(show_cum_point=0.99)
+
+        # Natural
+        if False:
+            fig_pca(show_cum_point=0.99, 
+                datasets=info_defs.natural_datasets,
+                outfile='fig_pca_natural.png')
+        # All
+        #fig_pca(show_cum_point=0.99)
+        fig_pca_2panel(show_cum_point=0.99)
+
         #fig_pca(outfile='fig_pca_noise.png',
         #    datasets=['MODIS_SST', 'MODIS_SST_2km', 'LLC_SST_nonoise', 'LLC_SST_noise'],
         #    show_cum_point=0.99)
@@ -730,6 +916,11 @@ def main(flg):
     # PCA variance
     if flg == 6:
         fig_true_pca(show_cum_point=0.99)
+
+    # PCA variance
+    if flg == 7:
+        fig_example_images()
+
 
 
 # Command line execution
