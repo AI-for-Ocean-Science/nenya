@@ -1,30 +1,30 @@
 \begin{table*}
 \centering
 \caption{Datasets\label{tab:datasets}}
-\begin{tabular}{ccccccccccc}
+\begin{tabular}{cccccccccccc}
 \hline 
-Name & Type & Source & \npix & km pix$^{-1}$ & Processing \\ 
+Name & Type & Source & \npix & km pix$^{-1}$ & Processing & $N_{99}$ \\ 
 \\ 
 \hline 
-MODIS\_SST & SST & MODIS& 128& 1.10& crop 110, jit 10, flip, rot, demean\\ 
-MODIS\_SST\_2km & SST & MODIS& 64& 2.00& crop 40, jit 5, flip, rot, demean\\ 
-VIIRS\_SST & SST & VIIRS& 192& 0.75& crop 160, jit 10, flip, rot, demean\\ 
-VIIRS\_SST\_2km & SST & VIIRS& 64& 2.00& crop 40, jit 5, flip, rot, demean\\ 
-VIIRS\_SST\_sub & SST & VIIRS& 64& 0.75& crop 40, jit 5, flip, rot, demean\\ 
-LLC\_SST\_nonoise & SST & LLC& 64& 2.25& crop 40, jit 5, flip, rot, demean\\ 
-LLC\_SST\_noise & SST & LLC& 64& 2.25& crop 40, jit 5, flip, rot, demean\\ 
-LLC\_SSHa & SSH && 64& 2.25& crop 40, jit 5, flip, rot, demean\\ 
-SWOT\_L3 & SSH & SWOT& 128& 0.25& crop 110, jit 10, flip, rot, demean\\ 
-WNoise & Noise && 64& 2.00& crop 40, jit 5, flip, rot\\ 
-Pk2 & Power-law && 64& 2.00& crop 40, jit 5, flip, rot\\ 
-Pk4 & Power-law && 64& 2.00& crop 40, jit 5, flip, rot\\ 
-MNIST & Digits && 28& 2.00& crop 22, jit 3, flip, rot\\ 
-ImageNet & Natural && 128& 2.00& crop 110, jit 10, flip, rot, demean\\ 
+MODIS\_SST & SST & MODIS& 128& 1.10& crop 110, jit 10, flip, rot, demean& 111\\ 
+MODIS\_SST\_2km & SST & MODIS& 64& 2.00& crop 40, jit 5, flip, rot, demean& 67\\ 
+VIIRS\_SST & SST & VIIRS& 192& 0.75& crop 160, jit 10, flip, rot, demean& 108\\ 
+VIIRS\_SST\_2km & SST & VIIRS& 64& 2.00& crop 40, jit 5, flip, rot, demean& 75\\ 
+VIIRS\_SST\_sub & SST & VIIRS& 64& 0.75& crop 40, jit 5, flip, rot, demean& 83\\ 
+LLC\_SST\_nonoise & SST & LLC& 64& 2.25& crop 40, jit 5, flip, rot, demean& 76\\ 
+LLC\_SST\_noise & SST & LLC& 64& 2.25& crop 40, jit 5, flip, rot, demean& 57\\ 
+LLC\_SSHa & SSH && 64& 2.25& crop 40, jit 5, flip, rot, demean& 76\\ 
+SWOT\_L3 & SSH & SWOT& 128& 0.25& crop 110, jit 10, flip, rot, demean& 89\\ 
+WNoise & Noise && 64& 2.00& crop 40, jit 5, flip, rot& 11\\ 
+Pk2 & Power-law && 64& 2.00& crop 40, jit 5, flip, rot& 24\\ 
+Pk4 & Power-law && 64& 2.00& crop 40, jit 5, flip, rot& 42\\ 
+MNIST & Digits && 28& 2.00& crop 22, jit 3, flip, rot& 67\\ 
+ImageNet & Natural && 128& 2.00& crop 110, jit 10, flip, rot, demean& 140\\ 
 \hline 
 \end{tabular} 
 \\ 
 \begin{minipage}{0.9\textwidth}
 \small
-\textbf{Processing abbreviations:} crop $N$ = random crop to $N \times N$ pixels; jit $M$ = random spatial jitter up to $M$ pixels; flip = random horizontal/vertical flip; rot = random 90$^\circ$ rotation; noise $\sigma$ = additive Gaussian noise with standard deviation $\sigma$; demean = subtract mean value from each cutout.
+\textbf{Processing abbreviations:} crop $N$ = random crop to $N \times N$ pixels; jit $M$ = random spatial jitter up to $M$ pixels; flip = random horizontal/vertical flip; rot = random 90$^\circ$ rotation; noise $\sigma$ = additive Gaussian noise with standard deviation $\sigma$; demean = subtract mean value from each cutout. $N_{99}$ = number of latent space PCA components required to explain 99\% of the variance.
 \end{minipage}
 \end{table*} 

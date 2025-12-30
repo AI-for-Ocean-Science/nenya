@@ -3,6 +3,7 @@
 import os, sys
 import json
 
+import numpy as np
 import h5py
 
 # Local
@@ -24,9 +25,9 @@ def mktab_datasets(outfile='tab_datasets.tex', sub=False, local=True):
     tbfil.write('\\begin{table*}\n')
     tbfil.write('\\centering\n')
     tbfil.write('\\caption{Datasets\\label{tab:datasets}}\n')
-    tbfil.write('\\begin{tabular}{ccccccccccc}\n')
+    tbfil.write('\\begin{tabular}{cccccccccccc}\n')
     tbfil.write('\\hline \n')
-    tbfil.write('Name & Type & Source & \\npix & km pix$^{-1}$ & Processing \\\\ \n')
+    tbfil.write('Name & Type & Source & \\npix & km pix$^{-1}$ & Processing & $N_{99}$ \\\\ \n')
     #tbfil.write('(deg) & (deg) & & (K) \n')
     tbfil.write('\\\\ \n')
     tbfil.write('\\hline \n')
@@ -116,6 +117,20 @@ def mktab_datasets(outfile='tab_datasets.tex', sub=False, local=True):
 
         slin += processing_str
 
+        # N_99: number of latent vectors to explain 99% of variance
+        pca_file = os.path.join('../Analysis', pdict['pca_file'])
+        n99_str = '& ...'
+        if os.path.exists(pca_file):
+            try:
+                d = np.load(pca_file)
+                cumsum = 1 - np.cumsum(d['explained_variance'])
+                # Find index where cumulative variance reaches 99%
+                n99 = np.argmin(np.abs((1 - cumsum) - 0.99)) + 1  # +1 for 1-indexed
+                n99_str = f'& {n99}'
+            except Exception as e:
+                pass
+        slin += n99_str
+
         tbfil.write(slin)
         tbfil.write('\\\\ \n')
 
@@ -132,7 +147,8 @@ def mktab_datasets(outfile='tab_datasets.tex', sub=False, local=True):
     tbfil.write('flip = random horizontal/vertical flip; ')
     tbfil.write('rot = random 90$^\\circ$ rotation; ')
     tbfil.write('noise $\\sigma$ = additive Gaussian noise with standard deviation $\\sigma$; ')
-    tbfil.write('demean = subtract mean value from each cutout.\n')
+    tbfil.write('demean = subtract mean value from each cutout. ')
+    tbfil.write('$N_{99}$ = number of latent space PCA components required to explain 99\\% of the variance.\n')
     tbfil.write('\\end{minipage}\n')
     tbfil.write('\\end{table*} \n')
 
