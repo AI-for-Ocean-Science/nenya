@@ -59,15 +59,42 @@ def fit_latents(latents_file:str,
     print(f"Saving: {outfile}")
     np.savez(outfile, **outputs)
 
-def generate_eigenmode_with_regularization(model, target_latent:np.ndarray, 
-                                           image_shape:np.ndarray, 
-                                           num_iterations=1000, lr:float=0.01, 
+def generate_eigenmode_with_regularization(model, target_latent:np.ndarray,
+                                           image_shape:np.ndarray,
+                                           num_iterations=1000, lr:float=0.01,
                                            clamp_value:float=None,
-                                           tv_weight:float=1e-4, l2_weight:float=1e-6):
+                                           tv_weight:float=1e-4, l2_weight:float=1e-6,
+                                           start_image:np.ndarray=None):
     """
     Enhanced version with total variation and L2 regularization for smoother images.
+
+    Args:
+        model: The neural network model for encoding images to latent space.
+        target_latent (np.ndarray): The target latent vector to match.
+        image_shape (np.ndarray): Shape of the output image (channels, height, width).
+        num_iterations (int): Number of optimization iterations. Defaults to 1000.
+        lr (float): Learning rate for the optimizer. Defaults to 0.01.
+        clamp_value (float): Value to clamp pixel values. Defaults to 5.0.
+        tv_weight (float): Total variation regularization weight. Defaults to 1e-4.
+        l2_weight (float): L2 regularization weight. Defaults to 1e-6.
+        start_image (np.ndarray, optional): Starting image for optimization.
+            If None, starts from random noise. Shape should be (channels, height, width).
+            Defaults to None.
+
+    Returns:
+        tuple: (generated_image, cosine_similarity) where generated_image is a numpy
+            array of shape (channels, height, width) and cosine_similarity is a float.
     """
-    generated_image = torch.randn(1, *image_shape, requires_grad=True, device=target_latent.device)
+    if start_image is not None:
+        # Use provided starting image
+        start_tensor = torch.tensor(start_image, dtype=torch.float32, device=target_latent.device)
+        if start_tensor.dim() == 2:
+            # Add channel dimension if missing
+            start_tensor = start_tensor.unsqueeze(0)
+        generated_image = start_tensor.unsqueeze(0).clone().requires_grad_(True)
+    else:
+        # Start from random noise
+        generated_image = torch.randn(1, *image_shape, requires_grad=True, device=target_latent.device)
     optimizer = torch.optim.Adam([generated_image], lr=lr)
 
     # Convert target_latent to tensor

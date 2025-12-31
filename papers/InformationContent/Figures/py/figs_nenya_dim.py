@@ -295,16 +295,16 @@ def fig_true_pca(outfile:str='fig_true_pca.png',
             frac_remain:bool=False,
             show_cum_point:float=None,
             xmnx:tuple=None,
-            exponent:float=-0.5): 
+            exponent:float=-0.5):
     """
-    Generate and save a PCA variance explained plot.
-    This function creates a plot to visualize the variance explained by PCA components
-    for a given set of datasets. It supports cumulative variance, fractional remaining
-    variance, and power-law fitting.
+    Generate and save a 2-panel PCA variance explained plot for true (image-space) PCA.
+
+    Panel 1 (left): Natural Images
+    Panel 2 (right): Primary Remote Sensing datasets
+
     Args:
-        outfile (str): The output file path for the saved plot. Defaults to 'fig_pca_variance.png'.
-        datasets (list): A list of dataset names to include in the plot. If None, a default
-            list of datasets is used. Defaults to None.
+        outfile (str): The output file path for the saved plot. Defaults to 'fig_true_pca.png'.
+        datasets (list): Ignored - uses natural_datasets and primary_remote_datasets.
         cumulative (bool): If True, plot the cumulative variance explained. Defaults to False.
         frac_remain (bool): If True, plot the fractional remaining variance. Defaults to False.
         show_cum_point (float): If provided, marks the point on the plot where the cumulative
@@ -315,104 +315,89 @@ def fig_true_pca(outfile:str='fig_true_pca.png',
         None: The function saves the plot to the specified output file.
     Notes:
         - The function expects PCA data files to be located in the '../Analysis/pca/' directory
-            with filenames formatted as 'pca_latents_<dataset>.npz'.
+            with filenames formatted as 'pca_preproc_<dataset>.npz'.
         - The datasets are color-coded, and different line styles are used to distinguish
             between dataset types.
         - The plot is saved in log-log scale with grid lines enabled.
     """
-    # Cumulative?
+    # Cumulative filename adjustment
     if cumulative:
-        if 'variance' in outfile:
-            outfile = outfile.replace('variance', 'cumulative')
+        if 'true_pca' in outfile:
+            outfile = outfile.replace('true_pca', 'true_pca_cumulative')
 
-    # Load PCAs
-    if datasets is None:
-        datasets = info_defs.all_datasets
-    clrs = []
-    ds = []
-    for dataset in datasets:
-        clr = grab_clr(dataset)
-        
-        pca_file = f'../Analysis/pca/pca_preproc_{dataset}.npz'
-        print(f"Loading PCA file: {pca_file}")
-        try:
-            d = np.load(pca_file)
-        except:
-            print(f"PCA file for {dataset} not found, skipping -- {pca_file}")
-            ds.append(None)
-            clrs.append(None)
-            continue
-        ds.append(d)
-        #
-        clrs.append(clr)
+    # Define datasets for each panel
+    natural_datasets_panel = info_defs.natural_datasets
+    remote_datasets_panel = info_defs.primary_remote_datasets
+    remote_datasets_panel += ['ImageNet']
 
-    #embed(header='PCA Variance Explained 89')
+    # Create figure with 2 panels
+    fig = plt.figure(figsize=(14, 6))
+    gs = gridspec.GridSpec(1, 2)
 
-    # 
-    fig = plt.figure(figsize=(8,6))
-    gs = gridspec.GridSpec(1,1)
+    panels = [
+        (natural_datasets_panel, 'Natural Images'),
+        (remote_datasets_panel, 'Remote Sensing')
+    ]
 
-    ax = plt.subplot(gs[0])
-    for ss, d in enumerate(ds):
-        if d is None:
-            continue
-        #if datasets[ss] == 'ImageNet':
-        #    embed(header='true pca; 268')
-        ls = grab_ls(datasets[ss])
-        # Cumulative?
-        cumsum = 1-np.cumsum(d['explained_variance_ratio'])
-        #embed(header='267 of figs')
+    for panel_idx, (panel_datasets, title) in enumerate(panels):
+        ax = plt.subplot(gs[panel_idx])
+
+        xs = None  # Will be set from first valid dataset
+
+        # Load and plot each dataset
+        for ss, dataset in enumerate(panel_datasets):
+            clr = grab_clr(dataset)
+            ls = grab_ls(dataset)
+
+            pca_file = f'../Analysis/pca/pca_preproc_{dataset}.npz'
+            print(f"Loading PCA file: {pca_file}")
+            try:
+                d = np.load(pca_file)
+            except:
+                print(f"PCA file for {dataset} not found, skipping -- {pca_file}")
+                continue
+
+            # Calculate y values
+            cumsum = 1 - np.cumsum(d['explained_variance_ratio'])
+            if cumulative:
+                yvals = cumsum
+            elif frac_remain:
+                yvals = d['explained_variance'] / cumsum
+            else:
+                yvals = d['explained_variance_ratio']
+
+            xs_curr = np.arange(d['explained_variance_ratio'].size) + 1
+            if xs is None:
+                xs = xs_curr
+
+            ax.plot(xs_curr, yvals, label=dataset.replace('_', '/'),
+                    color=clr, ls=ls, lw=2)
+
+            # Add cumulative point marker
+            if show_cum_point is not None:
+                imin = np.argmin(np.abs((1 - cumsum) - show_cum_point))
+                ax.plot(imin + 1, yvals[imin], 'x', color=clr, markersize=10)
+
+        # Labels and formatting
+        ax.set_title(title, fontsize=18)
         if cumulative:
-            yvals = cumsum
-        elif frac_remain:
-            cumsum = 1-np.cumsum(d['explained_variance_ratio'])
-            yvals = d['explained_variance'] / cumsum
+            ax.set_ylabel('Cumulative Variance explained per mode')
         else:
-            yvals = d['explained_variance_ratio']
-        ax.plot(np.arange(d['explained_variance_ratio'].size)+1, 
-                yvals,  label=datasets[ss].replace('_','/'),
-                color=clrs[ss], ls=ls)
-        # Add cum point
-        if show_cum_point is not None:
-            imin = np.argmin(np.abs((1-cumsum) - show_cum_point))
-            ax.plot(imin+1, yvals[imin], 'x', color=clrs[ss])
+            ax.set_ylabel('Variance explained per mode')
+        ax.set_xlabel('Number of True PCA components')
 
-            
-        if ss == 0:
-            xs = np.arange(d['explained_variance_ratio'].size)+1
+        ax.set_xscale('log')
+        ax.set_yscale('log')
+        ax.minorticks_on()
+        ax.legend(fontsize=13, loc='lower left')
+        ax.grid(True, which='both', ls='--', lw=0.5)
 
-    ys = d['explained_variance_ratio'][10] * (xs/xs[10])**(exponent) 
-    #ax.plot(xs, ys, '--', color='gray', label=f'Power law: {exponent}')
-    # Label
-    if cumulative:
-        ax.set_ylabel('Cumulative Variance explained per mode')
-    else:
-        ax.set_ylabel('Variance explained per mode')
-    ax.set_xlabel('Number of True PCA components')
-    #
-    #ax.set_xlim(0,10.)
-    ax.legend()
-    ax.set_xscale('log')
-    ax.set_yscale('log')
+        if xmnx is not None:
+            ax.set_xlim(xmnx)
 
-    # Minor ticks
-    ax.minorticks_on()
-    # Horizontal line at 0
-    #ax.axhline(0., color='k', ls='--')
+        rsp_utils.set_fontsize(ax, 16)
 
-    #loc = 'upper right' if ss == 1 else 'upper left'
-    ax.legend(fontsize=13, loc='lower left')
-
-    # Turn on grid
-    ax.grid(True, which='both', ls='--', lw=0.5)
-
-    # xlim?
-    if xmnx is not None:
-        ax.set_xlim(xmnx)
-
-    rsp_utils.set_fontsize(ax, 18)
-
-    plt.tight_layout()#pad=0.0, h_pad=0.0, w_pad=0.3)
+    plt.tight_layout()
     plt.savefig(outfile, dpi=300)
     print(f"Saved: {outfile}")
 
@@ -898,11 +883,11 @@ def main(flg):
         #    datasets=['MODIS_SST', 'MODIS_SST_2km', 'LLC_SST_nonoise', 'LLC_SST_noise'],
         #    show_cum_point=0.99)
 
-    # Eigenmodes
+    # Eigenmodes (MNIST)
     if flg == 3:
         fig_eigenimages('MNIST', 'Greys')
 
-    # Eigenmodes
+    # Eigenmodes (MODIS)
     if flg == 4:
         fig_eigenmatches('MODIS_SST', 'jet')
         #fig_eigenmatches('MODIS_SST', 'jet', last_ones=True,
@@ -917,7 +902,7 @@ def main(flg):
     if flg == 6:
         fig_true_pca(show_cum_point=0.99)
 
-    # PCA variance
+    # Example images
     if flg == 7:
         fig_example_images()
 

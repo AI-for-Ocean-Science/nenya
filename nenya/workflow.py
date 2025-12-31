@@ -133,11 +133,13 @@ def find_eigenmatches(pca_file:str, latents_file:str, nmodes:int,
     return indices, sims
 
 
-def find_eigenmodes(opt_path:str, pca_file:str, image_shape:tuple, 
-                    output_file:str, Neigenmodes:int=10, use_gpu:bool=False, 
-                    clamp_value:float=None, local_model_path:str=None, 
-                    base_model_name:str='last.pth', num_iterations:int=1000, 
-                    tv_weight:float=0.0, show:bool=False, debug:bool=False):
+def find_eigenmodes(opt_path:str, pca_file:str, image_shape:tuple,
+                    output_file:str, Neigenmodes:int=10, use_gpu:bool=False,
+                    clamp_value:float=None, local_model_path:str=None,
+                    base_model_name:str='last.pth', num_iterations:int=1000,
+                    tv_weight:float=0.0, show:bool=False, debug:bool=False,
+                    use_eigenmatch_start:bool=False, latents_file:str=None,
+                    preproc_file:str=None, partition:str='train'):
     """
     Generate and save eigenmodes using a pre-trained model and PCA data.
 
@@ -155,6 +157,15 @@ def find_eigenmodes(opt_path:str, pca_file:str, image_shape:tuple,
         tv_weight (float, optional): Total variation regularization weight. Defaults to 0.0.
         show (bool, optional): Whether to display the generated images. Defaults to False.
         debug (bool, optional): Whether to enable debug mode. Defaults to False.
+        use_eigenmatch_start (bool, optional): If True, use the closest eigenmatch image
+            as the starting point for optimization instead of random noise. Requires
+            latents_file and preproc_file to be provided. Defaults to False.
+        latents_file (str, optional): Path to the latents file. Required if
+            use_eigenmatch_start is True. Defaults to None.
+        preproc_file (str, optional): Path to the preprocessing file containing images.
+            Required if use_eigenmatch_start is True. Defaults to None.
+        partition (str, optional): Dataset partition to use for eigenmatches
+            (e.g., 'train', 'valid'). Defaults to 'train'.
 
     Returns:
         None: The function saves the generated eigenmodes and similarities to the specified output file.
@@ -164,6 +175,8 @@ def find_eigenmodes(opt_path:str, pca_file:str, image_shape:tuple,
         - If `show` is True, the generated images are displayed during the process.
         - If `debug` is True, debugging information is displayed, and the process is interactive.
         - The generated eigenmodes and their similarities are saved in `.npz` format.
+        - If `use_eigenmatch_start` is True, the optimization starts from the image whose
+          latent vector is closest to each eigenmode, which may improve convergence.
     """
     # Load model
     opt = params.Params(opt_path)
@@ -179,29 +192,50 @@ def find_eigenmodes(opt_path:str, pca_file:str, image_shape:tuple,
 
     # Load model
     model, _ = nenya_io.load_model(model_name, opt, use_gpu,
-                               remove_module=True, 
+                               remove_module=True,
                                weights_only=False)
 
     # Load the PCA model
     d = np.load(pca_file)
 
-    
+    # Find eigenmatches if requested
+    start_images = None
+    eigenmatch_indices = None
+    eigenmatch_sims = None
+    if use_eigenmatch_start:
+        if latents_file is None or preproc_file is None:
+            raise ValueError("latents_file and preproc_file must be provided when use_eigenmatch_start=True")
+        # Find the closest latent vectors to each eigenmode
+        modes = list(range(Neigenmodes))
+        eigenmatch_indices, eigenmatch_sims = pca.find_eigenmatches(
+            pca_file, latents_file, modes, nimages=1, partition=partition)
+        # eigenmatch_indices shape is (1, Neigenmodes), get the first match for each mode
+        eigenmatch_indices = eigenmatch_indices[0, :]  # shape: (Neigenmodes,)
+        eigenmatch_sims = eigenmatch_sims[0, :]  # shape: (Neigenmodes,)
+        # Load the corresponding images
+        with h5py.File(preproc_file, 'r') as f:
+            start_images = [f[partition][idx] for idx in eigenmatch_indices]
+        print(f"Using eigenmatch starting images with cosine similarities: {eigenmatch_sims}")
+
     # Run it
     eigen_images = []
     similarities = []
     for ss in range(Neigenmodes):
         # Grab the eigenmode
         eigenmode = d['M'][ss, :]
+        # Get starting image if available
+        start_image = start_images[ss] if start_images is not None else None
         # Generate the eigenmode with regularization
-        img, cosi = pca.generate_eigenmode_with_regularization(model, eigenmode, image_shape, 
-            tv_weight=tv_weight, clamp_value=clamp_value, num_iterations=num_iterations)
+        img, cosi = pca.generate_eigenmode_with_regularization(model, eigenmode, image_shape,
+            tv_weight=tv_weight, clamp_value=clamp_value, num_iterations=num_iterations,
+            start_image=start_image)
         eigen_images.append(img)
         similarities.append(cosi)
         # Show the image?
         if show:
             ax = cutout.show_image(img[0], show=True)
             ax.set_title=f'Eigenmode {ss+1}'
-        if debug: 
+        if debug:
             embed(header=f"Generated eigenmode {ss+1}/{Neigenmodes} with shape {img.shape}")
 
     # Save the eigenmodes
