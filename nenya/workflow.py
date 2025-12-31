@@ -221,6 +221,7 @@ def find_eigenmodes(opt_path:str, pca_file:str, image_shape:tuple,
     eigen_images = []
     similarities = []
     for ss in range(Neigenmodes):
+        print(f"Working on eigenmode: {ss}")
         # Grab the eigenmode
         eigenmode = d['M'][ss, :]
         # Get starting image if available
