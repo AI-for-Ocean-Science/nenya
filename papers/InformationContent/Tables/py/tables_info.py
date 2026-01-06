@@ -27,7 +27,7 @@ def mktab_datasets(outfile='tab_datasets.tex', sub=False, local=True):
     tbfil.write('\\caption{Datasets\\label{tab:datasets}}\n')
     tbfil.write('\\begin{tabular}{cccccccccccc}\n')
     tbfil.write('\\hline \n')
-    tbfil.write('Name & Type & Source & \\npix & km pix$^{-1}$ & Processing & $N_{99}$ \\\\ \n')
+    tbfil.write('Name & Type & Source & \\npix & km pix$^{-1}$ & Processing & \\nfeature & $N_{99}$ \\\\ \n')
     #tbfil.write('(deg) & (deg) & & (K) \n')
     tbfil.write('\\\\ \n')
     tbfil.write('\\hline \n')
@@ -78,6 +78,7 @@ def mktab_datasets(outfile='tab_datasets.tex', sub=False, local=True):
         # Processing - load from JSON opts file
         opts_file = os.path.join('../Analysis', pdict['opts_file'])
         processing_str = '& ...'
+        ndim_str = '& ...'
         if os.path.exists(opts_file):
             try:
                 with open(opts_file, 'r') as f:
@@ -111,11 +112,16 @@ def mktab_datasets(outfile='tab_datasets.tex', sub=False, local=True):
 
                 if proc_parts:
                     processing_str = f'& {", ".join(proc_parts)}'
+
+                # Number of dimensions (feat_dim)
+                if 'feat_dim' in opts:
+                    ndim_str = f'& {opts["feat_dim"]}'
             except (json.JSONDecodeError, KeyError, FileNotFoundError) as e:
                 # If there's an error reading the file, keep the default '...'
                 pass
 
         slin += processing_str
+        slin += ndim_str
 
         # N_99: number of latent vectors to explain 99% of variance
         pca_file = os.path.join('../Analysis', pdict['pca_file'])
@@ -148,6 +154,7 @@ def mktab_datasets(outfile='tab_datasets.tex', sub=False, local=True):
     tbfil.write('rot = random 90$^\\circ$ rotation; ')
     tbfil.write('noise $\\sigma$ = additive Gaussian noise with standard deviation $\\sigma$; ')
     tbfil.write('demean = subtract mean value from each cutout. ')
+    tbfil.write('$N_{\\rm f}$ = number of dimensions in Nenya latent space; ')
     tbfil.write('$N_{99}$ = number of latent space PCA components required to explain 99\\% of the variance.\n')
     tbfil.write('\\end{minipage}\n')
     tbfil.write('\\end{table*} \n')
