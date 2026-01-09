@@ -492,7 +492,8 @@ def fig_eigenimages(dataset:str, cmap:str, Nimages:int=9,
     outfile = f'{outroot}_{dataset}.png'
 
     # Load eigenimages
-    d = np.load(f'../Analysis/{dataset}_eigenimages.npz')
+    pdict = info_defs.grab_paths(dataset)
+    d = np.load(pdict['eigen_file'])
 
 
     fig = plt.figure(figsize=(6,6))
@@ -570,7 +571,7 @@ def fig_eigenmatches(dataset:str, cmap:str, Nmodes:int=9,
     print(f"Saved: {outfile}")
 
 def fig_example_images(outfile:str='fig_example_images.png',
-                       idx:int=0):
+                       idx:int=0, fourth:str='Pk4'):
     """
     Generate a 4-panel figure showing example images from VIIRS_SST, SWOT_L3,
     ImageNet, and LLC_SST datasets.
@@ -579,10 +580,22 @@ def fig_example_images(outfile:str='fig_example_images.png',
         outfile (str): The output file path for the saved plot.
         idx (int): Index of the image to show from each dataset.
     """
-    datasets = ['VIIRS_SST', 'SWOT_L3', 'ImageNet', 'LLC_SST_nonoise']
-    titles = ['VIIRS SST', 'SWOT L3', 'ImageNet', 'LLC SST']
-    cmaps = ['jet', 'RdBu_r', 'gray', 'jet']  # gray for ImageNet if single-channel
-    cbar_labels = ['SST (K)', 'SSHa (m)', 'Intensity', 'SST (K)']
+    datasets = ['VIIRS_SST', 'SWOT_L3', 'ImageNet']
+    titles = ['VIIRS SST', 'SWOT L3', 'ImageNet']
+    cmaps = ['jet', 'RdBu_r', 'gray']#, 'jet']  # gray for ImageNet if single-channel
+    cbar_labels = ['SSTa (K)', 'SSHa (m)', 'Intensity']#, 'SSTa (K)']
+    if fourth == 'LLC':
+        datasets += ['LLC_SST_nonoise']
+        titles += ['LLC_SST']
+        cmaps += ['jet']
+        cbar_labels += ['SSTa (K)']
+    elif fourth == 'Pk4':
+        datasets += ['Pk4']
+        titles += [r'$P(k) \propto k^{-4}$']
+        cmaps += ['Greens']
+        cbar_labels += ['Intensity']
+    else:
+        raise IOError(f"Bad fourth: {fourth}")
 
     # Physical scales (km) - from info_defs
     # VIIRS: 0.75 km/pixel, 64 pixels -> 48 km
@@ -592,7 +605,8 @@ def fig_example_images(outfile:str='fig_example_images.png',
         'VIIRS_SST': 0.75 * 192,  # 48 km
         'SWOT_L3': 0.25 * 128,    # 16 km
         'LLC_SST_nonoise': (144./64) * 64,  # 144 km
-        'ImageNet': None
+        'ImageNet': None,
+        'Pk4': None
     }
 
     fig, axes = plt.subplots(2, 2, figsize=(10, 8))
@@ -617,7 +631,7 @@ def fig_example_images(outfile:str='fig_example_images.png',
 
         # Plot
         if img.ndim == 2:
-            orig = None if dataset == 'ImageNet' else 'lower'
+            orig = None if dataset in ['ImageNet', 'Pk4'] else 'lower'
             im = ax.imshow(img, cmap=cmap, origin=orig)
             cbar = plt.colorbar(im, ax=ax, fraction=0.046, pad=0.02)
             cbar.set_label(cbar_lbl, fontsize=16)
@@ -658,6 +672,11 @@ def fig_Pk():
     ax_remote = plt.subplot(gs[1])
 
     for dataset in info_defs.all_datasets:
+        # Skip 2km and sub datasets for remote sensing
+        if dataset not in info_defs.natural_datasets:
+            if '2km' in dataset or 'sub' in dataset:
+                continue
+
         pdict = info_defs.grab_paths(dataset)
         pk_file = os.path.join('../Analysis', pdict['Pk_file'])
         if not os.path.exists(pk_file):
@@ -682,12 +701,26 @@ def fig_Pk():
         # Pixel units
         dx = pdict['dx'] if 'dx' in pdict else 1.0
 
+        # Skip the highest wavenumber (first element, since k is typically sorted high to low
+        # or last element if sorted low to high) - skip last point
+        skip_i = -1
+        skip_j = 1
+        k = k[skip_j:skip_i]
+        power = power[skip_j:skip_i]
+        wavelength = wavelength[skip_j:skip_i]
+
+        print(f'{dataset}: k={k[0]}, wave={wavelength[-1]*0.70}')
+
+        # Scale SSH
+        if 'SSH' in dataset or 'SWOT' in dataset:
+            power /= 2.  #  Geostrophy gives Deta/Dt ~ 2cm/K
+
         # Plot to appropriate panel
         if dataset in info_defs.natural_datasets:
-            ax_natural.loglog(wavelength/dx, power*k*dx, label=dataset,
+            ax_natural.loglog(k, power*k, label=dataset,
                         color=clr, ls=ls)
         else:
-            ax_remote.loglog(wavelength, power*k, label=dataset,
+            ax_remote.loglog(k, power*k, label=dataset,
                       color=clr, ls=ls)
 
     # Add power-law reference curves on the left panel (Natural Images)
@@ -700,37 +733,41 @@ def fig_Pk():
 
     # k^-2 power law: P(k) ~ k^-2, so k*P(k) ~ k^-1 ~ wavelength^1
     pk2_power = norm_val * (wv_ref / wv_ref[norm_idx])**1
-    ax_natural.loglog(wv_ref, pk2_power, ':', color=cdict['Pk2'],
+    ax_natural.loglog(k_ref, pk2_power, ':', color=cdict['Pk2'],
                       label=r'$k^{-2}$', lw=2)
 
     # k^-4 power law: P(k) ~ k^-4, so k*P(k) ~ k^-3 ~ wavelength^3
     pk4_power = norm_val * (wv_ref / wv_ref[norm_idx])**3
-    ax_natural.loglog(wv_ref, pk4_power, ':', color=cdict['Pk4'],
+    ax_natural.loglog(k_ref, pk4_power, ':', color=cdict['Pk4'],
                       label=r'$k^{-4}$', lw=2)
 
     # Labels and formatting
     ax_natural.set_title('Natural Images', fontsize=16)
-    ax_natural.legend(fontsize=12, loc='lower right')
-    ax_natural.set_xlabel('Size (pixels)')
+    ax_natural.legend(fontsize=12, loc='lower left')
+    ax_natural.set_xlabel('Wavenumber (cycles/pixels)')
     ax_natural.set_ylabel(r'Power Spectrum per log bin: $k \, P(k)$')
-    ax_natural.grid()
+    ax_natural.grid(True, which='both', ls='--', lw=0.5)
 
     ax_remote.set_title('Remote Sensing', fontsize=16)
-    ax_remote.legend(fontsize=12, loc='upper left')
-    ax_remote.set_xlabel('Wavelength (km)')
+    ax_remote.legend(fontsize=12, loc='lower left')
+    ax_remote.set_xlabel('Wavenumber (cycles/km)')
     ax_remote.set_ylabel(r'Power Spectrum per log bin: $k \, P(k)$')
-    ax_remote.grid()
+    ax_remote.grid(True, which='both', ls='--', lw=0.5)
 
-    # Add wave number on the top axis for remote sensing panel
-    ax_top = ax_remote.secondary_xaxis('top', functions=(lambda x: 1e3/x, lambda x: 1e3/x))
-    ax_top.set_xlabel('Wavenumber (cycles/km)')
+    # Invert x-axes so wavenumber increases left to right (wavelength decreases)
+    #ax_natural.invert_xaxis()
+    #ax_remote.invert_xaxis()
 
-    ax_top2 = ax_natural.secondary_xaxis('top', functions=(lambda x: 1e3/x, lambda x: 1e3/x))
-    ax_top2.set_xlabel('Wavenumber (cycles/pixels)')
+    # Add wavelength on the top axis (swapped from wavenumber)
+    ax_top = ax_remote.secondary_xaxis('top', functions=(lambda x: 1/x, lambda x: 1/x))
+    ax_top.set_xlabel('Wavelength (km)')
 
-    for ax in [ax_natural, ax_remote, ax_top, ax_top2]:
+    #ax_top2 = ax_natural.secondary_xaxis('top', functions=(lambda x: 1e3/x, lambda x: 1e3/x))
+    #ax_top2.set_xlabel('Size (pixels)')
+
+    for ax in [ax_natural, ax_remote, ax_top]:#, ax_top2]:
         rsp_utils.set_fontsize(ax, 18)
-        
+
 
     plt.tight_layout()
     plt.savefig('Pk_all_datasets.png', dpi=300)
@@ -883,19 +920,19 @@ def main(flg):
         #    datasets=['MODIS_SST', 'MODIS_SST_2km', 'LLC_SST_nonoise', 'LLC_SST_noise'],
         #    show_cum_point=0.99)
 
-    # Eigenmodes (MNIST)
+    # Eigenmodes 
     if flg == 3:
-        fig_eigenimages('MNIST', 'Greys')
+        #fig_eigenimages('MNIST', 'Greys')
+        fig_eigenimages('MODIS_SST', 'jet')
 
-    # Eigenmodes (MODIS)
+    # Closest matched images
     if flg == 4:
         fig_eigenmatches('MODIS_SST', 'jet')
         #fig_eigenmatches('MODIS_SST', 'jet', last_ones=True,
         #                 outroot='fig_last_eigenmatches')
 
-    # Eigenmodes
+    # P(k)
     if flg == 5:
-        #fig_eigenmatches('MODIS_SST', 'jet')
         fig_Pk()
 
     # PCA variance

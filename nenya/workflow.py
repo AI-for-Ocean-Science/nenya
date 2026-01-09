@@ -242,9 +242,11 @@ def find_eigenmodes(opt_path:str, pca_file:str, image_shape:tuple,
     # Save the eigenmodes
     if not debug:
         print(f"Saving eigenmodes to: {output_file}")
-        np.savez(output_file, eigen_images=np.array(eigen_images), 
-            similarities=np.array(similarities),
-            eigenmodes=d['M'][:Neigenmodes, :])
+        np.savez(output_file, 
+                 eigen_images=np.array(eigen_images), 
+                 similarities=np.array(similarities), 
+                 eigenmodes=d['M'][:Neigenmodes, :],
+                 modes=np.arange(Neigenmodes))
 
 
 def return_task():
