@@ -1,4 +1,5 @@
 import os
+from IPython import embed
 
 all_datasets = ['MODIS_SST', 
                     'MODIS_SST_2km',
