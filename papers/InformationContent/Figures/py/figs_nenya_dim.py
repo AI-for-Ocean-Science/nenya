@@ -671,6 +671,13 @@ def fig_Pk():
     ax_natural = plt.subplot(gs[0])
     ax_remote = plt.subplot(gs[1])
 
+    # Reference wavenumber for scaling natural images panel
+    k_ref_scale = 0.1  # cycles/pixel
+    ref_amplitude = None  # Will be set from first natural dataset
+
+    # Store natural dataset curves for scaling
+    natural_curves = []
+
     for dataset in info_defs.all_datasets:
         # Skip 2km and sub datasets for remote sensing
         if dataset not in info_defs.natural_datasets:
@@ -713,37 +720,57 @@ def fig_Pk():
 
         # Scale SSH
         if 'SSH' in dataset or 'SWOT' in dataset:
-            power /= 2.  #  Geostrophy gives Deta/Dt ~ 2cm/K
+            power /= 2e-2  #  Geostrophy gives Deta/Dt ~ 2cm/K or 2e-2m/K
 
         # Plot to appropriate panel
         if dataset in info_defs.natural_datasets:
-            ax_natural.loglog(k, power*k, label=dataset,
-                        color=clr, ls=ls)
+            # Store curve data for later scaling
+            natural_curves.append({
+                'k': k,
+                'power_k': power * k,
+                'label': dataset,
+                'color': clr,
+                'ls': ls
+            })
         else:
             ax_remote.loglog(k, power*k, label=dataset,
                       color=clr, ls=ls)
+
+    # Scale all natural curves to have the same amplitude at k=k_ref_scale
+    for i, curve in enumerate(natural_curves):
+        # Interpolate to find power at k_ref_scale
+        idx = np.argmin(np.abs(curve['k'] - k_ref_scale))
+        power_at_ref = curve['power_k'][idx]
+
+        if i == 0:
+            ref_amplitude = power_at_ref
+            scale_factor = 1.0
+        else:
+            scale_factor = ref_amplitude / power_at_ref
+
+        ax_natural.loglog(curve['k'], curve['power_k'] * scale_factor,
+                          label=curve['label'], color=curve['color'], ls=curve['ls'])
 
     # Add power-law reference curves on the left panel (Natural Images)
     # Use wavelength range from the natural panel
     wv_ref = np.logspace(0.5, 2, 50)  # wavelengths in pixels
     k_ref = 1.0 / wv_ref
-    # Normalize to a reference point
-    norm_idx = len(wv_ref) // 2
-    norm_val = 1e-3  # arbitrary normalization for visibility
 
     # k^-2 power law: P(k) ~ k^-2, so k*P(k) ~ k^-1 ~ wavelength^1
-    pk2_power = norm_val * (wv_ref / wv_ref[norm_idx])**1
+    # Scale to match ref_amplitude at k_ref_scale
+    idx_ref = np.argmin(np.abs(k_ref - k_ref_scale))
+    pk2_power = ref_amplitude * (k_ref / k_ref_scale)**(-1)
     ax_natural.loglog(k_ref, pk2_power, ':', color=cdict['Pk2'],
                       label=r'$k^{-2}$', lw=2)
 
     # k^-4 power law: P(k) ~ k^-4, so k*P(k) ~ k^-3 ~ wavelength^3
-    pk4_power = norm_val * (wv_ref / wv_ref[norm_idx])**3
+    pk4_power = ref_amplitude * (k_ref / k_ref_scale)**(-3)
     ax_natural.loglog(k_ref, pk4_power, ':', color=cdict['Pk4'],
                       label=r'$k^{-4}$', lw=2)
 
     # Labels and formatting
     ax_natural.set_title('Natural Images', fontsize=16)
-    ax_natural.legend(fontsize=12, loc='lower left')
+    ax_natural.legend(fontsize=12, loc='upper right')
     ax_natural.set_xlabel('Wavenumber (cycles/pixels)')
     ax_natural.set_ylabel(r'Power Spectrum per log bin: $k \, P(k)$')
     ax_natural.grid(True, which='both', ls='--', lw=0.5)
@@ -762,10 +789,10 @@ def fig_Pk():
     ax_top = ax_remote.secondary_xaxis('top', functions=(lambda x: 1/x, lambda x: 1/x))
     ax_top.set_xlabel('Wavelength (km)')
 
-    #ax_top2 = ax_natural.secondary_xaxis('top', functions=(lambda x: 1e3/x, lambda x: 1e3/x))
-    #ax_top2.set_xlabel('Size (pixels)')
+    ax_top2 = ax_natural.secondary_xaxis('top', functions=(lambda x: 1/x, lambda x: 1/x))
+    ax_top2.set_xlabel('Size (pixels)')
 
-    for ax in [ax_natural, ax_remote, ax_top]:#, ax_top2]:
+    for ax in [ax_natural, ax_remote, ax_top, ax_top2]:
         rsp_utils.set_fontsize(ax, 18)
 
 
