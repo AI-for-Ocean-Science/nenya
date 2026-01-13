@@ -1,12 +1,15 @@
 
 import os
 import numpy as np
-    
+from scipy import stats
+
 import matplotlib.pyplot as plt
 
 from nenya import pk as nenya_pk
 
 import info_defs
+
+from IPython import embed
 
 #datasets = ['MODIS_SST', 'MODIS_SST_2km',
 #        'VIIRS_SST', 'VIIRS_SST_2km', 'VIIRS_SST_sub', 
@@ -82,6 +85,92 @@ def plot_em_all_in_one():
     plt.savefig('Pk_all_datasets.png', dpi=300)
     plt.close()
     print("Saved combined power spectrum plot as 'Pk_all_datasets.png'")
+
+
+def fit_powerlaw(dataset: str, pix_min: int = 4, pix_max: int = 40):
+    """Fit a power-law to the P(k) spectrum over a specified pixel range.
+
+    Parameters
+    ----------
+    dataset : str
+        Name of the dataset
+    pix_min : int
+        Minimum wavelength in pixels for the fit range
+    pix_max : int
+        Maximum wavelength in pixels for the fit range
+
+    Returns
+    -------
+    dict
+        Dictionary containing:
+        - 'exponent': power-law exponent (slope in log-log space)
+        - 'exponent_err': standard error of the exponent
+        - 'intercept': y-intercept in log-log space
+        - 'r_squared': R^2 value of the fit
+        - 'wavelength_range': (min, max) wavelength in km used for fit
+    """
+    pdict = info_defs.grab_paths(dataset)
+
+    dfile = f"../Analysis/{pdict['Pk_file']}"
+    if not os.path.exists(dfile):
+        print(f"Pk file for {dataset} not found")
+        #embed(header='114 of calc')
+        return None
+
+    # Load P(k) data
+    data = np.load(dfile)
+    k = data['wavenumber']
+    power = data['power']
+    wavelength = data['wavelength']
+
+    # Convert pixel range to wavelength range using dx
+    dx = pdict['dx']  # km per pixel
+    wl_min = pix_min * dx
+    wl_max = pix_max * dx
+
+    # Select data in the specified wavelength range
+    mask = (wavelength >= wl_min) & (wavelength <= wl_max)
+
+    if np.sum(mask) < 3:
+        print(f"Not enough points in range for {dataset}")
+        return None
+
+    wl_fit = wavelength[mask]
+    power_fit = power[mask]
+
+    # Fit in log-log space: log(P) = slope * log(wl) + intercept
+    # P(k) ~ k^n means P(wl) ~ wl^(-n) since k = 1/wl
+    log_wl = np.log10(wl_fit)
+    log_power = np.log10(power_fit)
+
+    slope, intercept, r_value, p_value, std_err = stats.linregress(log_wl, log_power)
+
+    return {
+        'exponent': slope,
+        'exponent_err': std_err,
+        'intercept': intercept,
+        'r_squared': r_value**2,
+        'wavelength_range': (wl_min, wl_max),
+        'n_points': np.sum(mask),
+    }
+
+
+def fit_all_powerlaws(pix_min: int = 4, pix_max: int = 40):
+    """Fit power-laws to all datasets.
+
+    Returns
+    -------
+    dict
+        Dictionary mapping dataset names to their fit results
+    """
+    results = {}
+    for dataset in datasets:
+        result = fit_powerlaw(dataset, pix_min, pix_max)
+        if result is not None:
+            results[dataset] = result
+            print(f"{dataset}: exponent = {result['exponent']:.2f} ± {result['exponent_err']:.2f}, "
+                  f"R² = {result['r_squared']:.3f}")
+    return results
 
     
 if __name__ == "__main__":

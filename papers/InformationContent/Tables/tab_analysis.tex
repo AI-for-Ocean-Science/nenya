@@ -1,0 +1,29 @@
+\begin{table*}
+\centering
+\caption{Power Spectrum and PCA Analysis\label{tab:analysis}}
+\begin{tabular}{ccccccc}
+\hline 
+Name & $\beta$ & $R^2$ & $N_{99}$ & $N_{95}$ & $N_{90}$ & $f_{\rm var,1}$ \\ 
+\hline 
+MODIS\_SST & $2.90 \pm 0.04$ & 0.996 & 111 & 88 & 75 & 0.033 \\ 
+MODIS\_SST\_2km & $3.43 \pm 0.10$ & 0.993 & 67 & 54 & 46 & 0.094 \\ 
+VIIRS\_SST & $3.06 \pm 0.02$ & 0.998 & 109 & 65 & 49 & 0.093 \\ 
+VIIRS\_SST\_2km & $3.60 \pm 0.09$ & 0.995 & 76 & 63 & 54 & 0.062 \\ 
+VIIRS\_SST\_sub & $3.50 \pm 0.12$ & 0.991 & 84 & 68 & 57 & 0.120 \\ 
+LLC\_SST\_nonoise & $3.80 \pm 0.06$ & 0.998 & 76 & 52 & 39 & 0.171 \\ 
+LLC\_SST\_noise & $3.49 \pm 0.10$ & 0.993 & 57 & 46 & 38 & 0.235 \\ 
+LLC\_SSHa & $3.21 \pm 0.12$ & 0.988 & 76 & 50 & 37 & 0.148 \\ 
+SWOT\_L3 & $1.42 \pm 0.11$ & 0.900 & 89 & 60 & 48 & 0.070 \\ 
+WNoise & $-0.00 \pm 0.00$ & 0.492 & 11 & 6 & 4 & 0.649 \\ 
+Pk2 & $2.10 \pm 0.03$ & 0.999 & 24 & 21 & 19 & 0.105 \\ 
+Pk4 & $4.45 \pm 0.09$ & 0.997 & 43 & 35 & 29 & 0.148 \\ 
+MNIST & $1.38 \pm 0.20$ & 0.939 & 67 & 52 & 43 & 0.076 \\ 
+ImageNet & $2.47 \pm 0.01$ & 1.000 & 140 & 104 & 81 & 0.064 \\ 
+\hline 
+\end{tabular} 
+\\ 
+\begin{minipage}{0.9\textwidth}
+\small
+\textbf{Column descriptions:} $\beta$ = power-law exponent from $P(k) \propto \lambda^\beta$ fit over 4--40 pixel wavelengths; $R^2$ = coefficient of determination for power-law fit; $N_{{99}}$, $N_{{95}}$, $N_{{90}}$ = number of PCA components required to explain 99\%, 95\%, 90\% of variance; $f_{{\rm var,1}}$ = fraction of variance explained by the first PCA component.
+\end{minipage}
+\end{table*} 
