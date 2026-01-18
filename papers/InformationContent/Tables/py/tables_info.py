@@ -33,7 +33,7 @@ def mktab_datasets(outfile='tab_datasets.tex', sub=False, local=True):
     tbfil.write('\\caption{Datasets\\label{tab:datasets}}\n')
     tbfil.write('\\begin{tabular}{ccccc}\n')
     tbfil.write('\\hline \n')
-    tbfil.write('Name & Type & Source & \\npix & km pix$^{-1}$ \\\\ \n')
+    tbfil.write('Name & Type & Source & \\npix & \\dx \\\\ \n')
     tbfil.write('\\hline \n')
 
     # Loop me
@@ -41,8 +41,8 @@ def mktab_datasets(outfile='tab_datasets.tex', sub=False, local=True):
         pdict = info_defs.grab_paths(dataset)
 
         # Name (convert _ to \_)
-        cdataset = dataset.replace('_', '\\_')
-        slin = f'{cdataset}'
+        #cdataset = dataset.replace('_', '\\_')
+        slin = f'{pdict['macro']}'
 
         # Type (SST, SSH, etc.)
         if 'SST' in dataset:
@@ -61,12 +61,14 @@ def mktab_datasets(outfile='tab_datasets.tex', sub=False, local=True):
             slin += ' &'
 
         # Sensor/Source
-        if 'SST' in dataset:
+        if 'SST' in dataset or 'SSH' in dataset:
             slin += f' & {dataset.split("_")[0]}'
         elif 'SWOT' in dataset:
             slin += ' & SWOT'
+        elif dataset in ['MNIST', 'ImageNet']:
+            slin += f' & {dataset}'
         else:
-            slin += ' &'
+            slin += ' & Generated'
 
         # Npix
         preproc_file = pdict['preproc_file']
@@ -74,7 +76,7 @@ def mktab_datasets(outfile='tab_datasets.tex', sub=False, local=True):
         slin += f' & {preproc["train"].shape[1]}'
 
         # km/pix
-        if 'dx' in pdict:
+        if 'dx' in pdict and dataset not in info_defs.natural_datasets:
             slin += f' & {pdict["dx"]:0.2f}'
         else:
             slin += ' & ...'
@@ -85,6 +87,19 @@ def mktab_datasets(outfile='tab_datasets.tex', sub=False, local=True):
     # End
     tbfil.write('\\hline \n')
     tbfil.write('\\end{tabular} \n')
+    tbfil.write('\\\\ \n')
+    # Table notes
+    tbfil.write('\\begin{minipage}{0.9\\textwidth}\n')
+    tbfil.write('\\small\n')
+    tbfil.write('\\textbf{Column descriptions:} ')
+    tbfil.write('\\textit{Name}: dataset identifier (see text for definitions); ')
+    tbfil.write('\\textit{Type}: data type (SST = sea surface temperature, SSH = sea surface height, ')
+    tbfil.write('Noise = white noise, Power-law = synthetic power-law fields, Digits = handwritten digits, ')
+    tbfil.write('Natural = natural images); ')
+    tbfil.write('\\textit{Source}: instrument or data source; ')
+    tbfil.write('\\npix\\ = number of pixels per side of the square cutouts; ')
+    tbfil.write('\\dx\\ = spatial resolution in km per pixel (... indicates non-physical data).\n')
+    tbfil.write('\\end{minipage}\n')
     tbfil.write('\\end{table*} \n')
 
     tbfil.close()
@@ -348,5 +363,5 @@ def mktab_analysis(outfile='tab_analysis.tex', sub=False, local=True,
 if __name__ == '__main__':
 
     mktab_datasets()
-    mktab_model()
-    mktab_analysis()
+    #mktab_model()
+    #mktab_analysis()

@@ -3,22 +3,27 @@
 \caption{Datasets\label{tab:datasets}}
 \begin{tabular}{ccccc}
 \hline 
-Name & Type & Source & \npix & km pix$^{-1}$ \\ 
+Name & Type & Source & \npix & \dx \\ 
 \hline 
-MODIS\_SST & SST & MODIS & 128 & 1.10 \\ 
-MODIS\_SST\_2km & SST & MODIS & 64 & 2.00 \\ 
-VIIRS\_SST & SST & VIIRS & 192 & 0.75 \\ 
-VIIRS\_SST\_2km & SST & VIIRS & 64 & 2.00 \\ 
-VIIRS\_SST\_sub & SST & VIIRS & 64 & 0.75 \\ 
-LLC\_SST\_nonoise & SST & LLC & 64 & 2.25 \\ 
-LLC\_SST\_noise & SST & LLC & 64 & 2.25 \\ 
-LLC\_SSHa & SSH & & 64 & 2.25 \\ 
-SWOT\_L3 & SSH & SWOT & 128 & 0.25 \\ 
-WNoise & Noise & & 64 & 2.00 \\ 
-Pk2 & Power-law & & 64 & 2.00 \\ 
-Pk4 & Power-law & & 64 & 2.00 \\ 
-MNIST & Digits & & 28 & 2.00 \\ 
-ImageNet & Natural & & 128 & 2.00 \\ 
+\modis & SST & MODIS & 128 & 1.10 \\ 
+\modistwo & SST & MODIS & 64 & 2.00 \\ 
+\viirs & SST & VIIRS & 192 & 0.75 \\ 
+\viirstwo & SST & VIIRS & 64 & 2.00 \\ 
+\viirssub & SST & VIIRS & 64 & 0.75 \\ 
+\llcsst & SST & LLC & 64 & 2.25 \\ 
+\llcsstn & SST & LLC & 64 & 2.25 \\ 
+\llcssh & SSH & LLC & 64 & 2.25 \\ 
+\swot & SSH & SWOT & 128 & 0.25 \\ 
+\wnoise & Noise & Generated & 64 & ... \\ 
+\pktwo & Power-law & Generated & 64 & ... \\ 
+\pkfour & Power-law & Generated & 64 & ... \\ 
+\mnist & Digits & MNIST & 28 & ... \\ 
+\inet & Natural & ImageNet & 128 & ... \\ 
 \hline 
 \end{tabular} 
+\\ 
+\begin{minipage}{0.9\textwidth}
+\small
+\textbf{Column descriptions:} \textit{Name}: dataset identifier (see text for definitions); \textit{Type}: data type (SST = sea surface temperature, SSH = sea surface height, Noise = white noise, Power-law = synthetic power-law fields, Digits = handwritten digits, Natural = natural images); \textit{Source}: instrument or data source; \npix\ = number of pixels per side of the square cutouts; \dx\ = spatial resolution in km per pixel (... indicates non-physical data).
+\end{minipage}
 \end{table*} 

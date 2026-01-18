@@ -1,13 +1,13 @@
 import os
 from IPython import embed
 
-all_datasets = ['MODIS_SST', 
-                    'MODIS_SST_2km',
-                'VIIRS_SST', 
-                'VIIRS_SST_2km', 
-                'VIIRS_SST_sub', 
-                'LLC_SST_nonoise', 
-                'LLC_SST_noise', 
+all_datasets = ['MODIS_SSTa', 
+                'MODIS_SSTa_2km',
+                'VIIRS_SSTa', 
+                'VIIRS_SSTa_2km', 
+                'VIIRS_SSTa_sub', 
+                'LLC_SSTa_nonoise', 
+                'LLC_SSTa_noise', 
                 'LLC_SSHa', 
                 'SWOT_L3', 
                 #'SWOT_SSR', 
@@ -18,8 +18,8 @@ all_datasets = ['MODIS_SST',
                 'ImageNet',
                 ]
 
-primary_remote_datasets = ['MODIS_SST', 
-                'VIIRS_SST', 
+primary_remote_datasets = ['MODIS_SSTa', 
+                'VIIRS_SSTa', 
                 'SWOT_L3'] 
 
 natural_datasets = ['WNoise',
@@ -47,6 +47,7 @@ def grab_paths(dataset:str):
                                 'mnist_resampled_latents.h5')
         out_dict['opts_file'] = 'opts_nenya_mnist.json'
         out_dict['pca_file'] = 'pca_latents_MNIST.npz'
+        out_dict['macro'] = '\\mnist'
     elif dataset == 'ImageNet':
         if 'OS_DATA' in os.environ:
             path = os.path.join(os.getenv('OS_DATA'), 'Natural', 'ImageNet', 'Info')
@@ -57,6 +58,7 @@ def grab_paths(dataset:str):
                                 'imagenet_latents.h5')
         out_dict['opts_file'] = 'opts_nenya_imagenet.json'
         out_dict['pca_file'] = 'pca_latents_ImageNet.npz'
+        out_dict['macro'] = '\\inet'
     elif dataset == 'WNoise':
         if 'OS_DATA' in os.environ:
             path = os.path.join(os.getenv('OS_DATA'), 'Natural', 'White_Noise', 'Info')
@@ -67,6 +69,7 @@ def grab_paths(dataset:str):
                                 'wnoise_latents.h5')
         out_dict['opts_file'] = 'opts_nenya_wnoise.json'
         out_dict['pca_file'] = 'pca_latents_WNoise.npz'
+        out_dict['macro'] = '\\wnoise'
     elif dataset == 'Pk2':
         if 'OS_DATA' in os.environ:
             path = os.path.join(os.getenv('OS_DATA'), 'Natural', 'Pk', 'Info')
@@ -77,6 +80,7 @@ def grab_paths(dataset:str):
                                 'pk2_latents.h5')
         out_dict['opts_file'] = 'opts_nenya_pk2.json'
         out_dict['pca_file'] = 'pca_latents_pk2.npz'
+        out_dict['macro'] = '\\pktwo'
     elif dataset == 'Pk4':
         if 'OS_DATA' in os.environ:
             path = os.path.join(os.getenv('OS_DATA'), 'Natural', 'Pk', 'Info')
@@ -87,6 +91,7 @@ def grab_paths(dataset:str):
                                 'pk2_latents.h5')
         out_dict['opts_file'] = 'opts_nenya_pk4.json'
         out_dict['pca_file'] = 'pca_latents_pk4.npz'
+        out_dict['macro'] = '\\pkfour'
     elif dataset == 'orig_MODIS_SST_2km':
         if 'OS_SST' in os.environ:
             path = os.path.join(os.getenv('OS_SST'), 'MODIS_L2', 'Nenya')
@@ -99,7 +104,7 @@ def grab_paths(dataset:str):
         out_dict['opts_file'] = None
         # 200,000
         out_dict['pca_file'] = 'pca_latents_MODIS_SST_2km_sub.npz'
-    elif dataset == 'MODIS_SST':
+    elif dataset == 'MODIS_SSTa':
         if 'OS_SST' in os.environ:
             path = os.path.join(os.getenv('OS_SST'), 'MODIS_L2', 'Info')
             out_dict['path'] = path
@@ -110,7 +115,8 @@ def grab_paths(dataset:str):
         out_dict['opts_file'] = 'opts_nenya_modis.json'
         out_dict['pca_file'] = 'pca_latents_MODIS_SST.npz'
         out_dict['dx'] = 1.1
-    elif dataset == 'MODIS_SST_2km':
+        out_dict['macro'] = '\\modis'
+    elif dataset == 'MODIS_SSTa_2km':
         if 'OS_SST' in os.environ:
             path = os.path.join(os.getenv('OS_SST'), 'MODIS_L2', 'Info')
             out_dict['path'] = path
@@ -120,7 +126,8 @@ def grab_paths(dataset:str):
                                 'train_MODIS_2021_64x64_latents.h5')
         out_dict['opts_file'] = 'opts_nenya_modis_2km.json'
         out_dict['pca_file'] = 'pca_latents_MODIS_SST_2km.npz'
-    elif dataset == 'VIIRS_SST':
+        out_dict['macro'] = '\\modistwo'
+    elif dataset == 'VIIRS_SSTa':
         if 'OS_SST' in os.environ:
             path = os.path.join(os.getenv('OS_SST'), 'VIIRS', 'Info')
             out_dict['path'] = path
@@ -131,7 +138,8 @@ def grab_paths(dataset:str):
         out_dict['opts_file'] = 'opts_nenya_viirs.json'
         out_dict['pca_file'] = 'pca_latents_VIIRS_SST.npz'
         out_dict['dx'] = 0.75
-    elif dataset == 'VIIRS_SST_2km':
+        out_dict['macro'] = '\\viirs'
+    elif dataset == 'VIIRS_SSTa_2km':
         if 'OS_SST' in os.environ:
             path = os.path.join(os.getenv('OS_SST'), 'VIIRS', 'Info')
             out_dict['path'] = path
@@ -141,7 +149,8 @@ def grab_paths(dataset:str):
                                 'train_VIIRS_N21_2024_2km_latents.h5')
         out_dict['opts_file'] = 'opts_nenya_viirs_2km.json'
         out_dict['pca_file'] = 'pca_latents_VIIRS_SST_2km.npz'
-    elif dataset == 'VIIRS_SST_sub':  # Native resolution but 64x64 pixels
+        out_dict['macro'] = '\\viirstwo'
+    elif dataset == 'VIIRS_SSTa_sub':  # Native resolution but 64x64 pixels
         if 'OS_SST' in os.environ:
             path = os.path.join(os.getenv('OS_SST'), 'VIIRS', 'Info')
             out_dict['path'] = path
@@ -152,9 +161,10 @@ def grab_paths(dataset:str):
         out_dict['opts_file'] = 'opts_nenya_viirs_sub.json'
         out_dict['pca_file'] = 'pca_latents_VIIRS_SST_sub.npz'
         out_dict['dx'] = 0.75
+        out_dict['macro'] = '\\viirssub'
     elif dataset == 'orig_VIIRS_SST_2km':
             out_dict['pca_file'] = 'pca_latents_orig_VIIRS_SST_2km.npz'
-    elif 'LLC_SST' in dataset:
+    elif 'LLC_SSTa' in dataset:
         if 'OS_OGCM' in os.environ:
             path = os.path.join(os.getenv('OS_OGCM'), 'LLC', 'Info')
             out_dict['path'] = path
@@ -170,11 +180,11 @@ def grab_paths(dataset:str):
                                 'train_llc_noise_latents.h5')
         if 'nonoise' in dataset:
             out_dict['opts_file'] = 'opts_nenya_llc.json'
-        else:
-            out_dict['opts_file'] = 'opts_nenya_llc_noise.json'
-        if 'nonoise' in dataset:
+            out_dict['macro'] = '\\llcsst'
             out_dict['pca_file'] = 'pca_latents_LLC_SST_nonoise.npz'
         else:
+            out_dict['opts_file'] = 'opts_nenya_llc_noise.json'
+            out_dict['macro'] = '\\llcsstn'
             out_dict['pca_file'] = 'pca_latents_LLC_SST_noise.npz'
         out_dict['dx'] = 144./64
     elif 'LLC_SSHa' in dataset:
@@ -188,6 +198,7 @@ def grab_paths(dataset:str):
         out_dict['opts_file'] = 'opts_nenya_llc_ssha.json'
         out_dict['pca_file'] = 'pca_latents_LLC_SSHa_nonoise.npz'
         out_dict['dx'] = 144./64
+        out_dict['macro'] = '\\llcssh'
     elif dataset == 'SWOT_L3':
         if 'OS_SSH' in os.environ:
             path = os.path.join(os.getenv('OS_SSH'), 'SWOT_L3', 'Info')
@@ -199,6 +210,7 @@ def grab_paths(dataset:str):
         out_dict['opts_file'] = 'opts_nenya_swot_l3.json'
         out_dict['pca_file'] = 'pca_latents_SWOT_L3.npz'
         out_dict['dx'] = 0.25
+        out_dict['macro'] = '\\swot'
     else:
         raise ValueError(f"Dataset {dataset} not supported for Nenya.")
 
