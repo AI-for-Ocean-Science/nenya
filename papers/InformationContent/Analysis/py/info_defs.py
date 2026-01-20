@@ -218,6 +218,9 @@ def grab_paths(dataset:str):
     out_dict['pca_file'] = os.path.join('pca', out_dict['pca_file'])
     out_dict['opts_file'] = os.path.join('opts', out_dict['opts_file'])
 
+    # Image PCA file
+    out_dict['pca_imgfile'] = out_dict['pca_file'].replace('latents', 'preproc')
+
     # Auto-generate Pk
     out_dict['Pk_file'] = os.path.join('Pk', f'Pk_{dataset}.npz')
     out_dict['Pk_plot'] = os.path.join('Pk', f'Pk_{dataset}.png')

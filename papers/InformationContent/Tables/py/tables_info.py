@@ -301,7 +301,7 @@ def mktab_analysis(outfile='tab_analysis.tex', sub=False, local=True,
             slin += ' & ... & ...'
 
         # PCA statistics
-        pca_file = os.path.join('../Analysis', pdict['pca_file'])
+        pca_file = os.path.join('../Analysis', pdict['pca_imgfile'])
         n99_str = '...'
         n95_str = '...'
         n90_str = '...'
@@ -362,6 +362,6 @@ def mktab_analysis(outfile='tab_analysis.tex', sub=False, local=True,
 # Command line execution
 if __name__ == '__main__':
 
-    mktab_datasets()
+    #mktab_datasets()
     #mktab_model()
-    #mktab_analysis()
+    mktab_analysis()
