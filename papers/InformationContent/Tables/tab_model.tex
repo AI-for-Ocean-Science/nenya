@@ -3,22 +3,22 @@
 \caption{Contrastive Learning Model Configuration\label{tab:model}}
 \begin{tabular}{ccccccc}
 \hline 
-Name & Pre-processing & Augmentations & Model & \nfeature & $N_{99}$ \\ 
+Name & Pre-processing & Augmentations & \nfeature & $N_{99}$ \\ 
 \hline 
-MODIS\_SST & demean, crop 110 & jitter 10, flip, rotate & SimCLR/resnet50 & 256 & 111 \\ 
-MODIS\_SST\_2km & demean, crop 40 & jitter 5, flip, rotate & SimCLR/resnet50 & 256 & 67 \\ 
-VIIRS\_SST & demean, crop 160 & jitter 10, flip, rotate & SimCLR/resnet50 & 200 & 108 \\ 
-VIIRS\_SST\_2km & demean, crop 40 & jitter 5, flip, rotate & SimCLR/resnet50 & 256 & 75 \\ 
-VIIRS\_SST\_sub & demean, crop 40 & jitter 5, flip, rotate & SimCLR/resnet50 & 256 & 83 \\ 
-LLC\_SST\_nonoise & demean, crop 40 & jitter 5, flip, rotate & SimCLR/resnet50 & 256 & 76 \\ 
-LLC\_SST\_noise & demean, crop 40 & jitter 5, flip, rotate & SimCLR/resnet50 & 256 & 57 \\ 
-LLC\_SSHa & demean, crop 40 & jitter 5, flip, rotate & SimCLR/resnet50 & 256 & 76 \\ 
-SWOT\_L3 & demean, crop 110 & jitter 10, flip, rotate & SimCLR/resnet50 & 256 & 89 \\ 
-WNoise & crop 40 & jitter 5, flip, rotate & SimCLR/resnet50 & 256 & 11 \\ 
-Pk2 & crop 40 & jitter 5, flip, rotate & SimCLR/resnet50 & 256 & 24 \\ 
-Pk4 & crop 40 & jitter 5, flip, rotate & SimCLR/resnet50 & 256 & 42 \\ 
-MNIST & crop 22 & jitter 3, flip, rotate & SimCLR/resnet50 & 100 & 67 \\ 
-ImageNet & demean, crop 110 & jitter 10, flip, rotate & SimCLR/resnet50 & 256 & 140 \\ 
+MODIS\_SSTa & demean & crop 110, jitter 10, flip, rotate & 256 & 111 \\ 
+MODIS\_SSTa\_2km & demean & crop 40, jitter 5, flip, rotate & 256 & 67 \\ 
+VIIRS\_SSTa & demean & crop 160, jitter 10, flip, rotate & 200 & 108 \\ 
+VIIRS\_SSTa\_2km & demean & crop 40, jitter 5, flip, rotate & 256 & 75 \\ 
+VIIRS\_SSTa\_sub & demean & crop 40, jitter 5, flip, rotate & 256 & 83 \\ 
+LLC\_SSTa\_nonoise & demean & crop 40, jitter 5, flip, rotate & 256 & 76 \\ 
+LLC\_SSTa\_noise & demean & crop 40, jitter 5, flip, rotate & 256 & 57 \\ 
+LLC\_SSHa & demean & crop 40, jitter 5, flip, rotate & 256 & 76 \\ 
+SWOT\_L3 & demean & crop 110, jitter 10, flip, rotate & 256 & 89 \\ 
+WNoise & ... & crop 40, jitter 5, flip, rotate & 256 & 11 \\ 
+Pk2 & ... & crop 40, jitter 5, flip, rotate & 256 & 24 \\ 
+Pk4 & ... & crop 40, jitter 5, flip, rotate & 256 & 42 \\ 
+MNIST & ... & crop 22, jitter 3, flip, rotate & 100 & 67 \\ 
+ImageNet & demean & crop 110, jitter 10, flip, rotate & 256 & 140 \\ 
 \hline 
 \end{tabular} 
 \\ 

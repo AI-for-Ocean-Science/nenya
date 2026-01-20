@@ -126,7 +126,7 @@ def mktab_model(outfile='tab_model.tex', sub=False, local=True):
     tbfil.write('\\caption{Contrastive Learning Model Configuration\\label{tab:model}}\n')
     tbfil.write('\\begin{tabular}{ccccccc}\n')
     tbfil.write('\\hline \n')
-    tbfil.write('Name & Pre-processing & Augmentations & Model & \\nfeature & $N_{99}$ \\\\ \n')
+    tbfil.write('Name & Pre-processing & Augmentations & \\nfeature & $N_{99}$ \\\\ \n')
     tbfil.write('\\hline \n')
 
     # Loop me
@@ -156,16 +156,16 @@ def mktab_model(outfile='tab_model.tex', sub=False, local=True):
                 if opts.get('demean', False):
                     preproc_parts.append('demean')
 
-                # Random crop (the base crop dimension)
-                if 'random_cropjitter' in opts and opts['random_cropjitter']:
-                    crop_dim, _ = opts['random_cropjitter']
-                    preproc_parts.append(f'crop {crop_dim}')
-
                 if preproc_parts:
                     preproc_str = ', '.join(preproc_parts)
 
                 # Augmentations (random transformations during training)
                 augment_parts = []
+
+                # Random crop (the base crop dimension)
+                if 'random_cropjitter' in opts and opts['random_cropjitter']:
+                    crop_dim, _ = opts['random_cropjitter']
+                    augment_parts.append(f'crop {crop_dim}')
 
                 # Jitter is an augmentation
                 if 'random_cropjitter' in opts and opts['random_cropjitter']:
@@ -189,9 +189,9 @@ def mktab_model(outfile='tab_model.tex', sub=False, local=True):
                     augment_str = ', '.join(augment_parts)
 
                 # Model architecture
-                ssl_method = opts.get('ssl_method', 'SimCLR')
-                ssl_model = opts.get('ssl_model', 'resnet50')
-                model_str = f'{ssl_method}/{ssl_model}'
+                #ssl_method = opts.get('ssl_method', 'SimCLR')
+                #ssl_model = opts.get('ssl_model', 'resnet50')
+                #model_str = f'{ssl_method}/{ssl_model}'
 
                 # Number of dimensions (feat_dim)
                 if 'feat_dim' in opts:
@@ -202,7 +202,7 @@ def mktab_model(outfile='tab_model.tex', sub=False, local=True):
 
         slin += f' & {preproc_str}'
         slin += f' & {augment_str}'
-        slin += f' & {model_str}'
+        #slin += f' & {model_str}'
         slin += f' & {ndim_str}'
 
         # N_99: number of latent vectors to explain 99% of variance
@@ -352,5 +352,5 @@ def mktab_analysis(outfile='tab_analysis.tex', sub=False, local=True,
 if __name__ == '__main__':
 
     #mktab_datasets()
-    #mktab_model()
-    mktab_analysis()
+    #mktab_analysis()
+    mktab_model()
