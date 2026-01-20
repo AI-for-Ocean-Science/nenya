@@ -113,7 +113,7 @@ def grab_paths(dataset:str):
                                 'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm',
                                 'train_MODIS_2021_128x128_latents.h5')
         out_dict['opts_file'] = 'opts_nenya_modis.json'
-        out_dict['pca_file'] = 'pca_latents_MODIS_SST.npz'
+        out_dict['pca_file'] = 'pca_latents_MODIS_SSTa.npz'
         out_dict['dx'] = 1.1
         out_dict['macro'] = '\\modis'
     elif dataset == 'MODIS_SSTa_2km':
@@ -125,7 +125,7 @@ def grab_paths(dataset:str):
                                 'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm',
                                 'train_MODIS_2021_64x64_latents.h5')
         out_dict['opts_file'] = 'opts_nenya_modis_2km.json'
-        out_dict['pca_file'] = 'pca_latents_MODIS_SST_2km.npz'
+        out_dict['pca_file'] = 'pca_latents_MODIS_SSTa_2km.npz'
         out_dict['macro'] = '\\modistwo'
     elif dataset == 'VIIRS_SSTa':
         if 'OS_SST' in os.environ:
@@ -136,7 +136,7 @@ def grab_paths(dataset:str):
                                 'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm', 
                                 'train_VIIRS_N21_2024_latents.h5')
         out_dict['opts_file'] = 'opts_nenya_viirs.json'
-        out_dict['pca_file'] = 'pca_latents_VIIRS_SST.npz'
+        out_dict['pca_file'] = 'pca_latents_VIIRS_SSTa.npz'
         out_dict['dx'] = 0.75
         out_dict['macro'] = '\\viirs'
     elif dataset == 'VIIRS_SSTa_2km':
@@ -148,7 +148,7 @@ def grab_paths(dataset:str):
                                 'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm', 
                                 'train_VIIRS_N21_2024_2km_latents.h5')
         out_dict['opts_file'] = 'opts_nenya_viirs_2km.json'
-        out_dict['pca_file'] = 'pca_latents_VIIRS_SST_2km.npz'
+        out_dict['pca_file'] = 'pca_latents_VIIRS_SSTa_2km.npz'
         out_dict['macro'] = '\\viirstwo'
     elif dataset == 'VIIRS_SSTa_sub':  # Native resolution but 64x64 pixels
         if 'OS_SST' in os.environ:
@@ -159,7 +159,7 @@ def grab_paths(dataset:str):
                                 'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm', 
                                 'train_VIIRS_N21_2024_sub_latents.h5')
         out_dict['opts_file'] = 'opts_nenya_viirs_sub.json'
-        out_dict['pca_file'] = 'pca_latents_VIIRS_SST_sub.npz'
+        out_dict['pca_file'] = 'pca_latents_VIIRS_SSTa_sub.npz'
         out_dict['dx'] = 0.75
         out_dict['macro'] = '\\viirssub'
     elif dataset == 'orig_VIIRS_SST_2km':
@@ -181,11 +181,11 @@ def grab_paths(dataset:str):
         if 'nonoise' in dataset:
             out_dict['opts_file'] = 'opts_nenya_llc.json'
             out_dict['macro'] = '\\llcsst'
-            out_dict['pca_file'] = 'pca_latents_LLC_SST_nonoise.npz'
+            out_dict['pca_file'] = 'pca_latents_LLC_SSTa_nonoise.npz'
         else:
             out_dict['opts_file'] = 'opts_nenya_llc_noise.json'
             out_dict['macro'] = '\\llcsstn'
-            out_dict['pca_file'] = 'pca_latents_LLC_SST_noise.npz'
+            out_dict['pca_file'] = 'pca_latents_LLC_SSTa_noise.npz'
         out_dict['dx'] = 144./64
     elif 'LLC_SSHa' in dataset:
         if 'OS_OGCM' in os.environ:
@@ -196,7 +196,7 @@ def grab_paths(dataset:str):
                                 'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm',
                                 'train_llc_nonoise_latents.h5')
         out_dict['opts_file'] = 'opts_nenya_llc_ssha.json'
-        out_dict['pca_file'] = 'pca_latents_LLC_SSHa_nonoise.npz'
+        out_dict['pca_file'] = 'pca_latents_LLC_SSHa.npz'
         out_dict['dx'] = 144./64
         out_dict['macro'] = '\\llcssh'
     elif dataset == 'SWOT_L3':

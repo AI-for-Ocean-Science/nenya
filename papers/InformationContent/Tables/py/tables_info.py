@@ -279,9 +279,9 @@ def mktab_analysis(outfile='tab_analysis.tex', sub=False, local=True,
     tbfil.write('\\begin{table*}\n')
     tbfil.write('\\centering\n')
     tbfil.write('\\caption{Power Spectrum and PCA Analysis\\label{tab:analysis}}\n')
-    tbfil.write('\\begin{tabular}{ccccccc}\n')
+    tbfil.write('\\begin{tabular}{cccc}\n')
     tbfil.write('\\hline \n')
-    tbfil.write('Name & $\\beta$ & $R^2$ & $N_{99}$ & $N_{95}$ & $N_{90}$ & $f_{\\rm var,1}$ \\\\ \n')
+    tbfil.write('Name & $\\beta$ & $R^2$ & $f_{\\rm var,256}$ \\\\ \n')
     tbfil.write('\\hline \n')
 
     # Loop me
@@ -300,41 +300,31 @@ def mktab_analysis(outfile='tab_analysis.tex', sub=False, local=True,
         else:
             slin += ' & ... & ...'
 
-        # PCA statistics
+        # PCA statistics - variance explained by 256 eigenvectors
         pca_file = os.path.join('../Analysis', pdict['pca_imgfile'])
-        n99_str = '...'
-        n95_str = '...'
-        n90_str = '...'
-        var1_str = '...'
+        var256_str = '...'
 
         if os.path.exists(pca_file):
             try:
                 d = np.load(pca_file)
-                explained_var = d['explained_variance']
-                cumsum = np.cumsum(explained_var)
+                explained_var = d['explained_variance_ratio']
 
-                # N_99: components for 99% variance
-                n99 = np.searchsorted(cumsum, 0.99) + 1
-                n99_str = f'{n99}'
-
-                # N_95: components for 95% variance
-                n95 = np.searchsorted(cumsum, 0.95) + 1
-                n95_str = f'{n95}'
-
-                # N_90: components for 90% variance
-                n90 = np.searchsorted(cumsum, 0.90) + 1
-                n90_str = f'{n90}'
-
-                # Variance explained by first component
-                var1_str = f'{explained_var[0]:.3f}'
+                # Sum variance explained by first 256 components
+                if len(explained_var) >= 256:
+                    var256 = np.sum(explained_var[:256])
+                    var256_str = f'{var256:.3f}'
+                else:
+                    # If fewer than 256 components, sum all available
+                    var256 = np.sum(explained_var)
+                    var256_str = f'{var256:.3f}'
 
             except Exception as e:
+                print(f"Error loading PCA file for {dataset}: {e}")
                 pass
+        else:
+            print(f"PCA file not found for {dataset}: {pca_file}")
 
-        slin += f' & {n99_str}'
-        slin += f' & {n95_str}'
-        slin += f' & {n90_str}'
-        slin += f' & {var1_str}'
+        slin += f' & {var256_str}'
 
         tbfil.write(slin)
         tbfil.write(' \\\\ \n')
@@ -349,8 +339,7 @@ def mktab_analysis(outfile='tab_analysis.tex', sub=False, local=True,
     tbfil.write('\\textbf{Column descriptions:} ')
     tbfil.write(f'$\\beta$ = power-law exponent from $P(k) \\propto \\lambda^\\beta$ fit over {pix_min}--{pix_max} pixel wavelengths; ')
     tbfil.write('$R^2$ = coefficient of determination for power-law fit; ')
-    tbfil.write('$N_{{99}}$, $N_{{95}}$, $N_{{90}}$ = number of PCA components required to explain 99\\%, 95\\%, 90\\% of variance; ')
-    tbfil.write('$f_{{\\rm var,1}}$ = fraction of variance explained by the first PCA component.\n')
+    tbfil.write('$f_{{\\rm var,256}}$ = fraction of variance explained by the first 256 PCA components.\n')
     tbfil.write('\\end{minipage}\n')
     tbfil.write('\\end{table*} \n')
 

@@ -349,7 +349,11 @@ def fig_true_pca(outfile:str='fig_true_pca.png',
             clr = grab_clr(dataset)
             ls = grab_ls(dataset)
 
-            pca_file = f'../Analysis/pca/pca_preproc_{dataset}.npz'
+            pdict = info_defs.grab_paths(dataset)
+
+            #pca_file = f'../Analysis/pca/pca_preproc_{dataset}.npz'
+            pca_file = os.path.join('../Analysis', pdict['pca_imgfile'])
+            #pca_file = pdict['pca_imgfile']
             print(f"Loading PCA file: {pca_file}")
             try:
                 d = np.load(pca_file)

@@ -1,29 +1,29 @@
 \begin{table*}
 \centering
 \caption{Power Spectrum and PCA Analysis\label{tab:analysis}}
-\begin{tabular}{ccccccc}
+\begin{tabular}{cccc}
 \hline 
-Name & $\beta$ & $R^2$ & $N_{99}$ & $N_{95}$ & $N_{90}$ & $f_{\rm var,1}$ \\ 
+Name & $\beta$ & $R^2$ & $f_{\rm var,256}$ \\ 
 \hline 
-MODIS\_SSTa & ... & ... & 1 & 1 & 1 & 1525.849 \\ 
-MODIS\_SSTa\_2km & ... & ... & 1 & 1 & 1 & 381.401 \\ 
-VIIRS\_SSTa & ... & ... & 1 & 1 & 1 & 4917.768 \\ 
-VIIRS\_SSTa\_2km & ... & ... & 1 & 1 & 1 & 546.315 \\ 
-VIIRS\_SSTa\_sub & ... & ... & 1 & 1 & 1 & 1818.108 \\ 
-LLC\_SSTa\_nonoise & ... & ... & 1 & 1 & 1 & 344.072 \\ 
-LLC\_SSTa\_noise & ... & ... & 1 & 1 & 1 & 344.083 \\ 
-LLC\_SSHa & $3.21 \pm 0.12$ & 0.988 & ... & ... & ... & ... \\ 
-SWOT\_L3 & $1.42 \pm 0.11$ & 0.900 & 1 & 1 & 1 & 4.957 \\ 
-WNoise & $-0.00 \pm 0.00$ & 0.492 & 1 & 1 & 1 & 1.307 \\ 
-Pk2 & $2.10 \pm 0.03$ & 0.999 & ... & ... & ... & ... \\ 
-Pk4 & $4.45 \pm 0.09$ & 0.997 & ... & ... & ... & ... \\ 
-MNIST & $1.38 \pm 0.20$ & 0.939 & 1 & 1 & 1 & 5.117 \\ 
-ImageNet & $2.47 \pm 0.01$ & 1.000 & 1 & 1 & 1 & 332.321 \\ 
+MODIS\_SSTa & $2.90 \pm 0.04$ & 0.996 & 0.958 \\ 
+MODIS\_SSTa\_2km & $3.43 \pm 0.10$ & 0.993 & 0.973 \\ 
+VIIRS\_SSTa & $3.06 \pm 0.02$ & 0.998 & 0.970 \\ 
+VIIRS\_SSTa\_2km & $3.60 \pm 0.09$ & 0.995 & 0.981 \\ 
+VIIRS\_SSTa\_sub & $3.50 \pm 0.12$ & 0.991 & 0.992 \\ 
+LLC\_SSTa\_nonoise & $3.80 \pm 0.06$ & 0.998 & 0.987 \\ 
+LLC\_SSTa\_noise & $3.49 \pm 0.10$ & 0.993 & 0.958 \\ 
+LLC\_SSHa & $3.21 \pm 0.12$ & 0.988 & 0.980 \\ 
+SWOT\_L3 & $1.42 \pm 0.11$ & 0.900 & 0.801 \\ 
+WNoise & $-0.00 \pm 0.00$ & 0.492 & 0.077 \\ 
+Pk2 & $2.10 \pm 0.03$ & 0.999 & 0.636 \\ 
+Pk4 & $4.45 \pm 0.09$ & 0.997 & 0.993 \\ 
+MNIST & $1.38 \pm 0.20$ & 0.939 & 0.979 \\ 
+ImageNet & $2.47 \pm 0.01$ & 1.000 & 0.867 \\ 
 \hline 
 \end{tabular} 
 \\ 
 \begin{minipage}{0.9\textwidth}
 \small
-\textbf{Column descriptions:} $\beta$ = power-law exponent from $P(k) \propto \lambda^\beta$ fit over 4--40 pixel wavelengths; $R^2$ = coefficient of determination for power-law fit; $N_{{99}}$, $N_{{95}}$, $N_{{90}}$ = number of PCA components required to explain 99\%, 95\%, 90\% of variance; $f_{{\rm var,1}}$ = fraction of variance explained by the first PCA component.
+\textbf{Column descriptions:} $\beta$ = power-law exponent from $P(k) \propto \lambda^\beta$ fit over 4--40 pixel wavelengths; $R^2$ = coefficient of determination for power-law fit; $f_{{\rm var,256}}$ = fraction of variance explained by the first 256 PCA components.
 \end{minipage}
 \end{table*} 
