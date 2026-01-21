@@ -5,25 +5,25 @@
 \hline 
 Name & Pre-processing & Augmentations & \nfeature & $N_{99}$ \\ 
 \hline 
-MODIS\_SSTa & demean & crop 110, jitter 10, flip, rotate & 256 & 111 \\ 
-MODIS\_SSTa\_2km & demean & crop 40, jitter 5, flip, rotate & 256 & 67 \\ 
-VIIRS\_SSTa & demean & crop 160, jitter 10, flip, rotate & 200 & 108 \\ 
-VIIRS\_SSTa\_2km & demean & crop 40, jitter 5, flip, rotate & 256 & 75 \\ 
-VIIRS\_SSTa\_sub & demean & crop 40, jitter 5, flip, rotate & 256 & 83 \\ 
-LLC\_SSTa\_nonoise & demean & crop 40, jitter 5, flip, rotate & 256 & 76 \\ 
-LLC\_SSTa\_noise & demean & crop 40, jitter 5, flip, rotate & 256 & 57 \\ 
-LLC\_SSHa & demean & crop 40, jitter 5, flip, rotate & 256 & 76 \\ 
-SWOT\_L3 & demean & crop 110, jitter 10, flip, rotate & 256 & 89 \\ 
+MODIS\_SSTa & 128x128, downsample 2x2, median 3x1, 95\% clear & crop 110, jitter 10, flip, rotate & 256 & 111 \\ 
+MODIS\_SSTa\_2km & 128x128, downsample 2x2, median 3x1, 95\% clear & crop 40, jitter 5, flip, rotate & 256 & 67 \\ 
+VIIRS\_SSTa & 192x192, downsample 3x3, 95\% clear & crop 160, jitter 10, flip, rotate & 200 & 108 \\ 
+VIIRS\_SSTa\_2km & 192x192, downsample 3x3, 95\% clear & crop 40, jitter 5, flip, rotate & 256 & 75 \\ 
+VIIRS\_SSTa\_sub & 192x192, downsample 3x3, 95\% clear & crop 40, jitter 5, flip, rotate & 256 & 83 \\ 
+LLC\_SSTa\_nonoise & 64x64 & crop 40, jitter 5, flip, rotate & 256 & 76 \\ 
+LLC\_SSTa\_noise & 64x64, noise $\sigma$=0.039 & crop 40, jitter 5, flip, rotate & 256 & 57 \\ 
+LLC\_SSHa & 64x64 & crop 40, jitter 5, flip, rotate & 256 & 76 \\ 
+SWOT\_L3 & ... & crop 110, jitter 10, flip, rotate & 256 & 89 \\ 
 WNoise & ... & crop 40, jitter 5, flip, rotate & 256 & 11 \\ 
 Pk2 & ... & crop 40, jitter 5, flip, rotate & 256 & 24 \\ 
 Pk4 & ... & crop 40, jitter 5, flip, rotate & 256 & 42 \\ 
 MNIST & ... & crop 22, jitter 3, flip, rotate & 100 & 67 \\ 
-ImageNet & demean & crop 110, jitter 10, flip, rotate & 256 & 140 \\ 
+ImageNet & ... & crop 110, jitter 10, flip, rotate & 256 & 140 \\ 
 \hline 
 \end{tabular} 
 \\ 
 \begin{minipage}{0.9\textwidth}
 \small
-\textbf{Column descriptions:} \textit{Pre-processing}: transformations applied to all images before training (demean = subtract mean value; crop $N$ = crop to $N \times N$ pixels); \textit{Augmentations}: random transformations applied during contrastive learning (jitter $M$ = random spatial shift up to $M$ pixels; flip = random horizontal/vertical flip; rotate = random 90$^\circ$ rotation; noise $\sigma$ = additive Gaussian noise with standard deviation $\sigma$); \textit{Model}: SSL method and backbone architecture; $N_{\rm f}$ = latent space dimensionality; $N_{99}$ = PCA components needed for 99\% variance.
+\textbf{Column descriptions:} \textit{Pre-processing}: transformations applied to satellite/model data before training ($N$x$N$ = original cutout size in pixels; downsample $M$x$M$ = spatial downsampling factor; median $M$x$N$ = median filter kernel size; $X$\% clear = minimum cloud-free threshold; noise $\sigma$ = synthetic noise added to simulations); \textit{Augmentations}: random transformations applied during contrastive learning (jitter $M$ = random spatial shift up to $M$ pixels; flip = random horizontal/vertical flip; rotate = random 90$^\circ$ rotation; noise $\sigma$ = additive Gaussian noise with standard deviation $\sigma$); \textit{Model}: SSL method and backbone architecture; $N_{\rm f}$ = latent space dimensionality; $N_{99}$ = PCA components needed for 99\% variance.
 \end{minipage}
 \end{table*} 

@@ -114,6 +114,18 @@ def mktab_model(outfile='tab_model.tex', sub=False, local=True):
     as well as model architecture and output characteristics.
     """
 
+    # Path to ulmo preproc options
+    ulmo_preproc_path = '/home/xavier/Oceanography/python/ulmo/ulmo/preproc/options'
+
+    # Mapping from dataset prefixes to ulmo preproc JSON files
+    ulmo_preproc_files = {
+        'MODIS': os.path.join(ulmo_preproc_path, 'preproc_standard.json'),
+        'VIIRS': os.path.join(ulmo_preproc_path, 'preproc_viirs_std.json'),
+        'LLC_SSTa_nonoise': os.path.join(ulmo_preproc_path, 'preproc_llc_144_nonoise.json'),
+        'LLC_SSTa_noise': os.path.join(ulmo_preproc_path, 'preproc_llc_144.json'),
+        'LLC_SSHa': os.path.join(ulmo_preproc_path, 'preproc_llc_std.json'),
+    }
+
     if sub:
         outfile = outfile.replace('.tex', '_sub.tex')
 
@@ -144,20 +156,54 @@ def mktab_model(outfile='tab_model.tex', sub=False, local=True):
         model_str = '...'
         ndim_str = '...'
 
+        # Determine which ulmo preproc file to use based on dataset name
+        ulmo_preproc_file = None
+        if dataset in ulmo_preproc_files:
+            ulmo_preproc_file = ulmo_preproc_files[dataset]
+        elif dataset.startswith('MODIS'):
+            ulmo_preproc_file = ulmo_preproc_files['MODIS']
+        elif dataset.startswith('VIIRS'):
+            ulmo_preproc_file = ulmo_preproc_files['VIIRS']
+
+        # Load ulmo preproc JSON to get pre-processing steps
+        if ulmo_preproc_file and os.path.exists(ulmo_preproc_file):
+            try:
+                with open(ulmo_preproc_file, 'r') as f:
+                    ulmo_opts = json.load(f)
+
+                preproc_parts = []
+
+                # Field size (original cutout size)
+                if 'field_size' in ulmo_opts:
+                    preproc_parts.append(f'{ulmo_opts["field_size"]}x{ulmo_opts["field_size"]}')
+
+                # Downscale
+                if ulmo_opts.get('downscale', False) and 'dscale_size' in ulmo_opts:
+                    dscale = ulmo_opts['dscale_size']
+                    preproc_parts.append(f'downsample {dscale[0]}x{dscale[1]}')
+
+                # Median filter
+                if ulmo_opts.get('median', False) and 'med_size' in ulmo_opts:
+                    med = ulmo_opts['med_size']
+                    preproc_parts.append(f'median {med[0]}x{med[1]}')
+
+                # Clear threshold
+                if 'clear_threshold' in ulmo_opts:
+                    preproc_parts.append(f'{ulmo_opts["clear_threshold"]}\\% clear')
+
+                # Noise (for LLC simulations)
+                if 'noise' in ulmo_opts and ulmo_opts['noise'] > 0:
+                    preproc_parts.append(f'noise $\\sigma$={ulmo_opts["noise"]:.3f}')
+
+                if preproc_parts:
+                    preproc_str = ', '.join(preproc_parts)
+            except (json.JSONDecodeError, KeyError, FileNotFoundError) as e:
+                pass
+
         if os.path.exists(opts_file):
             try:
                 with open(opts_file, 'r') as f:
                     opts = json.load(f)
-
-                # Pre-processing steps (applied before training)
-                preproc_parts = []
-
-                # Demean is a pre-processing step
-                if opts.get('demean', False):
-                    preproc_parts.append('demean')
-
-                if preproc_parts:
-                    preproc_str = ', '.join(preproc_parts)
 
                 # Augmentations (random transformations during training)
                 augment_parts = []
@@ -230,8 +276,12 @@ def mktab_model(outfile='tab_model.tex', sub=False, local=True):
     tbfil.write('\\begin{minipage}{0.9\\textwidth}\n')
     tbfil.write('\\small\n')
     tbfil.write('\\textbf{Column descriptions:} ')
-    tbfil.write('\\textit{Pre-processing}: transformations applied to all images before training ')
-    tbfil.write('(demean = subtract mean value; crop $N$ = crop to $N \\times N$ pixels); ')
+    tbfil.write('\\textit{Pre-processing}: transformations applied to satellite/model data before training ')
+    tbfil.write('($N$x$N$ = original cutout size in pixels; ')
+    tbfil.write('downsample $M$x$M$ = spatial downsampling factor; ')
+    tbfil.write('median $M$x$N$ = median filter kernel size; ')
+    tbfil.write('$X$\\% clear = minimum cloud-free threshold; ')
+    tbfil.write('noise $\\sigma$ = synthetic noise added to simulations); ')
     tbfil.write('\\textit{Augmentations}: random transformations applied during contrastive learning ')
     tbfil.write('(jitter $M$ = random spatial shift up to $M$ pixels; ')
     tbfil.write('flip = random horizontal/vertical flip; ')
