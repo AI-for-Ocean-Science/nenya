@@ -374,7 +374,7 @@ def fig_true_pca(outfile:str='fig_true_pca.png',
             if xs is None:
                 xs = xs_curr
 
-            ax.plot(xs_curr, yvals, label=dataset.replace('_', '/'),
+            ax.plot(xs_curr, yvals, label=pdict['label'],
                     color=clr, ls=ls, lw=2)
 
             # Add cumulative point marker
@@ -390,10 +390,16 @@ def fig_true_pca(outfile:str='fig_true_pca.png',
             ax.set_ylabel('Variance explained per mode')
         ax.set_xlabel('Number of True PCA components')
 
+        # Add a power-law
+        xval = 1. + np.arange(256)
+        exp = -1.5
+        yval = 0.3 * xval**exp
+        ax.plot(xval, yval, 'k:', label=r'$N^{'+f'{exp}'+r'}$')
+
         ax.set_xscale('log')
         ax.set_yscale('log')
         ax.minorticks_on()
-        ax.legend(fontsize=13, loc='lower left')
+        ax.legend(fontsize=13, loc='upper right')
         ax.grid(True, which='both', ls='--', lw=0.5)
 
         if xmnx is not None:
@@ -413,7 +419,7 @@ def fig_learning_curves(outfile:str='fig_learning_curves.png',
     # Define the datasets
     #datasets = ['VIIRS_SST', 'MODIS_SST', 'MNIST', 'SWOT_L3', 
     #            'WNoise', 'ImageNet']
-    datasets = info_defs.all_datasets
+    datasets = info_defs.primary_remote_datasets + info_defs.natural_datasets
     
     # Create a figure
     fig = plt.figure(figsize=(12, 10))
@@ -445,7 +451,7 @@ def fig_learning_curves(outfile:str='fig_learning_curves.png',
             lbl0 = f'{dataset} validation'
             lbl1 = f'{dataset} training'
         else:
-            lbl0 = f'{dataset}'
+            lbl0 = pdict['label']
             lbl1 = None
         ax.plot(np.arange(loss_valid.size)+1, loss_valid, label=lbl0, lw=3, color=clr, ls=ls)
         if show_train:
@@ -966,9 +972,9 @@ def main(flg):
     if flg == 5:
         fig_Pk()
 
-    # PCA variance
+    # PCA variance on actual images
     if flg == 6:
-        fig_true_pca(show_cum_point=0.99)
+        fig_true_pca()#show_cum_point=0.99)
 
     # Example images
     if flg == 7:

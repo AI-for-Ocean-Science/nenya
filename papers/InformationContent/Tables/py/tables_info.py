@@ -98,7 +98,7 @@ def mktab_datasets(outfile='tab_datasets.tex', sub=False, local=True):
     tbfil.write('Natural = natural images); ')
     tbfil.write('\\textit{Source}: instrument or data source; ')
     tbfil.write('\\npix\\ = number of pixels per side of the square cutouts; ')
-    tbfil.write('\\dx\\ = spatial resolution in km per pixel (... indicates non-physical data).\n')
+    tbfil.write('\\dx\\ = spatial resolution in km per pixel with "..." indicating non-physical data.\n')
     tbfil.write('\\end{minipage}\n')
     tbfil.write('\\end{table*} \n')
 
@@ -331,7 +331,7 @@ def mktab_analysis(outfile='tab_analysis.tex', sub=False, local=True,
     tbfil.write('\\caption{Power Spectrum and PCA Analysis\\label{tab:analysis}}\n')
     tbfil.write('\\begin{tabular}{cccc}\n')
     tbfil.write('\\hline \n')
-    tbfil.write('Name & $\\beta$ & $R^2$ & $f_{\\rm var,256}$ \\\\ \n')
+    tbfil.write('Name & $\\beta$ & $f_{\\rm var,256}$ \\\\ \n')
     tbfil.write('\\hline \n')
 
     # Loop me
@@ -340,15 +340,17 @@ def mktab_analysis(outfile='tab_analysis.tex', sub=False, local=True,
 
         # Name (convert _ to \_)
         cdataset = dataset.replace('_', '\\_')
-        slin = f'{cdataset}'
+        #slin = f'{cdataset}'
+        slin = pdict['macro']
 
         # Power-law exponent from P(k)
         pk_result = calc_Pk.fit_powerlaw(dataset, pix_min=pix_min, pix_max=pix_max)
         if pk_result is not None:
             slin += f' & ${pk_result["exponent"]:.2f} \\pm {pk_result["exponent_err"]:.2f}$'
-            slin += f' & {pk_result["r_squared"]:.3f}'
+            #slin += f' & {pk_result["r_squared"]:.3f}'
         else:
-            slin += ' & ... & ...'
+            slin += ' & ... '#& ...'
+            #slin += ' & ... & ...'
 
         # PCA statistics - variance explained by 256 eigenvectors
         pca_file = os.path.join('../Analysis', pdict['pca_imgfile'])
@@ -388,7 +390,7 @@ def mktab_analysis(outfile='tab_analysis.tex', sub=False, local=True,
     tbfil.write('\\small\n')
     tbfil.write('\\textbf{Column descriptions:} ')
     tbfil.write(f'$\\beta$ = power-law exponent from $P(k) \\propto \\lambda^\\beta$ fit over {pix_min}--{pix_max} pixel wavelengths; ')
-    tbfil.write('$R^2$ = coefficient of determination for power-law fit; ')
+    #tbfil.write('$R^2$ = coefficient of determination for power-law fit; ')
     tbfil.write('$f_{{\\rm var,256}}$ = fraction of variance explained by the first 256 PCA components.\n')
     tbfil.write('\\end{minipage}\n')
     tbfil.write('\\end{table*} \n')
@@ -402,5 +404,5 @@ def mktab_analysis(outfile='tab_analysis.tex', sub=False, local=True,
 if __name__ == '__main__':
 
     #mktab_datasets()
-    #mktab_analysis()
-    mktab_model()
+    mktab_analysis()
+    #mktab_model()
