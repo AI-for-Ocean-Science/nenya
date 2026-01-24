@@ -134,7 +134,7 @@ def fig_pca_2panel(outfile:str='fig_pca_2panel.png',
                 yvals = d['explained_variance']
 
             xs = np.arange(d['explained_variance'].size) + 1
-            ax.plot(xs, yvals, label=dataset.replace('_', '/'),
+            ax.plot(xs, yvals, label=pdict['label'], #dataset.replace('_', '/'),
                     color=clr, ls=ls, lw=2)
 
             # Add cumulative point marker
@@ -764,19 +764,26 @@ def fig_Pk():
     # Add power-law reference curves on the left panel (Natural Images)
     # Use wavelength range from the natural panel
     wv_ref = np.logspace(0.5, 2, 50)  # wavelengths in pixels
-    k_ref = 1.0 / wv_ref
+    wv_ref2 = np.logspace(0., 1.7, 50)  # wavelengths in pixels
+    ref_2 = 1e-3
 
     # k^-2 power law: P(k) ~ k^-2, so k*P(k) ~ k^-1 ~ wavelength^1
     # Scale to match ref_amplitude at k_ref_scale
-    idx_ref = np.argmin(np.abs(k_ref - k_ref_scale))
-    pk2_power = ref_amplitude * (k_ref / k_ref_scale)**(-1)
-    ax_natural.loglog(k_ref, pk2_power, ':', color=cdict['Pk2'],
+    #idx_ref = np.argmin(np.abs(k_ref - k_ref_scale))
+    for ax, iwv_ref, iref_amplitude in zip([ax_natural, ax_remote],
+                           [wv_ref, wv_ref2],
+                           [ref_amplitude, ref_2]):
+        k_ref = 1.0 / iwv_ref
+        pk2_power = iref_amplitude * (k_ref / k_ref_scale)**(-1)
+        ax.loglog(k_ref, pk2_power, ':', color=cdict['Pk2'],
                       label=r'$k^{-2}$', lw=2)
 
-    # k^-4 power law: P(k) ~ k^-4, so k*P(k) ~ k^-3 ~ wavelength^3
-    pk4_power = ref_amplitude * (k_ref / k_ref_scale)**(-3)
-    ax_natural.loglog(k_ref, pk4_power, ':', color=cdict['Pk4'],
-                      label=r'$k^{-4}$', lw=2)
+        # k^-4 power law: P(k) ~ k^-4, so k*P(k) ~ k^-3 ~ wavelength^3
+        pk4_power = iref_amplitude * (k_ref / k_ref_scale)**(-3)
+        ax.loglog(k_ref, pk4_power, ':', color=cdict['Pk4'],
+                        label=r'$k^{-4}$', lw=2)
+        #ax_remote.loglog(k_ref, pk4_power, ':', color=cdict['Pk4'],
+        #              label=r'$k^{-4}$', lw=2)
 
     # Labels and formatting
     ax_natural.set_title('Natural Images', fontsize=16)
@@ -786,7 +793,7 @@ def fig_Pk():
     ax_natural.grid(True, which='both', ls='--', lw=0.5)
 
     ax_remote.set_title('Remote Sensing', fontsize=16)
-    ax_remote.legend(fontsize=12, loc='lower left')
+    ax_remote.legend(fontsize=12, loc='upper right')
     ax_remote.set_xlabel('Wavenumber (cycles/km)')
     ax_remote.set_ylabel(r'Power Spectrum per log bin: $k \, P(k)$')
     ax_remote.grid(True, which='both', ls='--', lw=0.5)

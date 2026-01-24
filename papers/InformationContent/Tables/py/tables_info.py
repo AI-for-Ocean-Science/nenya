@@ -147,7 +147,8 @@ def mktab_model(outfile='tab_model.tex', sub=False, local=True):
 
         # Name (convert _ to \_)
         cdataset = dataset.replace('_', '\\_')
-        slin = f'{cdataset}'
+        #slin = f'{cdataset}'
+        slin = pdict['macro']
 
         # Load opts file for processing info
         opts_file = os.path.join('../Analysis', pdict['opts_file'])
@@ -174,11 +175,11 @@ def mktab_model(outfile='tab_model.tex', sub=False, local=True):
                 preproc_parts = []
 
                 # Field size (original cutout size)
-                if 'field_size' in ulmo_opts:
-                    preproc_parts.append(f'{ulmo_opts["field_size"]}x{ulmo_opts["field_size"]}')
+                #if 'field_size' in ulmo_opts:
+                #    preproc_parts.append(f'{ulmo_opts["field_size"]}x{ulmo_opts["field_size"]}')
 
                 # Downscale
-                if ulmo_opts.get('downscale', False) and 'dscale_size' in ulmo_opts:
+                if '2km' in dataset and ulmo_opts.get('downscale', False) and 'dscale_size' in ulmo_opts:
                     dscale = ulmo_opts['dscale_size']
                     preproc_parts.append(f'downsample {dscale[0]}x{dscale[1]}')
 
@@ -188,8 +189,8 @@ def mktab_model(outfile='tab_model.tex', sub=False, local=True):
                     preproc_parts.append(f'median {med[0]}x{med[1]}')
 
                 # Clear threshold
-                if 'clear_threshold' in ulmo_opts:
-                    preproc_parts.append(f'{ulmo_opts["clear_threshold"]}\\% clear')
+                #if 'clear_threshold' in ulmo_opts:
+                #    preproc_parts.append(f'{ulmo_opts["clear_threshold"]}\\% clear')
 
                 # Noise (for LLC simulations)
                 if 'noise' in ulmo_opts and ulmo_opts['noise'] > 0:
@@ -404,5 +405,5 @@ def mktab_analysis(outfile='tab_analysis.tex', sub=False, local=True,
 if __name__ == '__main__':
 
     #mktab_datasets()
-    mktab_analysis()
-    #mktab_model()
+    #mktab_analysis()
+    mktab_model()

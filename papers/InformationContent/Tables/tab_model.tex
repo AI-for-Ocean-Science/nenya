@@ -5,20 +5,20 @@
 \hline 
 Name & Pre-processing & Augmentations & \nfeature & $N_{99}$ \\ 
 \hline 
-MODIS\_SSTa & 128x128, downsample 2x2, median 3x1, 95\% clear & crop 110, jitter 10, flip, rotate & 256 & 111 \\ 
-MODIS\_SSTa\_2km & 128x128, downsample 2x2, median 3x1, 95\% clear & crop 40, jitter 5, flip, rotate & 256 & 67 \\ 
-VIIRS\_SSTa & 192x192, downsample 3x3, 95\% clear & crop 160, jitter 10, flip, rotate & 200 & 108 \\ 
-VIIRS\_SSTa\_2km & 192x192, downsample 3x3, 95\% clear & crop 40, jitter 5, flip, rotate & 256 & 75 \\ 
-VIIRS\_SSTa\_sub & 192x192, downsample 3x3, 95\% clear & crop 40, jitter 5, flip, rotate & 256 & 83 \\ 
-LLC\_SSTa\_nonoise & 64x64 & crop 40, jitter 5, flip, rotate & 256 & 76 \\ 
-LLC\_SSTa\_noise & 64x64, noise $\sigma$=0.039 & crop 40, jitter 5, flip, rotate & 256 & 57 \\ 
-LLC\_SSHa & 64x64 & crop 40, jitter 5, flip, rotate & 256 & 76 \\ 
-SWOT\_L3 & ... & crop 110, jitter 10, flip, rotate & 256 & 89 \\ 
-WNoise & ... & crop 40, jitter 5, flip, rotate & 256 & 11 \\ 
-Pk2 & ... & crop 40, jitter 5, flip, rotate & 256 & 24 \\ 
-Pk4 & ... & crop 40, jitter 5, flip, rotate & 256 & 42 \\ 
-MNIST & ... & crop 22, jitter 3, flip, rotate & 100 & 67 \\ 
-ImageNet & ... & crop 110, jitter 10, flip, rotate & 256 & 140 \\ 
+\modis & median 3x1 & crop 110, jitter 10, flip, rotate & 256 & 111 \\ 
+\modistwo & downsample 2x2, median 3x1 & crop 40, jitter 5, flip, rotate & 256 & 67 \\ 
+\viirs & ... & crop 160, jitter 10, flip, rotate & 200 & 108 \\ 
+\viirstwo & downsample 3x3 & crop 40, jitter 5, flip, rotate & 256 & 75 \\ 
+\viirssub & ... & crop 40, jitter 5, flip, rotate & 256 & 83 \\ 
+\llcsst & ... & crop 40, jitter 5, flip, rotate & 256 & 76 \\ 
+\llcsstn & noise $\sigma$=0.039 & crop 40, jitter 5, flip, rotate & 256 & 57 \\ 
+\llcssh & ... & crop 40, jitter 5, flip, rotate & 256 & 76 \\ 
+\swot & ... & crop 110, jitter 10, flip, rotate & 256 & 89 \\ 
+\wnoise & ... & crop 40, jitter 5, flip, rotate & 256 & 11 \\ 
+\pktwo & ... & crop 40, jitter 5, flip, rotate & 256 & 24 \\ 
+\pkfour & ... & crop 40, jitter 5, flip, rotate & 256 & 42 \\ 
+\mnist & ... & crop 22, jitter 3, flip, rotate & 100 & 67 \\ 
+\inet & ... & crop 110, jitter 10, flip, rotate & 256 & 140 \\ 
 \hline 
 \end{tabular} 
 \\ 
