@@ -98,6 +98,10 @@ def fig_pca_2panel(outfile:str='fig_pca_2panel.png',
     natural_datasets_panel = info_defs.natural_datasets
     remote_datasets_panel = info_defs.primary_remote_datasets
     remote_datasets_panel += ['ImageNet']
+    # Add LLC
+    remote_datasets_panel += ['LLC_SSTa_nonoise', 
+                'LLC_SSTa_noise', 
+                'LLC_SSHa']
 
     # Cumulative filename adjustment
     if cumulative:

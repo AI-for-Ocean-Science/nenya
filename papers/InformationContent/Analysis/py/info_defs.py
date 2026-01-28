@@ -192,12 +192,13 @@ def grab_paths(dataset:str):
             out_dict['opts_file'] = 'opts_nenya_llc.json'
             out_dict['macro'] = '\\llcsst'
             out_dict['pca_file'] = 'pca_latents_LLC_SSTa_nonoise.npz'
+            out_dict['label'] = 'LLC/SSTa'
         else:
             out_dict['opts_file'] = 'opts_nenya_llc_noise.json'
             out_dict['macro'] = '\\llcsstn'
             out_dict['pca_file'] = 'pca_latents_LLC_SSTa_noise.npz'
+            out_dict['label'] = 'LLC/SSTa+noise'
         out_dict['dx'] = 144./64
-        out_dict['label'] = 'LLC/SSTa'
     elif 'LLC_SSHa' in dataset:
         if 'OS_OGCM' in os.environ:
             path = os.path.join(os.getenv('OS_OGCM'), 'LLC', 'Info')
