@@ -742,12 +742,12 @@ def fig_Pk():
             natural_curves.append({
                 'k': k,
                 'power_k': power * k,
-                'label': dataset,
+                'label': pdict['label'],
                 'color': clr,
                 'ls': ls
             })
         else:
-            ax_remote.loglog(k, power*k, label=dataset,
+            ax_remote.loglog(k, power*k, label=pdict['label'],
                       color=clr, ls=ls)
 
     # Scale all natural curves to have the same amplitude at k=k_ref_scale
