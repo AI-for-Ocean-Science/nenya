@@ -27,11 +27,6 @@ def calc_one(dataset:str, clobber:bool=False):
     # Load
     cutouts = nenya_pk.load_images(pdict['preproc_file'], partition='train')
 
-    if dataset in ['VIIRS_SST']:
-        batch_size = 16
-    else:
-        batch_size = None
-    
     # Compute spectrum (parallel version - recommended)
     k, power, wavelength = nenya_pk.orig_compute_ensemble_spectrum_parallel(
         cutouts=cutouts,
@@ -174,5 +169,5 @@ def fit_all_powerlaws(pix_min: int = 4, pix_max: int = 40):
 
     
 if __name__ == "__main__":
-    #calc_all()
-    plot_em_all_in_one()
+    calc_all()
+    #plot_em_all_in_one()
