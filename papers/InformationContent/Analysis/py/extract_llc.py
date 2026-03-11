@@ -22,7 +22,7 @@ from IPython import embed
 
 import info_defs
 
-pdict = info_defs.grab_paths('LLC_SST')
+#pdict = info_defs.grab_paths('LLC_SST')
 
 # Hard code as needed
 
@@ -50,11 +50,12 @@ def ex_nonoise():
                     orig_key='valid')
 
 def ex_viirs_match():
+    pdict = info_defs.grab_paths('LLC_SSTa_VIIRS')
     # Open the LLC VIIRS file
     poptions=None
     extract_utils.prep_for_training(os.path.join(gall_tables_path, 'llc_viirs_match.parquet'),
                     os.path.join(local_gall_preproc_path, 'LLC_VIIRS144_preproc.h5'),
-                    os.path.join(local_preproc_path, 'LLC4320_SSTa_VIIRS.h5'),
+                    pdict['preproc_file'],
                     os.path.join(local_tables_path, 'LLC4320_SSTa_VIIRS.parquet'), 
                     inpaint=False, poptions=poptions,
                     use_ppidx=True, 

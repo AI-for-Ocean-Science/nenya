@@ -178,7 +178,12 @@ def grab_paths(dataset:str):
         if 'OS_OGCM' in os.environ:
             path = os.path.join(os.getenv('OS_OGCM'), 'LLC', 'Info')
             out_dict['path'] = path
-            if 'nonoise' in dataset:
+            if 'VIIRS' in dataset:
+                out_dict['preproc_file'] = os.path.join(path, 'PreProc', 'LLC4320_SSTa_VIIRS.h5')
+                out_dict['latents_file'] = os.path.join(path, 'latents', 'LLC_SSTa_VIIRS',
+                                'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm',
+                                'train_llc_nonoise_latents.h5')
+            elif 'nonoise' in dataset:
                 out_dict['preproc_file'] = os.path.join(path, 'PreProc', 'train_llc_nonoise.h5')
                 out_dict['latents_file'] = os.path.join(path, 'latents', 'LLC_SST_nonoise',
                                 'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm',
@@ -188,7 +193,12 @@ def grab_paths(dataset:str):
                 out_dict['latents_file'] = os.path.join(path, 'latents', 'LLC_SST_noise',
                                 'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm',
                                 'train_llc_noise_latents.h5')
-        if 'nonoise' in dataset:
+        if 'VIIRS' in dataset:
+            out_dict['opts_file'] = 'opts_nenya_llc.json'
+            out_dict['macro'] = '\\llcsstv'
+            out_dict['pca_file'] = 'pca_latents_LLC_SSTa_VIIRS.npz'
+            out_dict['label'] = 'LLC/SSTa+VIIRS'
+        elif 'nonoise' in dataset:
             out_dict['opts_file'] = 'opts_nenya_llc.json'
             out_dict['macro'] = '\\llcsst'
             out_dict['pca_file'] = 'pca_latents_LLC_SSTa_nonoise.npz'
