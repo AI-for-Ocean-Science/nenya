@@ -724,13 +724,20 @@ def fig_Pk():
 
         # Skip the highest wavenumber (first element, since k is typically sorted high to low
         # or last element if sorted low to high) - skip last point
-        skip_i = -1
+        skip_i = 0
         skip_j = 1
-        k = k[skip_j:skip_i]
-        power = power[skip_j:skip_i]
-        wavelength = wavelength[skip_j:skip_i]
+        if skip_i != 0:
+            k = k[skip_j:skip_i]
+            power = power[skip_j:skip_i]
+            wavelength = wavelength[skip_j:skip_i]
+        else:
+            k = k[skip_j:]
+            power = power[skip_j:]
+            wavelength = wavelength[skip_j:]
 
-        print(f'{dataset}: k={k[0]}, wave={wavelength[-1]*0.70}')
+        #embed(header='738 of figs')
+
+        print(f'{dataset}: k={k[0]}, wave={wavelength[-1]}')
 
         # Scale SSH
         if 'SSH' in dataset or 'SWOT' in dataset:
