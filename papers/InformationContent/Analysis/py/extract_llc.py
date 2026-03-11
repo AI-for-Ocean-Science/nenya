@@ -32,8 +32,10 @@ if 'OS_OGCM' not in os.environ.keys():
 local_llc_path = os.path.join(os.getenv('OS_OGCM'), 'LLC')
 local_tables_path = os.path.join(local_llc_path, 'Info', 'Tables')
 local_orig_preproc_path = os.path.join(local_llc_path, 'Nenya', 'PreProc')
+local_gall_preproc_path = os.path.join(local_llc_path, 'Gallmeier', 'PreProc')
 local_preproc_path = os.path.join(local_llc_path, 'Info', 'PreProc')
 tables_path = os.path.join(local_llc_path, 'Tables')
+gall_tables_path = os.path.join(local_llc_path, 'Gallmeier', 'Tables')
 
 def ex_nonoise():
     # Open the LLC Uniform file
@@ -42,6 +44,18 @@ def ex_nonoise():
                     os.path.join(local_orig_preproc_path, 'LLC_uniform144_nonoise_preproc.h5'),
                     os.path.join(local_preproc_path, 'train_llc_nonoise.h5'), 
                     os.path.join(local_tables_path, 'train_llc_nonoise.parquet'), 
+                    inpaint=False, poptions=poptions,
+                    use_ppidx=True, 
+                    n_train=150000, n_valid=50000,
+                    orig_key='valid')
+
+def ex_viirs_match():
+    # Open the LLC VIIRS file
+    poptions=None
+    extract_utils.prep_for_training(os.path.join(gall_tables_path, 'llc_viirs_match.parquet'),
+                    os.path.join(local_gall_preproc_path, 'LLC_VIIRS144_preproc.h5'),
+                    os.path.join(local_preproc_path, 'LLC4320_SSTa_VIIRS.h5'),
+                    os.path.join(local_tables_path, 'LLC4320_SSTa_VIIRS.parquet'), 
                     inpaint=False, poptions=poptions,
                     use_ppidx=True, 
                     n_train=150000, n_valid=50000,
@@ -115,6 +129,9 @@ def ex_ssh():
 
 # Command line execution
 if __name__ == '__main__':
+    # Uniform
     #ex_nonoise()
     #ex_noise()
-    ex_ssh()
+    #ex_ssh()
+
+    # VIIRS
