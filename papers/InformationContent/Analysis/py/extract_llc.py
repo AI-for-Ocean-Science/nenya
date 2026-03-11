@@ -135,3 +135,4 @@ if __name__ == '__main__':
     #ex_ssh()
 
     # VIIRS
+    ex_viirs_match()
