@@ -37,7 +37,11 @@ def grabbing_iury_data():
     #   curl -fsSL https://pixi.sh/install.sh | bash
     #   This failed on profx, so I grabbed the binary
 
+
     # Grab the swot_patterns Repo
+
+    # pixi install
+    # pixi shell
 
     import xarray as xr
     import matplotlib.pyplot as plt
@@ -66,14 +70,17 @@ def grabbing_iury_data():
     ssha_unfiltered = ds.ssha_unfiltered
 
     # Grab 256 cutouts of ssha_unfiltered
-    cutouts = ssha_unfiltered.isel(cutout=slice(0, 200000))
+    #cutouts = ssha_unfiltered.isel(cutout=slice(0, 200000))
 
     # Write to disk as netcdf
     print("Writing to disk...")
     outfile = os.path.join(os.getenv('OS_SSH'), 'SWOT_v2', 
         'ssha_unfiltered_64x64_54km_0-200000.nc')
+    #cutouts.to_netcdf(outfile)
+    outfile = os.path.join(os.getenv('OS_SSH'), 'SWOT_v2', 
+        'ssha_unfiltered_64x64_54km.nc')
     os.makedirs(os.path.dirname(outfile), exist_ok=True)
-    cutouts.to_netcdf(outfile)
+    ssha_unfiltered.to_netcdf(outfile)
     print(f"Wrote {outfile}")
 
 if __name__ == '__main__':
