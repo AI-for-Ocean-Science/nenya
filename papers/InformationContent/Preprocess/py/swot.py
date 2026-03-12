@@ -32,6 +32,7 @@ def main(ntrain=150000, nvalid=50000):
     print(f"SWOT_L3 preprocessed and saved to: {preproc_file}")
 
 def grabbing_iury_data():
+
     # Install pixi 
     #   curl -fsSL https://pixi.sh/install.sh | bash
     #   This failed on profx, so I grabbed the binary
@@ -61,8 +62,19 @@ def grabbing_iury_data():
 
     ds = xr.open_zarr(session.store, consolidated=False)
 
-    embed(header='65 of swot.py')
-    # Grab 100 cutouts
+    #embed(header='65 of swot.py')
+    ssha_unfiltered = ds.ssha_unfiltered
+
+    # Grab 256 cutouts of ssha_unfiltered
+    #cutouts = ssha_unfiltered.isel(cutout=slice(0, 256))
+
+    # Write to disk as netcdf
+    print("Writing to disk...")
+    outfile = os.path.join(os.getenv('OS_SSH'), 'SWOT_v2', 
+        'ssha_unfiltered_64x64_54km.nc')
+    os.makedirs(os.path.dirname(outfile), exist_ok=True)
+    ssha_unfiltered.to_netcdf(outfile)
+    print(f"Wrote {outfile}")
 
 if __name__ == '__main__':
     #main()
