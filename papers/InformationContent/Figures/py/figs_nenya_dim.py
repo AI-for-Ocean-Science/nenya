@@ -175,6 +175,110 @@ def fig_pca_2panel(outfile:str='fig_pca_2panel.png',
     print(f"Saved: {outfile}")
 
 
+def fig_pca_noise_res(outfile:str='fig_pca_noise_res.png',
+                      cumulative:bool=False,
+                      show_cum_point:float=None,
+                      xmnx:tuple=None,
+                      exponent:float=-0.5):
+    """
+    Generate a 2-panel PCA variance explained plot examining
+    noise (left) and resolution (right) effects.
+
+    Panel 1 (left): Noise - LLC_SSTa_nonoise vs LLC_SSTa_noise
+        plus Remote Sensing (MODIS_SSTa, VIIRS_SSTa, SWOT_L3)
+    Panel 2 (right): Resolution - VIIRS_SSTa_2km vs VIIRS_SSTa
+        vs LLC_SSTa_noise
+
+    Args:
+        outfile (str): The output file path for the saved plot.
+        cumulative (bool): If True, plot the cumulative variance explained.
+        show_cum_point (float): If provided, marks the point where cumulative
+            variance reaches this value.
+        xmnx (tuple): Sets xlim of the x-axis if provided.
+        exponent (float): The exponent for the power-law fit line.
+    """
+    # Define datasets for each panel
+    noise_datasets = info_defs.primary_remote_datasets + [
+        'LLC_SSTa_nonoise', 'LLC_SSTa_noise']
+    # Remove SWOT
+    noise_datasets.remove('SWOT_L3')
+
+    # Datasets for resolution panel
+    resolution_datasets = ['VIIRS_SSTa_2km', 'VIIRS_SSTa',
+                           'LLC_SSTa_noise']
+
+    # Cumulative filename adjustment
+    if cumulative:
+        if 'noise_res' in outfile:
+            outfile = outfile.replace('noise_res', 'noise_res_cumulative')
+
+    # Create figure with 2 panels
+    fig = plt.figure(figsize=(14, 6))
+    gs = gridspec.GridSpec(1, 2)
+
+    panels = [
+        (noise_datasets, 'Noise'),
+        (resolution_datasets, 'Resolution')
+    ]
+
+    for panel_idx, (datasets, title) in enumerate(panels):
+        ax = plt.subplot(gs[panel_idx])
+
+        # Load and plot each dataset
+        for ss, dataset in enumerate(datasets):
+            pdict = info_defs.grab_paths(dataset)
+            clr = grab_clr(dataset)
+            ls = grab_ls(dataset)
+
+            pca_file = f'../Analysis/{pdict["pca_file"]}'
+            print(f"Loading PCA file: {pca_file}")
+            d = np.load(pca_file)
+
+            # Calculate y values
+            cumsum = 1 - np.cumsum(d['explained_variance'])
+            if cumulative:
+                yvals = cumsum
+            else:
+                yvals = d['explained_variance']
+
+            xs = np.arange(d['explained_variance'].size) + 1
+            ax.plot(xs, yvals, label=pdict['label'],
+                    color=clr, ls=ls, lw=2)
+
+            # Add cumulative point marker
+            if show_cum_point is not None:
+                imin = np.argmin(np.abs((1 - cumsum) - show_cum_point))
+                ax.plot(imin + 1, yvals[imin], 'x', color=clr, markersize=10)
+
+        # Add power-law reference line
+        xs_ref = np.arange(d['explained_variance'].size) + 1
+        ys = d['explained_variance'][10] * (xs_ref / xs_ref[10])**(exponent)
+        ax.plot(xs_ref, ys, '--', color='gray', label=f'Power law: {exponent}')
+
+        # Labels and formatting
+        ax.set_title(title, fontsize=18)
+        if cumulative:
+            ax.set_ylabel('Cumulative Variance explained per mode')
+        else:
+            ax.set_ylabel('Variance explained per mode')
+        ax.set_xlabel('Number of PCA components (Latent Space)')
+
+        ax.set_xscale('log')
+        ax.set_yscale('log')
+        ax.minorticks_on()
+        ax.legend(fontsize=13, loc='lower left')
+        ax.grid(True, which='both', ls='--', lw=0.5)
+
+        if xmnx is not None:
+            ax.set_xlim(xmnx)
+
+        rsp_utils.set_fontsize(ax, 16)
+
+    plt.tight_layout()
+    plt.savefig(outfile, dpi=300)
+    print(f"Saved: {outfile}")
+
+
 def fig_pca(outfile:str='fig_pca_variance.png',
             datasets:list=None, cumulative:bool=False,
             frac_remain:bool=False,
@@ -997,6 +1101,10 @@ def main(flg):
     # Example images
     if flg == 7:
         fig_example_images()
+
+    # PCA noise vs resolution
+    if flg == 8:
+        fig_pca_noise_res(show_cum_point=0.99)
 
 
 
