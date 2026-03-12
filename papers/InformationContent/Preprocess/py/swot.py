@@ -66,14 +66,14 @@ def grabbing_iury_data():
     ssha_unfiltered = ds.ssha_unfiltered
 
     # Grab 256 cutouts of ssha_unfiltered
-    #cutouts = ssha_unfiltered.isel(cutout=slice(0, 256))
+    cutouts = ssha_unfiltered.isel(cutout=slice(0, 200000))
 
     # Write to disk as netcdf
     print("Writing to disk...")
     outfile = os.path.join(os.getenv('OS_SSH'), 'SWOT_v2', 
-        'ssha_unfiltered_64x64_54km.nc')
+        'ssha_unfiltered_64x64_54km_0-200000.nc')
     os.makedirs(os.path.dirname(outfile), exist_ok=True)
-    ssha_unfiltered.to_netcdf(outfile)
+    cutouts.to_netcdf(outfile)
     print(f"Wrote {outfile}")
 
 if __name__ == '__main__':
