@@ -31,5 +31,41 @@ def main(ntrain=150000, nvalid=50000):
         f.attrs['image_shape'] = all_images.shape[1:]
     print(f"SWOT_L3 preprocessed and saved to: {preproc_file}")
 
+def grabbing_iury_data():
+    # Install pixi 
+    #   curl -fsSL https://pixi.sh/install.sh | bash
+    #   This failed on profx, so I grabbed the binary
+
+    # Grab the swot_patterns Repo
+
+    import xarray as xr
+    import matplotlib.pyplot as plt
+    import numpy as np
+    from glob import glob
+    import random
+    import icechunk
+
+    from IPython import embed
+
+    import os
+    os.environ["AWS_PROFILE"] = "swot-user"
+
+    storage = icechunk.s3_storage(
+        bucket="iuryt-shared",
+        prefix=f"icechunk/ocean/swot_cutouts/64x64_resampled_54km",
+        region="us-west-2",
+    )
+
+    repo = icechunk.Repository.open(storage)
+    session = repo.readonly_session("main")
+
+    ds = xr.open_zarr(session.store, consolidated=False)
+
+    embed(header='65 of swot.py')
+    # Grab 100 cutouts
+
 if __name__ == '__main__':
-    main()
+    #main()
+
+    # Iury
+    grabbing_iury_data()
