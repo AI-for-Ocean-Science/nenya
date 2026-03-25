@@ -236,6 +236,19 @@ def grab_paths(dataset:str):
         out_dict['dx'] = 0.25
         out_dict['macro'] = '\\swot'
         out_dict['label'] = 'SWOT/SSHa'
+    elif dataset == 'SWOT_L2':
+        if 'OS_SSH' in os.environ:
+            path = os.path.join(os.getenv('OS_SSH'), 'SWOT_v2', 'Info')
+            out_dict['path'] = path
+            out_dict['preproc_file'] = os.path.join(path, 'PreProc', 'SWOT_L2_54km_preproc.h5')
+            out_dict['latents_file'] = os.path.join(path, 'latents', 
+                                'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm', 
+                                'SWOT_L2_54km_latents.h5')
+        out_dict['opts_file'] = 'opts_nenya_swot_l2.json'
+        out_dict['pca_file'] = 'pca_latents_SWOT_L2.npz'
+        out_dict['dx'] = 0.25
+        out_dict['macro'] = '\\swot'
+        out_dict['label'] = 'SWOT/SSHa-L2'
     else:
         raise ValueError(f"Dataset {dataset} not supported for Nenya.")
 

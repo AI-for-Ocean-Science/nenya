@@ -1,12 +1,14 @@
 import os, sys
 import numpy as np
 import h5py
+import pandas
+import xarray as xr
 
 # Local
 sys.path.append(os.path.abspath("../Analysis/py"))
 import info_defs
 
-def main(ntrain=150000, nvalid=50000):
+def main_L3(ntrain=150000, nvalid=50000):
     # Load up the existing file
     h5_file = os.path.join(os.getenv('OS_SSH'), 'swot_prototype_train.h5')
 
@@ -30,6 +32,79 @@ def main(ntrain=150000, nvalid=50000):
         f.attrs['n_valid'] = nvalid
         f.attrs['image_shape'] = all_images.shape[1:]
     print(f"SWOT_L3 preprocessed and saved to: {preproc_file}")
+
+def main_L2(ntrain=150000, nvalid=50000):
+    # Load the NetCDF source file
+    nc_file = os.path.join(os.getenv('OS_SSH'), 'SWOT_v2',
+                           'ssha_unfiltered_64x64_54km.nc')
+    print("Loading SWOT L2 data from:", nc_file)
+    ds = xr.open_dataset(nc_file)
+
+    ssha = ds.ssha_unfiltered.values  # (cutout, y, x)
+    lon = ds.longitude_avg.values
+    lat = ds.latitude_avg.values
+    time = ds.time.values
+
+    # Filter out cutouts with any NaN
+    good = ~np.any(np.isnan(ssha.reshape(ssha.shape[0], -1)), axis=1)
+    good_indices = np.where(good)[0]  # original NetCDF cutout indices
+    ssha = ssha[good]
+    lon = lon[good]
+    lat = lat[good]
+    time = time[good]
+    print(f"Kept {ssha.shape[0]} cutouts out of {good.size} (removed {good.size - ssha.shape[0]} with NaN)")
+
+    # Randomly draw ntrain+nvalid cutouts
+    total = ntrain + nvalid
+    rng = np.random.default_rng(12345)
+    idx = rng.choice(ssha.shape[0], size=total, replace=False)
+    cutout_idx = good_indices[idx]  # map back to original NetCDF indices
+    ssha = ssha[idx]
+    lon = lon[idx]
+    lat = lat[idx]
+    time = time[idx]
+    print(f"Randomly selected {total} cutouts")
+
+    # Paths
+    out_dict = info_defs.grab_paths('SWOT_L2')
+    preproc_file = out_dict['preproc_file']
+    path = out_dict['path']
+
+    # Create output directories
+    os.makedirs(os.path.dirname(preproc_file), exist_ok=True)
+    tbl_dir = os.path.join(path, 'Tables')
+    os.makedirs(tbl_dir, exist_ok=True)
+
+    # Write preproc HDF5
+    print("Writing preproc file:", preproc_file)
+    with h5py.File(preproc_file, 'w') as f:
+        f.create_dataset('train', data=ssha[:ntrain])
+        f.create_dataset('valid', data=ssha[ntrain:ntrain+nvalid])
+
+        f.attrs['dataset'] = 'SWOT_L2'
+        f.attrs['n_train'] = ntrain
+        f.attrs['n_valid'] = nvalid
+        f.attrs['image_shape'] = ssha.shape[1:]
+    print(f"SWOT_L2 preprocessed and saved to: {preproc_file}")
+
+    # Build parquet metadata table
+    pp_type = np.array(['train'] * ntrain + ['valid'] * nvalid)
+    pp_idx = np.concatenate([np.arange(ntrain), np.arange(nvalid)])
+
+    df = pandas.DataFrame({
+        'pp_file': preproc_file,
+        'pp_type': pp_type,
+        'pp_idx': pp_idx,
+        'cutout_idx': cutout_idx,
+        'lon': lon,
+        'lat': lat,
+        'datetime': time,
+    })
+
+    tbl_file = os.path.join(tbl_dir, 'SWOT_L2_54km.parquet')
+    df.to_parquet(tbl_file, index=False)
+    print(f"Metadata table saved to: {tbl_file}")
+
 
 def grabbing_iury_data():
 
@@ -74,8 +149,8 @@ def grabbing_iury_data():
 
     # Write to disk as netcdf
     print("Writing to disk...")
-    outfile = os.path.join(os.getenv('OS_SSH'), 'SWOT_v2', 
-        'ssha_unfiltered_64x64_54km_0-200000.nc')
+    #outfile = os.path.join(os.getenv('OS_SSH'), 'SWOT_v2', 
+    #    'ssha_unfiltered_64x64_54km_0-200000.nc')
     #cutouts.to_netcdf(outfile)
     outfile = os.path.join(os.getenv('OS_SSH'), 'SWOT_v2', 
         'ssha_unfiltered_64x64_54km.nc')
@@ -84,7 +159,10 @@ def grabbing_iury_data():
     print(f"Wrote {outfile}")
 
 if __name__ == '__main__':
-    #main()
+    #main_L3()
 
-    # Iury
-    grabbing_iury_data()
+    # L2
+    main_L2()
+
+    # Iury / L2
+    #grabbing_iury_data()
