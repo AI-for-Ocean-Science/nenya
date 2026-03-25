@@ -49,4 +49,8 @@ Make sure the claude_initial_review.tex its own stand-alone file that can compil
 
 ## Brainstorming
 
-1. Examine the files in the Overleaf project and generate a brainstorming document in a separate Latex file that captures the brainstorming session.  This document should be placed in Overleaf project and name it "claude_brainstorming.tex".  Provide a plan before generating any files.
+1. Examine the files in the Overleaf project and generate a brainstorming document in a separate, stand-alone Latex file that captures the brainstorming session.  This document should be placed in the Overleaf project and name it "claude_brainstorming.tex".  You should access the web as you wish to do your brainstorming. Provide a plan before proceeding or generating any files. 
+
+2. Yes, proceed with that plan and push to git as you go.
+
+3. Do a deeper search of the web for information on the topic of the paper.  Add your findings to the brainstorming document.  Ultrathink.
