@@ -34,3 +34,5 @@ Proceed to generate the code.
 The code should draw a total of 200,000 random cutouts from the SWOT L2 dataset, before splitting into train and valid sets.  
 
 The table needs to be updated to record the indices of the cutouts in the preproc file.
+
+Add a debug mode that only reads in the first 1000 cutouts from the preproc file and generates smaller files.

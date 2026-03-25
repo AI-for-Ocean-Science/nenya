@@ -33,12 +33,19 @@ def main_L3(ntrain=150000, nvalid=50000):
         f.attrs['image_shape'] = all_images.shape[1:]
     print(f"SWOT_L3 preprocessed and saved to: {preproc_file}")
 
-def main_L2(ntrain=150000, nvalid=50000):
+def main_L2(ntrain=150000, nvalid=50000, debug=False):
+    if debug:
+        ntrain = 750
+        nvalid = 250
+
     # Load the NetCDF source file
     nc_file = os.path.join(os.getenv('OS_SSH'), 'SWOT_v2',
                            'ssha_unfiltered_64x64_54km.nc')
     print("Loading SWOT L2 data from:", nc_file)
     ds = xr.open_dataset(nc_file)
+
+    if debug:
+        ds = ds.isel(cutout=slice(0, 1000))
 
     ssha = ds.ssha_unfiltered.values  # (cutout, y, x)
     lon = ds.longitude_avg.values
@@ -161,8 +168,8 @@ def grabbing_iury_data():
 if __name__ == '__main__':
     #main_L3()
 
-    # L2
-    main_L2()
-
     # Iury / L2
     #grabbing_iury_data()
+
+    # L2
+    main_L2(debug=True)
