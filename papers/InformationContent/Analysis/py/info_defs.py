@@ -264,8 +264,9 @@ def grab_paths(dataset:str):
     out_dict['Pk_plot'] = os.path.join('Pk', f'Pk_{dataset}.png')
 
     # Eigen
-    out_dict['eigen_file'] = os.path.join(path, 'eigen',
-        f'{dataset}_eigenimages.npz')
+    if out_dict['path'] is not None:
+        out_dict['eigen_file'] = os.path.join(out_dict['path'], 'eigen',
+            f'{dataset}_eigenimages.npz')
 
     # dx
     if 'dx' not in out_dict.keys():

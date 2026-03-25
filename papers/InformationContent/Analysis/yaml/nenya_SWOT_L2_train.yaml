@@ -42,7 +42,7 @@ spec:
           - git clone https://github.com/Sea-Meets-the-Stars/wrangler.git;
             cd wrangler;
             git fetch;
-            git checkout nasa_ai;
+            git checkout llc_wrangling;
             git pull;
             pip install -e ".[dev]";
             cd ../nenya;
