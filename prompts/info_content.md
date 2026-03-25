@@ -36,3 +36,13 @@ The code should draw a total of 200,000 random cutouts from the SWOT L2 dataset,
 The table needs to be updated to record the indices of the cutouts in the preproc file.
 
 Add a debug mode that only reads in the first 1000 cutouts from the preproc file and generates smaller files.
+
+## Run Nenya in Nautilus
+
+### Plan
+
+Mimicing the nenya_SWOT_L3.py script, create a new script nenya_SWOT_L2.py that runs Nenya on the SWOT L2 dataset.  Use the SWOT_L2 dataset in info_defs.grab_paths() to get the correct paths.  Provide a plan before you start writing the code.  The plan should include the creation of any additional files needed to run Nenya in Nautilus, including the opts file and yaml file.
+
+### Execute
+
+Proceed to generate the files.
