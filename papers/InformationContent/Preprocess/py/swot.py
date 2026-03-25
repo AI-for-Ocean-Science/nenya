@@ -172,4 +172,4 @@ if __name__ == '__main__':
     #grabbing_iury_data()
 
     # L2
-    main_L2(debug=True)
+    main_L2()#debug=True)
