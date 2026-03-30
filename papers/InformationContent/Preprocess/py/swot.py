@@ -85,8 +85,8 @@ def main_L2(ntrain=150000, nvalid=50000, debug=False):
     # Write preproc HDF5
     print("Writing preproc file:", preproc_file)
     with h5py.File(preproc_file, 'w') as f:
-        f.create_dataset('train', data=ssha[:ntrain])
-        f.create_dataset('valid', data=ssha[ntrain:ntrain+nvalid])
+        f.create_dataset('train', data=ssha[:ntrain].astype(np.float32))
+        f.create_dataset('valid', data=ssha[ntrain:ntrain+nvalid].astype(np.float32))
 
         f.attrs['dataset'] = 'SWOT_L2'
         f.attrs['n_train'] = ntrain
