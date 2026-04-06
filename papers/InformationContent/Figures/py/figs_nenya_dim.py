@@ -1069,10 +1069,18 @@ def main(flg):
     # Paper figures
     # ############################################
 
-    # Learning curves
+    # Example images
     if flg == 1:
+        fig_example_images()
+
+    # Learning curves
+    if flg == 2:
         fig_learning_curves()
         #fig_learning_curves(outfile='fig_learning_curves.pdf')
+
+    # P(k)
+    if flg == 3:
+        fig_Pk()
 
     # PCA variance on latent space
     if flg == 2:
@@ -1093,7 +1101,7 @@ def main(flg):
         #    show_cum_point=0.99)
 
     # Eigenmodes 
-    if flg == 3:
+    if flg == 5:
         #fig_eigenimages('MNIST', 'Greys')
         fig_eigenimages('MODIS_SST', 'jet')
 
@@ -1103,17 +1111,11 @@ def main(flg):
         #fig_eigenmatches('MODIS_SST', 'jet', last_ones=True,
         #                 outroot='fig_last_eigenmatches')
 
-    # P(k)
-    if flg == 5:
-        fig_Pk()
 
     # PCA variance on actual images
     if flg == 6:
         fig_true_pca()#show_cum_point=0.99)
 
-    # Example images
-    if flg == 7:
-        fig_example_images()
 
     # PCA noise vs resolution
     if flg == 8:

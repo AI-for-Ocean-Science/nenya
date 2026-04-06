@@ -242,8 +242,8 @@ def grab_paths(dataset:str):
         out_dict['opts_file'] = 'opts_nenya_swot_l3.json'
         out_dict['pca_file'] = 'pca_latents_SWOT_L3.npz'
         out_dict['dx'] = 0.25
-        out_dict['macro'] = '\\swot'
-        out_dict['label'] = 'SWOT/SSHa'
+        out_dict['macro'] = '\\swotl3'
+        out_dict['label'] = 'SWOT/SSHa_L3'
     elif dataset == 'SWOT_L2':
         if 'OS_SSH' in os.environ:
             path = os.path.join(os.getenv('OS_SSH'), 'SWOT_v2', 'Info')
@@ -254,7 +254,7 @@ def grab_paths(dataset:str):
                                 'SWOT_L2_54km_latents.h5')
         out_dict['opts_file'] = 'opts_nenya_swot_l2.json'
         out_dict['pca_file'] = 'pca_latents_SWOT_L2.npz'
-        out_dict['dx'] = 0.25
+        out_dict['dx'] = 0.843  # km
         out_dict['macro'] = '\\swot'
         out_dict['label'] = 'SWOT/SSHa-L2'
     else:
