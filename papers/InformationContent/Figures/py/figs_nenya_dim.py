@@ -403,6 +403,7 @@ def fig_true_pca(outfile:str='fig_true_pca.png',
             frac_remain:bool=False,
             show_cum_point:float=None,
             xmnx:tuple=None,
+            all_sst:bool=False,
             exponent:float=-0.5):
     """
     Generate and save a 2-panel PCA variance explained plot for true (image-space) PCA.
@@ -436,6 +437,8 @@ def fig_true_pca(outfile:str='fig_true_pca.png',
     # Define datasets for each panel
     natural_datasets_panel = info_defs.natural_datasets
     remote_datasets_panel = info_defs.primary_remote_datasets
+    if all_sst:
+        remote_datasets_panel = info_defs.all_sst_datasets
     remote_datasets_panel += ['ImageNet']
 
     # Create figure with 2 panels
@@ -469,7 +472,7 @@ def fig_true_pca(outfile:str='fig_true_pca.png',
                 print(f"PCA file for {dataset} not found, skipping -- {pca_file}")
                 continue
 
-            embed(header='true_pca 472')
+            #embed(header='true_pca 472')
 
             # Calculate y values
             cumsum = 1 - np.cumsum(d['explained_variance_ratio'])
@@ -1053,7 +1056,7 @@ def main(flg):
 
     # PCA variance on actual images extendeding to many more modes
     if flg == 51:
-        fig_true_pca()#show_cum_point=0.99)
+        fig_true_pca(all_sst=True, outfile='fig_true_pca_all_sst.png')#show_cum_point=0.99)
 
 
     # Team brainstorming

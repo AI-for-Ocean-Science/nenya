@@ -10,7 +10,7 @@ all_datasets = ['MODIS_SSTa',
                 'LLC_SSTa_nonoise', 
                 'LLC_SSTa_noise', 
                 'LLC_SSHa', 
-                'SWOT_L3', 
+                'SWOT_L2', 
                 #'SWOT_SSR', 
                 'WNoise',
                 'Pk2',
@@ -21,7 +21,15 @@ all_datasets = ['MODIS_SSTa',
 
 primary_remote_datasets = ['MODIS_SSTa', 
                 'VIIRS_SSTa', 
-                'SWOT_L3'] 
+                'SWOT_L2'] 
+
+all_sst_datasets = ['MODIS_SSTa', 
+                'MODIS_SSTa_2km',
+                'VIIRS_SSTa', 
+                'VIIRS_SSTa_2km', 
+                'VIIRS_SSTa_sub', 
+                'LLC_SSTa_nonoise', 
+                'LLC_SSTa_noise'] 
 
 natural_datasets = ['WNoise',
                     'Pk2',
