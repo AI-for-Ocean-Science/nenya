@@ -79,6 +79,7 @@ def grab_ls(dataset:str):
 def fig_pca_2panel(outfile:str='fig_pca_2panel.png',
                    cumulative:bool=False,
                    show_cum_point:float=None,
+                   add_LLC:bool=False,
                    xmnx:tuple=None,
                    exponent:float=-0.5):
     """
@@ -99,8 +100,10 @@ def fig_pca_2panel(outfile:str='fig_pca_2panel.png',
     natural_datasets_panel = info_defs.natural_datasets
     remote_datasets_panel = info_defs.primary_remote_datasets
     remote_datasets_panel += ['ImageNet']
+
     # Add LLC
-    remote_datasets_panel += ['LLC_SSTa_nonoise', 
+    if add_LLC:
+        remote_datasets_panel += ['LLC_SSTa_nonoise', 
                 'LLC_SSTa_noise', 
                 'LLC_SSHa']
 
@@ -1156,12 +1159,8 @@ def main(flg):
     if flg == 4:
         fig_true_pca()#show_cum_point=0.99)
 
-
     # PCA variance on latent space
-    if flg == 7:
-        #fig_pca(show_cum_point=0.99, outfile='fig_pca_variance_zoomin.png',
-        #        xmnx=(30, 300))
-
+    if flg == 5:
         # Natural
         if False:
             fig_pca(show_cum_point=0.99, 
@@ -1176,7 +1175,7 @@ def main(flg):
         #    show_cum_point=0.99)
 
     # Eigenmodes 
-    if flg == 5:
+    if flg == 6:
         #fig_eigenimages('MNIST', 'Greys')
         fig_eigenimages('MODIS_SST', 'jet')
 
