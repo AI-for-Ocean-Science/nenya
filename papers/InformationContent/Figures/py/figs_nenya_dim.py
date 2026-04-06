@@ -44,6 +44,7 @@ cdict['LLC'] = '#2ca02c'  # Green
 cdict['LLC_SSHa'] = '#9467bd'  # Purple
 # Red
 cdict['SWOT_L3'] = '#d62728'  # Red
+cdict['SWOT_L2'] = '#d62728'  # Red
 # Black
 cdict['ImageNet'] = '#000000'  # Black
 # Silver
