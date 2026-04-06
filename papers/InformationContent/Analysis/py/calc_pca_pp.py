@@ -224,12 +224,12 @@ if __name__ == '__main__':
     #pca_preproc_dataset('MNIST', key='train', max_samples=150000, n_components=256)
 
     # Standard 256
-    if False:
+    if True:
         for dataset in info_defs.all_datasets:
             pca_preproc_dataset(dataset, key='train', max_samples=150000, n_components=256)
 
     # Extend to 4096
-    if True:
+    if False:
         for dataset in info_defs.all_datasets:
             ncomp = 28**2 if dataset == 'MNIST' else 4096
             pca_preproc_dataset(dataset, key='train', max_samples=150000, n_components=ncomp)
