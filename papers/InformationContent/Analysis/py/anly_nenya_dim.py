@@ -67,8 +67,8 @@ if __name__ == '__main__':
     #pca_latents('MNIST')
     #pca_latents('ImageNet')
     #pca_latents('WNoise')
-    #pca_latents('Pk2')
-    #pca_latents('Pk4')
+    pca_latents('Pk2')
+    pca_latents('Pk4')
 
     # SWOT 
     #pca_latents('SWOT_L3')
