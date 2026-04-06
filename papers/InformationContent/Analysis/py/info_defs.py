@@ -91,7 +91,7 @@ def grab_paths(dataset:str):
                                 'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm',
                                 'pk2_latents.h5')
         out_dict['opts_file'] = 'opts_nenya_pk2.json'
-        out_dict['pca_file'] = 'pca_latents_pk2.npz'
+        out_dict['pca_file'] = 'pca_latents_Pk2.npz'
         out_dict['macro'] = '\\pktwo'
         out_dict['label'] = r'$P_2(k)$'
     elif dataset == 'Pk4':
@@ -103,7 +103,7 @@ def grab_paths(dataset:str):
                                 'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm',
                                 'pk2_latents.h5')
         out_dict['opts_file'] = 'opts_nenya_pk4.json'
-        out_dict['pca_file'] = 'pca_latents_pk4.npz'
+        out_dict['pca_file'] = 'pca_latents_Pk4.npz'
         out_dict['macro'] = '\\pkfour'
         out_dict['label'] = r'$P_4(k)$'
     elif dataset == 'orig_MODIS_SST_2km':
