@@ -79,9 +79,11 @@ def grab_paths(dataset:str):
                                 'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm',
                                 'wnoise_latents.h5')
         out_dict['opts_file'] = 'opts_nenya_wnoise.json'
+        out_dict['opts_file_extended'] = 'opts_nenya_wnoise_extended.json'
         out_dict['pca_file'] = 'pca_latents_WNoise.npz'
         out_dict['macro'] = '\\wnoise'
         out_dict['label'] = 'WhiteNoise'
+        # Extended training 
     elif dataset == 'Pk2':
         if 'OS_DATA' in os.environ:
             path = os.path.join(os.getenv('OS_DATA'), 'Natural', 'Pk', 'Info')

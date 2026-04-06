@@ -10,6 +10,8 @@ def main(task:str):
     pdict = info_defs.grab_paths(dataset)
     if task == 'train':
         workflow.train(pdict['opts_file'])#, load_epoch=8, debug=False)
+    elif task == 'train_extended':
+        workflow.train(pdict['opts_file_extended'], load_epoch=50, debug=False)
     elif task == 'evaluate':
         workflow.evaluate(pdict['opts_file'], pdict['preproc_file'], local_model_path=pdict['path'],
                           latents_file=pdict['latents_file'], debug=False)

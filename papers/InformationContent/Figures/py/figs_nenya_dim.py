@@ -403,6 +403,8 @@ def fig_true_pca(outfile:str='fig_true_pca.png',
             datasets:list=None, cumulative:bool=False,
             frac_remain:bool=False,
             show_cum_point:float=None,
+            one_panel:bool=False,
+            extended:bool=False,
             xmnx:tuple=None,
             all_sst:bool=False,
             exponent:float=-0.5):
@@ -443,13 +445,22 @@ def fig_true_pca(outfile:str='fig_true_pca.png',
     remote_datasets_panel += ['ImageNet']
 
     # Create figure with 2 panels
-    fig = plt.figure(figsize=(14, 6))
-    gs = gridspec.GridSpec(1, 2)
+    if one_panel:
+        fig = plt.figure(figsize=(8, 6))
+        gs = gridspec.GridSpec(1, 1)
+    else:
+        fig = plt.figure(figsize=(14, 6))
+        gs = gridspec.GridSpec(1, 2)
 
-    panels = [
-        (natural_datasets_panel, 'Natural Images'),
-        (remote_datasets_panel, 'Remote Sensing')
-    ]
+    if one_panel:
+        panels = [
+            (natural_datasets_panel, 'Natural Images'),
+        ]
+    else:
+        panels = [
+            (natural_datasets_panel, 'Natural Images'),
+            (remote_datasets_panel, 'Remote Sensing')
+        ]
 
     for panel_idx, (panel_datasets, title) in enumerate(panels):
         ax = plt.subplot(gs[panel_idx])
@@ -465,6 +476,9 @@ def fig_true_pca(outfile:str='fig_true_pca.png',
 
             #pca_file = f'../Analysis/pca/pca_preproc_{dataset}.npz'
             pca_file = os.path.join('../Analysis', pdict['pca_imgfile'])
+            if extended:
+                ncomp = 28**2 if dataset == 'MNIST' else 4096
+                pca_file = pca_file.replace('.npz', f'_{ncomp}.npz')
             #pca_file = pdict['pca_imgfile']
             print(f"Loading PCA file: {pca_file}")
             try:
@@ -506,15 +520,19 @@ def fig_true_pca(outfile:str='fig_true_pca.png',
 
         # Add a power-law
         xval = 1. + np.arange(256)
-        exp = -1.5
+        exp = -1.5 if not extended else -1
         yval = 0.3 * xval**exp
         ax.plot(xval, yval, 'k:', label=r'$N^{'+f'{exp}'+r'}$')
 
         ax.set_xscale('log')
         ax.set_yscale('log')
         ax.minorticks_on()
+        
         ax.legend(fontsize=13, loc='upper right')
         ax.grid(True, which='both', ls='--', lw=0.5)
+
+        if extended:
+            ax.set_ylim(1e-7, 1.0)
 
         if xmnx is not None:
             ax.set_xlim(xmnx)
@@ -940,6 +958,49 @@ def fig_Pk():
     print(f'Wrote: Pk_all_datasets.png')
 
 
+def fig_eigenmodes_remote_sensing(
+        outfile:str='fig_eigenmodes_remote_sensing.png'):
+    """
+    Plot the first 2 eigenmodes from image-space PCA for the 3 primary
+    remote sensing datasets (MODIS_SSTa, VIIRS_SSTa, SWOT_L2).
+
+    Layout: 3 rows (one per dataset) x 2 columns (eigenmode 1, eigenmode 2),
+    each panel with its own colorbar.
+    """
+    datasets = info_defs.primary_remote_datasets  # MODIS_SSTa, VIIRS_SSTa, SWOT_L2
+    cmaps = ['jet', 'jet', 'RdBu_r']  # SST uses jet, SSH uses RdBu_r
+    n_modes = 2
+
+    fig, axes = plt.subplots(3, 2, figsize=(10, 12))
+
+    for row, (dataset, cmap) in enumerate(zip(datasets, cmaps)):
+        pdict = info_defs.grab_paths(dataset)
+        pca_file = f'../Analysis/{pdict["pca_imgfile"]}'
+        print(f"Loading: {pca_file}")
+        d = np.load(pca_file)
+
+        # Determine image side length from n_features
+        n_features = d['n_features'].item()
+        img_size = int(np.sqrt(n_features))
+
+        for col in range(n_modes):
+            ax = axes[row, col]
+            # Each row of M is an eigenmode (flattened image)
+            eigenmode = d['M'][col].reshape(img_size, img_size)
+
+            im = ax.imshow(eigenmode, cmap=cmap, origin='lower')
+            cbar = plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+            cbar.ax.tick_params(labelsize=10)
+
+            ax.set_title(f'{pdict["label"]}  —  Mode {col+1}', fontsize=14)
+            ax.set_xticks([])
+            ax.set_yticks([])
+
+    plt.tight_layout()
+    plt.savefig(outfile, dpi=300, bbox_inches='tight')
+    print(f"Saved: {outfile}")
+
+
 def fig_multi_eigenmatches(
     dataset:str, cmap:str, modes:list=np.arange(9),
     partition:str='train', nimages:int=9,
@@ -1055,10 +1116,19 @@ def main(flg):
         #              'LLC_SST', 'SWOT_L3'])
     
 
-    # PCA variance on actual images extendeding to many more modes
+    # PCA variance on actual images; all SST
     if flg == 51:
         fig_true_pca(all_sst=True, outfile='fig_true_pca_all_sst.png')#show_cum_point=0.99)
 
+    # Eigenmodes for remote sensing datasets (image-space PCA)
+    if flg == 53:
+        fig_eigenmodes_remote_sensing()
+
+    # PCA variance on actual images e   xtendeding to many more modes
+    if flg == 52:
+        fig_true_pca(one_panel=True, 
+            outfile='fig_true_pca_extended.png',
+            extended=True)
 
     # Team brainstorming
     if flg == 60:
@@ -1082,8 +1152,13 @@ def main(flg):
     if flg == 3:
         fig_Pk()
 
+    # PCA variance on actual images
+    if flg == 4:
+        fig_true_pca()#show_cum_point=0.99)
+
+
     # PCA variance on latent space
-    if flg == 2:
+    if flg == 7:
         #fig_pca(show_cum_point=0.99, outfile='fig_pca_variance_zoomin.png',
         #        xmnx=(30, 300))
 
@@ -1106,15 +1181,11 @@ def main(flg):
         fig_eigenimages('MODIS_SST', 'jet')
 
     # Closest matched images
-    if flg == 4:
+    if flg == 9:
         fig_eigenmatches('MODIS_SST', 'jet')
         #fig_eigenmatches('MODIS_SST', 'jet', last_ones=True,
         #                 outroot='fig_last_eigenmatches')
 
-
-    # PCA variance on actual images
-    if flg == 6:
-        fig_true_pca()#show_cum_point=0.99)
 
 
     # PCA noise vs resolution

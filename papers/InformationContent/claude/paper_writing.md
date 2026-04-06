@@ -11,6 +11,7 @@
 - Place any new table-generation code in `papers/InformationContent/Tables/py/`.
 - Place any Notebooks in the appropriate subdirectory.
 - Key data definitions live in `Analysis/py/info_defs.py` — reuse `grab_paths()` for all dataset references.
+- Include inline comments in the code to explain the code.
 
 ### Data
 
@@ -34,7 +35,22 @@
 - You are welcome to use multiple agents to help you with the task.
 - When possible, reuse existing code and modules rather than writing new code.
 
-## Prompts to Claude
+# Figures
+
+1. Eigenmodes for remote sensing datasets
+
+I wish to add a new method to fig_nenya_dim.py to plot the first 2 eigenmodes for the remote sensing datasets.  
+
+Here is the definition of the method:
+
+- This method should be called fig_eigenmodes_remote_sensing() 
+- It should plot the first 2eigenmodes for the remote sensing datasets using the outputs in pdict['pca_imgfile'].  
+- The method should be placed in the Figures/py/figs_nenya_dim.py file.  
+- It should operate on the 3 primary remote sensing datasets: MODIS_SSTa, VIIRS_SSTa, SWOT_L2.
+- It should be a 3x2 grid of images with a colorbar for each image.
+- Have it be called using flg==53
+
+# Prompts
 
 ## Setup
 
@@ -58,3 +74,7 @@ Make sure the claude_initial_review.tex its own stand-alone file that can compil
 ## Participation rank and RankMe metric
 
 1. Examine the files in Analysis/ and generate a new module to calculate the participation rank and RankMe metric on the latent space.  This module should be placed in Analysis/py/info_rank.py.  Provide a plan before proceeding and write it to Overleaf as you go.
+
+## Figures
+
+1. Reread this doc and the Figures section above. Proceed to generate code for the first figure.
