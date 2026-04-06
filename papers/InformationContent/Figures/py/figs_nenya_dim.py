@@ -964,16 +964,16 @@ def fig_eigenmodes_remote_sensing(
     Plot the first 2 eigenmodes from image-space PCA for the 3 primary
     remote sensing datasets (MODIS_SSTa, VIIRS_SSTa, SWOT_L2).
 
-    Layout: 3 rows (one per dataset) x 2 columns (eigenmode 1, eigenmode 2),
+    Layout: 2 rows (eigenmodes) x 3 columns (datasets),
     each panel with its own colorbar.
     """
     datasets = info_defs.primary_remote_datasets  # MODIS_SSTa, VIIRS_SSTa, SWOT_L2
     cmaps = ['jet', 'jet', 'RdBu_r']  # SST uses jet, SSH uses RdBu_r
     n_modes = 2
 
-    fig, axes = plt.subplots(3, 2, figsize=(10, 12))
+    fig, axes = plt.subplots(2, 3, figsize=(15, 8))
 
-    for row, (dataset, cmap) in enumerate(zip(datasets, cmaps)):
+    for col, (dataset, cmap) in enumerate(zip(datasets, cmaps)):
         pdict = info_defs.grab_paths(dataset)
         pca_file = f'../Analysis/{pdict["pca_imgfile"]}'
         print(f"Loading: {pca_file}")
@@ -983,16 +983,16 @@ def fig_eigenmodes_remote_sensing(
         n_features = d['n_features'].item()
         img_size = int(np.sqrt(n_features))
 
-        for col in range(n_modes):
+        for row in range(n_modes):
             ax = axes[row, col]
             # Each row of M is an eigenmode (flattened image)
-            eigenmode = d['M'][col].reshape(img_size, img_size)
+            eigenmode = d['M'][row].reshape(img_size, img_size)
 
             im = ax.imshow(eigenmode, cmap=cmap, origin='lower')
             cbar = plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
             cbar.ax.tick_params(labelsize=10)
 
-            ax.set_title(f'{pdict["label"]}  —  Mode {col+1}', fontsize=14)
+            ax.set_title(f'{pdict["label"]}  —  Mode {row+1}', fontsize=14)
             ax.set_xticks([])
             ax.set_yticks([])
 

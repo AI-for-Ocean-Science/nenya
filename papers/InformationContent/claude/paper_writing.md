@@ -78,3 +78,4 @@ Make sure the claude_initial_review.tex its own stand-alone file that can compil
 ## Figures
 
 1. Reread this doc and the Figures section above. Proceed to generate code for the first figure.
+2. Looks good, but please swap rows and columns in the figure.
