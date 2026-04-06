@@ -121,7 +121,7 @@ def get_wavenumber_grids(ny, nx, dx):
     kx_1d = freq_x / dx
     ky_1d = freq_y / dx
 
-    embed(header='124 of pk.py')
+    #embed(header='124 of pk.py')
     
     # Create 2D grids
     kx, ky = np.meshgrid(kx_1d, ky_1d)
