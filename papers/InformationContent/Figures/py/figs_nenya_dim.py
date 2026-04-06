@@ -469,6 +469,8 @@ def fig_true_pca(outfile:str='fig_true_pca.png',
                 print(f"PCA file for {dataset} not found, skipping -- {pca_file}")
                 continue
 
+            embed(header='true_pca 472')
+
             # Calculate y values
             cumsum = 1 - np.cumsum(d['explained_variance_ratio'])
             if cumulative:
@@ -1049,12 +1051,19 @@ def main(flg):
         #              'LLC_SST', 'SWOT_L3'])
     
 
+    # PCA variance on actual images extendeding to many more modes
+    if flg == 51:
+        fig_true_pca()#show_cum_point=0.99)
+
+
     # Team brainstorming
     if flg == 60:
         # 103
         fig_multi_eigenmatches('MODIS_SST', 'jet', modes=[103-1])
 
+    # ############################################
     # Paper figures
+    # ############################################
 
     # Learning curves
     if flg == 1:

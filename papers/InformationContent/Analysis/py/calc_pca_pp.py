@@ -182,6 +182,8 @@ def pca_preproc_dataset(
     
     # Output file
     output_file = os.path.join('pca', f'pca_preproc_{dataset}.npz')
+    if n_components != 256:
+        output_file = os.path.join('pca', f'pca_preproc_{dataset}_{n_components}.npz')
     if os.path.exists(output_file) and not clobber:
         print(f"Output file already exists: {output_file}")
         print("Use clobber=True to overwrite.\n")
@@ -221,8 +223,15 @@ if __name__ == '__main__':
     # Example: Process MNIST
     #pca_preproc_dataset('MNIST', key='train', max_samples=150000, n_components=256)
 
-    for dataset in info_defs.all_datasets:
-        pca_preproc_dataset(dataset, key='train', max_samples=150000, n_components=256)
+    # Standard 256
+    if False:
+        for dataset in info_defs.all_datasets:
+            pca_preproc_dataset(dataset, key='train', max_samples=150000, n_components=256)
+
+    # Extend to 5000
+    if True:
+        for dataset in info_defs.all_datasets:
+            pca_preproc_dataset(dataset, key='train', max_samples=150000, n_components=5000)
         
     
     
