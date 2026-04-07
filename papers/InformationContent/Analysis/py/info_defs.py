@@ -265,6 +265,8 @@ def grab_paths(dataset:str):
     # Add pca/ to pca_file
     out_dict['pca_file'] = os.path.join('pca', out_dict['pca_file'])
     out_dict['opts_file'] = os.path.join('opts', out_dict['opts_file'])
+    if 'opts_file_extended' in out_dict.keys():
+        out_dict['opts_file_extended'] = os.path.join('opts', out_dict['opts_file_extended'])
 
     # Image PCA file
     out_dict['pca_imgfile'] = out_dict['pca_file'].replace('latents', 'preproc')
