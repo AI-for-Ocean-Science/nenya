@@ -261,7 +261,7 @@ def return_task():
     elif len(sys.argv) == 2:
         task = sys.argv[1].lower()
         if task not in ['train', 'evaluate', 'chk_latents', 'eigenimages',
-            'train_extended']:
+            'train_extended', 'evaluate_extended']:
             print(f"Unknown task: {task}. Use 'train', 'evaluate', 'eigenimages', or 'chk_latents'.")
             sys.exit(1)
         print(f"Running task: {task}")
