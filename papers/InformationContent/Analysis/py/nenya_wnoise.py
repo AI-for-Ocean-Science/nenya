@@ -15,6 +15,9 @@ def main(task:str):
     elif task == 'evaluate':
         workflow.evaluate(pdict['opts_file'], pdict['preproc_file'], local_model_path=pdict['path'],
                           latents_file=pdict['latents_file'], debug=False)
+    elif task == 'evaluate_extended':
+        workflow.evaluate(pdict['opts_file_extended'], pdict['preproc_file'], local_model_path=pdict['path'],
+                          latents_file=pdict['latents_file_extended'], debug=False)
     elif task == 'chk_latents':
         workflow.chk_latents(dataset, pdict['latents_file'], pdict['preproc_file'], 100)
     else:
