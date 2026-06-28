@@ -20,7 +20,7 @@
 
 ### LaTeX / Overleaf
 
-- The paper LaTeX source is in this Overleaf-synced directory: /home/xavier/Projects/overleaf/Info_content 
+- The paper LaTeX source is in this Overleaf-synced directory: Projects/Overleaf/Info_content 
 - Figures go in the Overleaf project folder as PNG files in the Figures/ subdirectory.
 - Embed figures within the text near their description.
 - When adding new files, update the main `.tex` file to include them.
@@ -79,3 +79,71 @@ Make sure the claude_initial_review.tex its own stand-alone file that can compil
 
 1. Reread this doc and the Figures section above. Proceed to generate code for the first figure.
 2. Looks good, but please swap rows and columns in the figure.
+
+## TODO List
+
+1. Please examine all of the files related to this project and generate a TODO list of what needs to be done to complete the project.  Add this TODO list to the file in the Overleaf project named "ToDO.txt".  If you have any questions, please ask me.  Log your work in the Logs section of this file.
+
+### Q&A
+
+Open questions raised while generating the TODO list (2026-06-23); see Section G
+of ToDO.txt in the Overleaf project:
+
+1. Learning-curve figure: include BOTH an architecture figure AND a separate
+   learning-curve figure, or only one? (fig_learning_curves.png exists but is
+   currently unused; the architecture figure is mislabeled as the learning curve.)
+   A. Include both
+2. Rank metrics (PR / RankMe): integrate into the main paper now? If so, where
+   (new Results subsection, table column, or figure)? Module info_rank.py and
+   claude_rank_metrics.tex exist but are not referenced in the manuscript.
+   A. Let's hold off for now.
+3. SWOT dataset description: draft it from the code/opts, or wait for Iury?
+   A. Let's wait for Iury.
+4. Target journal confirmed as Copernicus GI, or still open? (Affects bib style
+   and abstract length.)
+   A. Still open
+5. SWOT_L2 vs SWOT_L3: which is the canonical SWOT dataset for the paper figures?
+   A. Let's use SWOT_L2.
+
+## Logging
+
+Append an entry to the **Logs** section of this file using the format:
+
+```
+### <Date> (Short summary of the work)
+
+<Detailed description of the work and what you learned>
+```
+
+## Logs
+
+### 2026-06-23 (Generated comprehensive project TODO list)
+
+Examined the full project to assess what remains for completion and wrote a
+comprehensive TODO list to ToDO.txt in the Overleaf project (replacing the
+sparse 4-item stub, with the original author items retained and flagged "orig").
+
+Files reviewed:
+- Overleaf: information_content.tex (main manuscript), claude_initial_review.tex
+  (the 2026-03-24 status assessment), claude_brainstorming.tex,
+  claude_rank_metrics.tex, and Tables/{tab_datasets,tab_model,tab_analysis}.tex.
+- Code: Analysis/py/ (info_defs.py, info_rank.py, extract/PCA/Pk scripts),
+  Figures/py/figs_nenya_dim.py, Tables/py/tables_info.py, Preprocess/py/.
+
+Key findings / state of the paper:
+- Methods section ~80% complete; Results ~20%; Abstract/Intro/Conclusions/
+  back-matter essentially unwritten; bibliography is stub-only.
+- LaTeX issues from the initial review are STILL present: stray "[t]" after
+  \end{figure*} (lines 659, 666); gallmeiter2023 -> gallmeier2023 typo (line 364);
+  column-count mismatches in tab_analysis ({cccc} vs 3 cols) and tab_model
+  ({ccccccc} vs 5 cols); architecture figure mislabeled as the learning-curve
+  figure while fig_learning_curves.png is never included.
+- New work exists but is NOT integrated into the manuscript: the
+  Participation Ratio / RankMe analysis (info_rank.py + claude_rank_metrics.tex)
+  and the remote-sensing eigenmodes figure (fig_eigenmodes_remote_sensing(),
+  flg==53 in figs_nenya_dim.py).
+
+Organized the TODO into sections A-G: Manuscript Text, References, Figures,
+Tables, Analysis/new-work, LaTeX fixes, and Open Questions. Logged 5 open
+questions for the author in the Q&A section above and in Section G of ToDO.txt.
+Did not push to git pending the author's review.
