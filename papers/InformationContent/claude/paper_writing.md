@@ -86,6 +86,8 @@ Make sure the claude_initial_review.tex its own stand-alone file that can compil
 
 2. I have answered the questions in the Q&A section below.  Please update the TODO list to reflect the answers.  Push the Overleaf with git. Then generate an implementation plan named `final_steps.md` in `papers/InformationContent`.  I expect you will need to use Nautilus to run additional tests.  If so, see the `PAB` repo and especially its `Oceanography/python/PAB/nautilus` folder.  Use Fable if you can. Log your work.  
 
+3. Ok, that plan looks good.  Please generate a series of prompt docs in `papers/InformationContent/claude` that will be used to complete the final steps.  Name them `final_steps_<step_number>.md`.  These should be used to complete the final steps.  Log your work.  Use Fable if you can.
+
 ### Q&A
 
 Open questions raised while generating the TODO list (2026-06-23); see Section G
