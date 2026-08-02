@@ -24,7 +24,7 @@
 - Figures go in the Overleaf project folder as PNG files in the Figures/ subdirectory.
 - Embed figures within the text near their description.
 - When adding new files, update the main `.tex` file to include them.
-- You may push to git as you work.
+- You may push to git as you work.  The password token is given by $OVER_TOKEN
 
 ## Claude Code
 
@@ -83,6 +83,8 @@ Make sure the claude_initial_review.tex its own stand-alone file that can compil
 ## TODO List
 
 1. Please examine all of the files related to this project and generate a TODO list of what needs to be done to complete the project.  Add this TODO list to the file in the Overleaf project named "ToDO.txt".  If you have any questions, please ask me.  Log your work in the Logs section of this file.
+
+2. I have answered the questions in the Q&A section below.  Please update the TODO list to reflect the answers.  Push the Overleaf with git. Then generate an implementation plan named `final_steps.md` in `papers/InformationContent`.  I expect you will need to use Nautilus to run additional tests.  If so, see the `PAB` repo and especially its `Oceanography/python/PAB/nautilus` folder.  Use Fable if you can. Log your work.  
 
 ### Q&A
 
