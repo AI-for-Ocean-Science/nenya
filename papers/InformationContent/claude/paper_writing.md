@@ -151,3 +151,42 @@ Organized the TODO into sections A-G: Manuscript Text, References, Figures,
 Tables, Analysis/new-work, LaTeX fixes, and Open Questions. Logged 5 open
 questions for the author in the Q&A section above and in Section G of ToDO.txt.
 Did not push to git pending the author's review.
+
+### 2026-08-02 (Updated ToDO.txt with Q&A answers; wrote final_steps.md plan)
+
+Executed task 2 of the TODO List: incorporated the author's answers to the
+five Section G open questions into the Overleaf ToDO.txt, pushed the Overleaf
+repo to git, and generated the implementation plan
+`papers/InformationContent/final_steps.md`.
+
+ToDO.txt changes (committed as ca4bccc and pushed to Overleaf):
+- Header note recording the 2026-08-02 decisions; added [B] (blocked) and
+  [H] (on hold) status keys.
+- Section A: SWOT description marked [B] — wait for Iury, do not draft.
+- Section C: architecture/learning-curve item resolved — include BOTH figures.
+- Sections D/E: PR/RankMe items marked [H] (author deferred).
+- Section G: answers recorded inline under each question.
+- New Section H: tasks arising from the answers — [P1] standardize on SWOT_L2
+  everywhere (audit tex/tables/figures for SWOT_L3 usage), [P1] add the
+  learning-curve figure environment, [?] decide the target journal.
+
+final_steps.md (new): a phased plan to submission-ready draft.
+- Phase 0: local verification (LLC cutout provenance, LLC first-2-months
+  spin-up check, Pk2/Pk4 zero-mean claim, SWOT_L2 audit, dx consistency).
+- Phase 1: CONDITIONAL Nautilus compute — only if Phase 0 shows the LLC
+  preproc includes the spin-up months: re-extract, retrain (existing
+  Analysis/yaml/ job specs; profxj/ihop_nvidia image, 4x A10), re-extract
+  latents, recompute PCA/P(k). Operational conventions borrowed from the PAB
+  repo's nautilus folder (resumable stages, per-stage logging, fail-fast);
+  Fable agents to drive job prep/launch/monitoring.
+- Phase 2: figures/tables (generate the eigenmodes PNG — code exists at
+  flg==53 but the PNG was never produced; learning-curve + architecture
+  figure fixes; table column-count fixes; year/geo columns).
+- Phase 3: manuscript text in order Results -> Conclusions -> Introduction ->
+  Abstract, plus a real .bib bibliography.
+- Phase 4: clean compile + consistency pass.
+
+Learned along the way: the Overleaf git token lives in ~/.bashrc as
+OVER_TOKEN (not "OVERLEAF"); pca_latents_SWOT_L2.npz and Pk_SWOT_L2.npz
+already exist, so the SWOT_L2 standardization needs no new compute; the
+fig_eigenmodes_remote_sensing PNG is the only missing figure product.
