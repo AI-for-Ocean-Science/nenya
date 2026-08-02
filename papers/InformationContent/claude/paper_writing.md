@@ -190,3 +190,39 @@ Learned along the way: the Overleaf git token lives in ~/.bashrc as
 OVER_TOKEN (not "OVERLEAF"); pca_latents_SWOT_L2.npz and Pk_SWOT_L2.npz
 already exist, so the SWOT_L2 standardization needs no new compute; the
 fig_eigenmodes_remote_sensing PNG is the only missing figure product.
+
+### 2026-08-02 (Generated final_steps prompt docs, phases 0-4)
+
+Executed task 3 of the TODO List: wrote five prompt docs in
+papers/InformationContent/claude/, one per phase of final_steps.md, numbered
+to match the plan's phases (final_steps_0.md ... final_steps_4.md). Each doc
+is a self-contained prompt for a future session: a "Before you start" block
+(read Claude.md + the plan + upstream phase reports; ocean14 env; use Fable
+agents for parallelizable work), the task list with file paths and line
+numbers pulled from ToDO.txt/final_steps.md, an explicit deliverables list,
+and the standing close-out steps (tick plan boxes, update ToDO.txt, push
+Overleaf with $OVER_TOKEN, log here, push nenya info_content).
+
+- final_steps_0.md — Phase 0 verification. Five independent local checks;
+  produces claude/phase0_findings.md with a GO/NO-GO decision that gates
+  Phase 1.
+- final_steps_1.md — Phase 1 Nautilus compute, CONDITIONAL on the Phase 0
+  gate. LLC re-extract (spin-up excluded) -> retrain via copies of the
+  existing Analysis/yaml job specs -> latents -> PCA/P(k); preserves old
+  products under _withspinup names; produces claude/phase1_report.md with
+  old-vs-new betas and a Phase 2 regeneration list.
+- final_steps_2.md — Phase 2 figures/tables. Eigenmodes PNG (flg==53),
+  learning-curve + architecture figure fixes, captions, table column-count
+  and year/geo fixes, SWOT_L2 regeneration list, stray "[t]" removal.
+- final_steps_3.md — Phase 3 manuscript text in order Results -> Conclusions
+  -> Introduction -> Abstract, plus .bib bibliography, macros, back matter;
+  author-decision points marked as % CLAUDE-QUESTION: comments; explicit
+  do-not-touch list (Iury's SWOT text, RankMe, journal formatting).
+- final_steps_4.md — Phase 4 final pass. Clean compile, cross-ref audit,
+  consistency greps (XX/TEXT/Blah/SWOT_L3 leftovers), and a "FINAL AUTHOR
+  ITEMS" section appended to ToDO.txt collecting everything needing a human.
+
+Design choices: docs are numbered 0-4 (not 1-5) so names match the plan's
+phase numbers; phase reports (phase0_findings.md, phase1_report.md) are the
+hand-off artifacts between phases so each doc can run in a fresh session
+without rereading the whole project.
