@@ -260,3 +260,43 @@ fig_pca_noise_res() will crash (removes 'SWOT_L3' from a list that now
 holds SWOT_L2); claude_rank_metrics.tex and claude_brainstorming.tex embed
 L3-era numbers; SST timestep 2011-11-13 sits exactly on the 2-month cut
 boundary -- Phase 1 must state its cut convention.
+
+### 2026-08-02 (Phase 1 IN PROGRESS -- re-extraction done, Nautilus training launched)
+
+Executing final_steps_1.md. Cut convention (per author): exclude all cutouts
+with dates in the first 2 months of the LLC4320 run, i.e. datetime <
+2011-11-13; the 2011-11-13 boundary timestep is RETAINED.
+
+DONE in this session (commit a86d61b on info_content):
+1. Code: extract_utils.prep_for_training gained min_date; extract_llc.py
+   gained LLC_SPINUP_END='2011-11-13', ex_nonoise(min_date, seed) and
+   ex_ssh(min_date, seed) (the SSHa date-cut path samples the DBOF table
+   directly and reuses fronts create_hdf5_cutouts). Seed 12345 used.
+   NOTE: wrangler/fronts/nenya are NOT pip-installed locally -- run with
+   PYTHONPATH=/mnt/tank/Oceanography/python/{wrangler,fronts,nenya} under
+   conda env ocean14.
+2. Fixed latent bugs: nenya_LLC_nonoise.py / nenya_LLC_noise.py used stale
+   dataset keys LLC_SST_* (grab_paths now wants LLC_SSTa_*), and the noise
+   script resumed from load_epoch=49 (v1 restart logic) -- now fresh.
+3. Re-extraction complete + validated: 150k/50k per dataset, zero cutouts
+   before 2011-11-13 (SST 2011-11-13 -> 2012-08-05, 20 timesteps; SSHa
+   2011-11-30 -> 2012-07-31, 5 timesteps), noise sigma verified 0.090.
+   Old products preserved locally AND on S3 as *_withspinup; old model
+   checkpoints backed up to s3://llc/Nenya/models_withspinup/.
+4. New preproc uploaded to s3://llc/PreProc/ (same keys as v1). Local S3
+   access: default aws profile + --endpoint-url https://s3-west.nrp-nautilus.io.
+5. Launched 3 Nautilus jobs (namespace sea-meets-the-stars):
+   xavier-nenya-llc-{nonoise,noise,ssha}-train-v2 from the new v2 YAMLs
+   (branches: nenya info_content, wrangler llc_wrangling; 4x A10 each;
+   backoffLimit 0 -- a preempted/failed job must be re-applied by hand).
+   At session pause: nonoise Running, noise/ssha Pending (GPU scheduling).
+
+REMAINING for Phase 1 (resume here):
+- Verify the 3 jobs completed (kubectl -n sea-meets-the-stars get jobs |
+  grep v2); on completion each pushes checkpoints to s3://llc/Nenya/models.
+- Pull new checkpoints locally (under $OS_OGCM/LLC/Info/models/...),
+  run 'evaluate' in nenya_LLC_{nonoise,noise,SSHa}.py to extract latents.
+- Rename old pca/Pk npz to *_withspinup, rerun calc_pca_pp.py + calc_Pk.py
+  for the LLC datasets, compare old-vs-new beta/N99.
+- Write claude/phase1_report.md; update ToDO.txt (Section E), push
+  Overleaf; log here; push nenya.
