@@ -6,7 +6,7 @@ import info_defs
 from IPython import embed
 
 def main(task:str):
-    dataset = 'LLC_SST_nonoise'
+    dataset = 'LLC_SSTa_nonoise'
     pdict = info_defs.grab_paths(dataset)
     if task == 'train':
         workflow.train(pdict['opts_file'], debug=False)

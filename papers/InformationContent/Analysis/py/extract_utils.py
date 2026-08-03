@@ -25,9 +25,10 @@ def prep_for_training(tbl_file:str,
                       preproc_file:str, 
                       train_tbl_file:str=None,
                       inpaint:bool=False,
-                      n_train:int=300000, 
+                      n_train:int=300000,
                       n_valid:int=100000,
                       use_ppidx:bool=False,
+                      min_date:str=None,
                       debug:bool=False,
                       poptions:dict=None,
                       orig_key:str='fields',
@@ -41,6 +42,9 @@ def prep_for_training(tbl_file:str,
         preproc_file (str): HDF5 file with the pre-processed data
         n_train (int, optional): Number of training samples. Defaults to 300000.
         n_valid (int, optional): Number of validation samples. Defaults to 100000.
+        min_date (str, optional): If provided, only cutouts with
+            datetime >= min_date are eligible for selection
+            (e.g. to exclude the LLC4320 model spin-up period).
         poptions (dict, optional): Preprocessing options. Defaults to None.
     """
 
@@ -53,6 +57,11 @@ def prep_for_training(tbl_file:str,
         # Cut the table to the pp_idx
         df = df[df['pp_idx'] >= 0].copy()
         print(f"Cutting the table to {len(df)} samples with pp_idx >= 0")
+
+    # Cut on date? (e.g. exclude the LLC4320 spin-up period)
+    if min_date is not None:
+        df = df[df['datetime'] >= min_date].copy()
+        print(f"Cutting the table to {len(df)} samples with datetime >= {min_date}")
 
     # Random select n_train samples and n_valid samples
     idx_tv = np.random.choice(df.index, n_train+n_valid, replace=False)

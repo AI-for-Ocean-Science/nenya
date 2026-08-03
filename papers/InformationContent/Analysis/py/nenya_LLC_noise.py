@@ -10,10 +10,13 @@ import h5py
 from IPython import embed
 
 def main(task:str):
-    dataset = 'LLC_SST_noise'
+    dataset = 'LLC_SSTa_noise'
     pdict = info_defs.grab_paths(dataset)
     if task == 'train':
-        workflow.train(pdict['opts_file'], load_epoch=49, debug=False)
+        # load_epoch=49 was used to resume the original (spin-up) run after a
+        # preemption (see nenya_LLC_noise_restart_train.yaml); the no-spinup
+        # v2 retrain starts fresh.
+        workflow.train(pdict['opts_file'], load_epoch=None, debug=False)
     elif task == 'evaluate':
         workflow.evaluate(pdict['opts_file'], pdict['preproc_file'], local_model_path=pdict['path'],
                           latents_file=pdict['latents_file'], debug=False)
@@ -24,7 +27,7 @@ def main(task:str):
 
 def reset_learning(trial:int):
     # Load the learning curve files
-    dataset = 'LLC_SST_noise'
+    dataset = 'LLC_SSTa_noise'
     pdict = info_defs.grab_paths(dataset)
     path = pdict['path']
     valid_file = os.path.join(path, 'models', 'LLC_noise', 
