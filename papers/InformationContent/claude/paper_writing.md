@@ -226,3 +226,37 @@ Design choices: docs are numbered 0-4 (not 1-5) so names match the plan's
 phase numbers; phase reports (phase0_findings.md, phase1_report.md) are the
 hand-off artifacts between phases so each doc can run in a fresh session
 without rereading the whole project.
+
+### 2026-08-02 (Executed Phase 0 verification checks -- GO for Phase 1)
+
+Ran final_steps_0.md: three parallel Fable agents (LLC provenance+spin-up,
+Pk zero-mean, SWOT audit) plus an inline dx check. Full report with evidence
+in claude/phase0_findings.md; final_steps.md Phase 0 boxes ticked; ToDO.txt
+Sections E/H updated and pushed to Overleaf.
+
+Verdicts:
+1. LLC provenance DOCUMENTED: LLC4320 (start 2011-09-13); SST cutouts from
+   the 2022 Gallmeier parent table, 24 biweekly timesteps 2011-09-18 to
+   2012-08-05; SSHa 6 bimonthly timesteps 2011-09-30 to 2012-07-31; 64x64 px
+   = 144 km cutouts; noise file adds sigma=0.09 K at the data level.
+2. LLC spin-up: CONTAMINATED -- ~16.7% of train and ~17% of valid cutouts in
+   ALL THREE LLC datasets fall within 2 months of run start (earliest SST
+   cutouts just 5 days after start). ==> PHASE 1 IS A GO (Nautilus rerun).
+3. Pk2/Pk4 zero-mean claim: CORRECT in code (per-image demean + unit std)
+   and verified numerically (|mean|<2e-9, |std-1|<3e-9 on 200-image samples).
+4. SWOT audit: every SWOT number/curve in the manuscript is L3-sourced
+   (Overleaf floats predate the code's L2 switch): 3 table rows + 4 PNGs;
+   fig_example_images() still hard-codes SWOT_L3 in figs_nenya_dim.py
+   (lines 728/729/751). All L2 inputs already exist (L2: npix 64, dx 0.843,
+   N99=132, beta=2.58+/-0.31, f_var256=0.985 vs L3's 128/0.25/89/1.42/0.801).
+   Regeneration list handed to Phase 2 in phase0_findings.md.
+5. dx: MODIS XX -> 1.1 km but the "128x128 km^2" span is really ~141 km;
+   MODIS-2km/VIIRS-2km table dx=2.00 is the info_defs fallback default --
+   true values 2.2 / 2.25 km/pix (fix info_defs, regenerate tab_datasets).
+
+Notable flags: LLC noise sigma conflict (0.09 K in extraction code vs
+~0.04 K cited in ToDO/tab_model -- resolve during the Phase 1 rerun);
+fig_pca_noise_res() will crash (removes 'SWOT_L3' from a list that now
+holds SWOT_L2); claude_rank_metrics.tex and claude_brainstorming.tex embed
+L3-era numbers; SST timestep 2011-11-13 sits exactly on the 2-month cut
+boundary -- Phase 1 must state its cut convention.

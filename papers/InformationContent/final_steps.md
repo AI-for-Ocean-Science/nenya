@@ -20,25 +20,29 @@ Derived from the Overleaf `ToDO.txt` (sections A–H) and the author's
 
 ## Phase 0 — Verification checks (local, `ocean14` env; no new compute)
 
-- [ ] **LLC cutout provenance** (ToDO E, P1, orig): confirm the
-      location/provenance of the LLC SST cutouts used to build the preproc
-      files (`Analysis/py/extract_llc.py`, `info_defs.grab_paths()`), and
-      record the answer in the dataset table / text.
-- [ ] **LLC first-2-months check** (ToDO E, P2, orig): determine whether the
-      current LLC preproc files include the first 2 months of the LLC4320 run
-      (model spin-up). If they do, the LLC datasets must be re-extracted and
-      re-run → triggers Phase 1. If not, document it and skip Phase 1.
-- [ ] **P2(k)/P4(k) zero-mean claim** (ToDO E, P2): verify in
-      `Preprocess/py/power_spectrum_images.py` / `build_Pk_images.py` that the
-      generated Pk2/Pk4 images have zero mean and unit std per image, as the
-      text (line ~276) claims. Fix text or code accordingly.
-- [ ] **SWOT_L2 audit** (ToDO H, P1): grep `information_content.tex`,
-      `Tables/py/tables_info.py`, the three `Tables/*.tex`, and
-      `Figures/py/figs_nenya_dim.py` for SWOT_L3 usage; every SWOT row/curve in
-      the paper must come from SWOT_L2 (`pca_latents_SWOT_L2.npz`,
-      `Pk_SWOT_L2.npz`; both already exist in `Analysis/pca/`, `Analysis/Pk/`).
-- [ ] **dx consistency** (ToDO E, P3): reconcile MODIS dx in the text
-      ("~XX km", line ~290) with `tab_datasets` (1.10 km) and fill the "XX".
+**DONE 2026-08-02 — see `claude/phase0_findings.md`. Verdict: GO for Phase 1**
+(all three LLC datasets ~17% spin-up contaminated; also, every SWOT
+number/curve in the manuscript is still SWOT_L3-sourced → Phase 2 list).
+
+- [x] **LLC cutout provenance** (ToDO E, P1, orig): LLC4320 (start
+      2011-09-13); SST from the 2022 Gallmeier parent table, 24 biweekly
+      timesteps 2011-09-18→2012-08-05; SSHa 6 bimonthly timesteps
+      2011-09-30→2012-07-31; 64×64 px = 144 km cutouts. Noise file adds
+      sigma=0.09 K (conflicts with the 0.04 K in ToDO/tab_model — flagged).
+- [x] **LLC first-2-months check** (ToDO E, P2, orig): CONTAMINATED —
+      ~16.7% of train and ~17% of valid cutouts in all three LLC datasets
+      fall in the first 2 months. **Triggers Phase 1.**
+- [x] **P2(k)/P4(k) zero-mean claim** (ToDO E, P2): CLAIM CORRECT — per-image
+      demean + unit-std in code and verified numerically on both preproc
+      files. No change needed.
+- [x] **SWOT_L2 audit** (ToDO H, P1): all manuscript SWOT content (3 table
+      rows, 4 included PNGs) is L3-sourced; `fig_example_images()` still
+      hard-codes SWOT_L3. Full regeneration list in `phase0_findings.md`;
+      all L2 inputs exist (L2: N99=132, beta=2.58±0.31, f_var256=0.985).
+- [x] **dx consistency** (ToDO E, P3): MODIS "XX" → 1.1 km, but the claimed
+      128 km span is really ≈141 km; MODIS-2km/VIIRS-2km table dx=2.00 is a
+      fallback default — true values 2.2 / 2.25 (fix info_defs + regenerate
+      tab_datasets in Phase 2).
 
 ## Phase 1 — Nautilus compute (CONDITIONAL on Phase 0 findings)
 
