@@ -291,7 +291,25 @@ DONE in this session (commit a86d61b on info_content):
    backoffLimit 0 -- a preempted/failed job must be re-applied by hand).
    At session pause: nonoise Running, noise/ssha Pending (GPU scheduling).
 
+UPDATE 2026-08-05 (second session pause):
+- nonoise training COMPLETED on Nautilus (~55h); v2 checkpoints pushed to
+  s3://llc/Nenya/models/LLC_nonoise/ (2026-08-05 05:17). last.pth + opts +
+  learning_curve downloaded to $OS_OGCM/LLC/Info/models/LLC_nonoise/ (v1
+  moved to models/LLC_nonoise_withspinup; v1 latents dir moved to
+  latents/LLC_SST_nonoise_withspinup).
+- noise + ssha jobs FAILED once (BackoffLimitExceeded, pods gone, likely
+  preemption); RELAUNCHED 2026-08-05 ~15:40, currently Pending/Running.
+- nonoise latent extraction attempted locally (CPU; run from Analysis/ as
+  `python py/nenya_LLC_nonoise.py evaluate` with the PYTHONPATH trio under
+  ocean14): FAILED with a multiprocessing serialization error under
+  `conda run` (log: scratchpad latents_nonoise_v2.log copy in
+  /tmp/claude-1000/.../tasks/bfg0i6lz3.output). NOT yet debugged -- likely
+  the DataLoader num_workers=8 + conda-run interaction; try running with
+  `conda activate ocean14` directly or num_workers=0, or extract on the
+  cluster instead.
+
 REMAINING for Phase 1 (resume here):
+- Debug + rerun nonoise latent extraction (see UPDATE above).
 - Verify the 3 jobs completed (kubectl -n sea-meets-the-stars get jobs |
   grep v2); on completion each pushes checkpoints to s3://llc/Nenya/models.
 - Pull new checkpoints locally (under $OS_OGCM/LLC/Info/models/...),
