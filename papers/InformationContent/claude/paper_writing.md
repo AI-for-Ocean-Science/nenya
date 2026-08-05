@@ -308,8 +308,41 @@ UPDATE 2026-08-05 (second session pause):
   `conda activate ocean14` directly or num_workers=0, or extract on the
   cluster instead.
 
+UPDATE 2026-08-05 evening (third session pause):
+- Latents bug DIAGNOSED + FIXED: Python 3.14 defaults multiprocessing to
+  forkserver, which pickles the DataLoader dataset; HDF5RGBDataset holds an
+  open h5py handle -> 'h5py objects cannot be pickled'. Fix: force fork via
+  new Analysis/py/run_latents_local.py (committed e6aba6a). Usage from
+  Analysis/: PYTHONPATH=py:<wrangler>:<fronts>:<nenya> conda run -n ocean14
+  python -u py/run_latents_local.py nenya_LLC_nonoise evaluate
+  ALSO add /mnt/tank/Oceanography/python/remote_sensing to PYTHONPATH for
+  calc_Pk (nenya.pk imports remote_sensing).
+- nonoise latents extraction RUNNING (nohup, survives exit; ~2h on CPU;
+  log ~/.claude/jobs/5f7b75e3/tmp/latents_nonoise_v2.log; done when it
+  prints 'Latents saved to').
+- noise + ssha v2 training RUNNING on Nautilus (relaunched 2026-08-05
+  ~15:40; noise reached epoch 1 by 16:20; expect ~2 days).
+- Image-space products for the 3 no-spinup LLC datasets DONE (Pk npz/png,
+  pca_preproc 256 + 4096; v1 files preserved as *_withspinup).
+- EARLY RESULT: spin-up exclusion does NOT move the image-space numbers.
+  beta (4-40 pix fit): nonoise 3.80+/-0.06 -> 3.80+/-0.06; noise 3.49 ->
+  3.49; SSHa 3.21+/-0.12 -> 3.15+/-0.13. f_var256 (from 4096 PCA): 0.987 ->
+  0.987, 0.958 -> 0.958, 0.980 -> 0.979. tab_analysis image-space columns
+  are effectively unchanged; any paper-level impact must come via the
+  retrained latents (N99 etc.), still pending.
+
 REMAINING for Phase 1 (resume here):
-- Debug + rerun nonoise latent extraction (see UPDATE above).
+- Verify nonoise latents finished ('Latents saved to' in the log above);
+  then recompute latent PCA (anly_nenya_dim.py pca_latents('LLC_SSTa_nonoise')
+  from Analysis/; old pca_latents_*.npz already renamed *_withspinup) and
+  compare N99 vs old.
+- When noise/ssha jobs complete: pull last.pth+opts+learning_curve from
+  s3://llc/Nenya/models/{LLC_noise,LLC_SSHa}/ to $OS_OGCM/LLC/Info/models/
+  (back up v1 dirs to *_withspinup first, same for latents dirs), run
+  run_latents_local.py for nenya_LLC_noise / nenya_LLC_SSHa, then their
+  latent PCAs.
+- Write claude/phase1_report.md (include the beta/f_var256 table above +
+  N99 old-vs-new); update ToDO.txt Section E; push Overleaf; log; push nenya.
 - Verify the 3 jobs completed (kubectl -n sea-meets-the-stars get jobs |
   grep v2); on completion each pushes checkpoints to s3://llc/Nenya/models.
 - Pull new checkpoints locally (under $OS_OGCM/LLC/Info/models/...),
