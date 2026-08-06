@@ -331,11 +331,21 @@ UPDATE 2026-08-05 evening (third session pause):
   are effectively unchanged; any paper-level impact must come via the
   retrained latents (N99 etc.), still pending.
 
+UPDATE 2026-08-05 night (fourth session):
+- nonoise v2 latents DONE (200k x 256, latents/LLC_SST_nonoise/.../
+  train_llc_nonoise_latents.h5) and latent PCA recomputed
+  (pca/pca_latents_LLC_SSTa_nonoise.npz; run pca_latents() from Analysis/,
+  NOT Analysis/pca/ -- pca_file is 'pca/...' relative).
+- KEY RESULT: N99 = 76 (v1 withspinup) -> 77 (v2 no-spinup); N95 = 52 -> 54.
+  Together with the unchanged image-space stats, the spin-up exclusion is a
+  robustness CONFIRMATION -- the paper's LLC numbers barely move.
+- Housekeeping: a duplicate nonoise extraction accidentally launched this
+  session was killed (the session-3 nohup run won the race); the session-3
+  version of run_latents_local.py was overwritten by an equivalent one with
+  CLI 'run_latents_local.py nonoise|noise|SSHa' (commit eac7914) -- use THAT
+  interface going forward.
+
 REMAINING for Phase 1 (resume here):
-- Verify nonoise latents finished ('Latents saved to' in the log above);
-  then recompute latent PCA (anly_nenya_dim.py pca_latents('LLC_SSTa_nonoise')
-  from Analysis/; old pca_latents_*.npz already renamed *_withspinup) and
-  compare N99 vs old.
 - When noise/ssha jobs complete: pull last.pth+opts+learning_curve from
   s3://llc/Nenya/models/{LLC_noise,LLC_SSHa}/ to $OS_OGCM/LLC/Info/models/
   (back up v1 dirs to *_withspinup first, same for latents dirs), run
