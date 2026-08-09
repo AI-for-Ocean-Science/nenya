@@ -58,21 +58,21 @@ in `Analysis/yaml/` and borrows operational lessons from the PAB repo
 
 Steps (LLC re-run case; applies to LLC_SSTa_nonoise, LLC_SSTa_noise, LLC_SSHa):
 
-1. **Re-extract cutouts** excluding the first 2 months
-   (`Analysis/py/extract_llc.py`); rebuild the preproc `.h5` and push to
-   Nautilus S3 (`aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp ...`).
-2. **Retrain** on Nautilus: copy the existing job specs
-   (`Analysis/yaml/nenya_LLC_nonoise_train.yaml`, `..._noise_train.yaml`,
-   `..._SSHa_train.yaml`) — image `profxj/ihop_nvidia:latest`, 4× A10 GPU,
-   clone `wrangler` (branch `llc_wrangling`) + `nenya` (branch
-   `info_content`), run `python -u py/nenya_LLC_*.py train`, push `models/`
-   back to S3.
-3. **Extract latents** with the retrained checkpoints
-   (`workflow.evaluate` via the per-dataset `nenya_LLC_*.py` scripts).
-4. **Recompute PCA and P(k)** locally (`calc_pca_pp.py`, `calc_Pk.py`) into
-   `Analysis/pca/` and `Analysis/Pk/`.
-5. **Regenerate** every affected figure/table (Phase 2) and update the beta
-   values in `tab_analysis`.
+- [x] 1. **Re-extract cutouts** excluding the first 2 months — done 2026-08-04;
+      v2 preproc on `s3://llc/PreProc/` (same keys), v1 kept as `*_withspinup`.
+- [x] 2. **Retrain** on Nautilus — all three v2 jobs Complete (nonoise
+      2026-08-05; noise/SSHa 2026-08-07/08 after one preemption + relaunch);
+      checkpoints on `s3://llc/Nenya/models/`, v1 backed up to
+      `models_withspinup/`. v2 YAMLs: `Analysis/yaml/nenya_LLC_*_train_v2.yaml`.
+- [x] 3. **Extract latents** — done locally via
+      `Analysis/py/run_latents_local.py` (fork fix for Python 3.14);
+      150k train + 50k valid × 256 per dataset, verified.
+- [x] 4. **Recompute PCA and P(k)** — image-space Pk + pca_preproc done
+      2026-08-05; latent PCAs done 2026-08-05 (nonoise) / 2026-08-09
+      (noise, SSHa). N99: nonoise 76→77, noise 57→57, SSHa 76→70.
+- [x] 5. **Update `tab_analysis`** — regenerated 2026-08-09 (SSHa row
+      3.15±0.13/0.979; SWOT row now canonical SWOT_L2). Remaining
+      figure/table regeneration is tracked under Phase 2.
 
 Operational notes (from the PAB Nautilus experience):
 
