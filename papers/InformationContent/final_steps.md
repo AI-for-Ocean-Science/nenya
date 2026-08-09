@@ -46,6 +46,11 @@ number/curve in the manuscript is still SWOT_L3-sourced → Phase 2 list).
 
 ## Phase 1 — Nautilus compute (CONDITIONAL on Phase 0 findings)
 
+**DONE 2026-08-09 — see `claude/phase1_report.md`. Verdict: robustness
+confirmed** (image-space beta/f_var256 unchanged within errors; latent N99:
+nonoise 76→77, noise 57→57, SSHa 76→70). tab_analysis regenerated (SSHa +
+canonical SWOT_L2 rows); old products preserved as `*_withspinup`.
+
 Only needed if the LLC preproc files include the spin-up months (or if any
 SWOT_L2 product turns out stale). Workflow mirrors the existing training jobs
 in `Analysis/yaml/` and borrows operational lessons from the PAB repo

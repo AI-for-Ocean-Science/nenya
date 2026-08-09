@@ -361,3 +361,27 @@ REMAINING for Phase 1 (resume here):
   for the LLC datasets, compare old-vs-new beta/N99.
 - Write claude/phase1_report.md; update ToDO.txt (Section E), push
   Overleaf; log here; push nenya.
+UPDATE 2026-08-09 (fifth session): PHASE 1 COMPLETE.
+- noise + ssha v2 training COMPLETED on Nautilus (Complete 1/1; ~2d8h and
+  ~2d12h); checkpoints on S3 2026-08-07 23:43 / 2026-08-08 04:01.
+- v1 model + latents dirs backed up to *_withspinup; v2 last.pth + opts +
+  learning_curve pulled to $OS_OGCM/LLC/Info/models/{LLC_noise,LLC_SSHa}.
+- Latents extracted locally for both (run_latents_local.py noise SSHa,
+  ~2h each on CPU; train 150k + valid 50k x 256 each). NOTE: conda run
+  buffers stdout -- the log stays empty until the process exits; not a
+  stall. The SSHa latents file is named train_llc_nonoise_latents.h5 (same
+  as v1) -- pre-existing quirk in nenya_LLC_SSHa.py, contents are SSHa.
+- Latent PCAs recomputed (dataset keys are LLC_SSTa_noise / LLC_SSHa in
+  info_defs -- NOT LLC_SST_noise). Results: N99 noise 57->57 (N95 46->46),
+  SSHa 76->70 (N95 50->44); with nonoise 76->77 the spin-up exclusion is a
+  robustness confirmation; SSHa is the only mover (fewer modes, consistent
+  with removing spin-up transients).
+- tab_analysis regenerated via Tables/py/tables_info.py mktab_analysis():
+  \llcssh 3.21+/-0.12/0.980 -> 3.15+/-0.13/0.979; \swot row now the
+  canonical SWOT_L2 (2.58+/-0.31/0.985, was L3 1.42/0.801). Copied to repo
+  Tables/ + Overleaf; Overleaf ToDO.txt Section E spin-up item marked DONE;
+  Overleaf pushed (d307708).
+- Wrote claude/phase1_report.md (full old-vs-new tables + product paths).
+- Phase 1 DONE. Next: Phase 2 (figures/tables) -- note tab_analysis {cccc}
+  vs 3-col mismatch and tab_model fixes are still Phase 2 items; in-text
+  LLC/SWOT numbers get fixed in Phase 3 with the new values.
