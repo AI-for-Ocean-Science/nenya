@@ -132,6 +132,8 @@ def grab_paths(dataset:str):
         out_dict['opts_file'] = 'opts_nenya_modis.json'
         out_dict['pca_file'] = 'pca_latents_MODIS_SSTa.npz'
         out_dict['dx'] = 1.1
+        out_dict['year'] = '2021'
+        out_dict['coverage'] = 'Global'
         out_dict['macro'] = '\\modis'
         out_dict['label'] = 'MODIS/SSTa'
     elif dataset == 'MODIS_SSTa_2km':
@@ -144,6 +146,9 @@ def grab_paths(dataset:str):
                                 'train_MODIS_2021_64x64_latents.h5')
         out_dict['opts_file'] = 'opts_nenya_modis_2km.json'
         out_dict['pca_file'] = 'pca_latents_MODIS_SSTa_2km.npz'
+        out_dict['dx'] = 128.*1.1/64  # 2.2 km/pix (128 native pixels at 1.1 km resampled to 64)
+        out_dict['year'] = '2021'
+        out_dict['coverage'] = 'Global'
         out_dict['macro'] = '\\modistwo'
         out_dict['label'] = 'MODIS/SSTa-2km'
     elif dataset == 'VIIRS_SSTa':
@@ -157,6 +162,8 @@ def grab_paths(dataset:str):
         out_dict['opts_file'] = 'opts_nenya_viirs.json'
         out_dict['pca_file'] = 'pca_latents_VIIRS_SSTa.npz'
         out_dict['dx'] = 0.75
+        out_dict['year'] = '2024'
+        out_dict['coverage'] = 'Global'
         out_dict['macro'] = '\\viirs'
         out_dict['label'] = 'VIIRS/SSTa'
     elif dataset == 'VIIRS_SSTa_2km':
@@ -169,6 +176,9 @@ def grab_paths(dataset:str):
                                 'train_VIIRS_N21_2024_2km_latents.h5')
         out_dict['opts_file'] = 'opts_nenya_viirs_2km.json'
         out_dict['pca_file'] = 'pca_latents_VIIRS_SSTa_2km.npz'
+        out_dict['dx'] = 192.*0.75/64  # 2.25 km/pix (192 native pixels at 0.75 km resampled to 64)
+        out_dict['year'] = '2024'
+        out_dict['coverage'] = 'Global'
         out_dict['macro'] = '\\viirstwo'
         out_dict['label'] = 'VIIRS/SSTa-2km'
     elif dataset == 'VIIRS_SSTa_sub':  # Native resolution but 64x64 pixels
@@ -182,6 +192,8 @@ def grab_paths(dataset:str):
         out_dict['opts_file'] = 'opts_nenya_viirs_sub.json'
         out_dict['pca_file'] = 'pca_latents_VIIRS_SSTa_sub.npz'
         out_dict['dx'] = 0.75
+        out_dict['year'] = '2024'
+        out_dict['coverage'] = 'Global'
         out_dict['macro'] = '\\viirssub'
         out_dict['label'] = 'VIIRS/SSTa-sub'
     elif dataset == 'orig_VIIRS_SST_2km':
@@ -221,6 +233,8 @@ def grab_paths(dataset:str):
             out_dict['pca_file'] = 'pca_latents_LLC_SSTa_noise.npz'
             out_dict['label'] = 'LLC/SSTa+noise'
         out_dict['dx'] = 144./64
+        out_dict['year'] = '2011-2012'  # LLC4320 run period
+        out_dict['coverage'] = '$\\pm 57^\\circ$'
     elif 'LLC_SSHa' in dataset:
         if 'OS_OGCM' in os.environ:
             path = os.path.join(os.getenv('OS_OGCM'), 'LLC', 'Info')
@@ -232,6 +246,8 @@ def grab_paths(dataset:str):
         out_dict['opts_file'] = 'opts_nenya_llc_ssha.json'
         out_dict['pca_file'] = 'pca_latents_LLC_SSHa.npz'
         out_dict['dx'] = 144./64
+        out_dict['year'] = '2011-2012'  # LLC4320 run period
+        out_dict['coverage'] = '$-78^\\circ$ to $+57^\\circ$'
         out_dict['macro'] = '\\llcssh'
         out_dict['label'] = 'LLC/SSHa'
     elif dataset == 'SWOT_L3':
@@ -258,6 +274,8 @@ def grab_paths(dataset:str):
         out_dict['opts_file'] = 'opts_nenya_swot_l2.json'
         out_dict['pca_file'] = 'pca_latents_SWOT_L2.npz'
         out_dict['dx'] = 0.843  # km
+        out_dict['year'] = '2023-2024'  # SWOT science orbit
+        out_dict['coverage'] = '$\\pm 78^\\circ$'
         out_dict['macro'] = '\\swot'
         out_dict['label'] = 'SWOT/SSHa-L2'
     else:

@@ -31,9 +31,9 @@ def mktab_datasets(outfile='tab_datasets.tex', sub=False, local=True):
     tbfil.write('\\begin{table*}\n')
     tbfil.write('\\centering\n')
     tbfil.write('\\caption{Datasets\\label{tab:datasets}}\n')
-    tbfil.write('\\begin{tabular}{ccccc}\n')
+    tbfil.write('\\begin{tabular}{ccccccc}\n')
     tbfil.write('\\hline \n')
-    tbfil.write('Name & Type & Source & \\npix & \\dx \\\\ \n')
+    tbfil.write('Name & Type & Source & Year & Coverage & \\npix & \\dx \\\\ \n')
     tbfil.write('\\hline \n')
 
     # Loop me
@@ -70,6 +70,18 @@ def mktab_datasets(outfile='tab_datasets.tex', sub=False, local=True):
         else:
             slin += ' & Generated'
 
+        # Year
+        if 'year' in pdict:
+            slin += f' & {pdict["year"]}'
+        else:
+            slin += ' & ...'
+
+        # Geographic coverage
+        if 'coverage' in pdict:
+            slin += f' & {pdict["coverage"]}'
+        else:
+            slin += ' & ...'
+
         # Npix
         preproc_file = pdict['preproc_file']
         preproc = h5py.File(preproc_file, 'r')
@@ -97,6 +109,10 @@ def mktab_datasets(outfile='tab_datasets.tex', sub=False, local=True):
     tbfil.write('Noise = white noise, Power-law = synthetic power-law fields, Digits = handwritten digits, ')
     tbfil.write('Natural = natural images); ')
     tbfil.write('\\textit{Source}: instrument or data source; ')
+    tbfil.write('\\textit{Year}: time period of the observations or model run, ')
+    tbfil.write('with "..." indicating not applicable; ')
+    tbfil.write('\\textit{Coverage}: geographic (latitude) coverage, ')
+    tbfil.write('with "..." indicating not applicable; ')
     tbfil.write('\\npix\\ = number of pixels per side of the square cutouts; ')
     tbfil.write('\\dx\\ = spatial resolution in km per pixel with "..." indicating non-physical data.\n')
     tbfil.write('\\end{minipage}\n')
@@ -136,7 +152,7 @@ def mktab_model(outfile='tab_model.tex', sub=False, local=True):
     tbfil.write('\\begin{table*}\n')
     tbfil.write('\\centering\n')
     tbfil.write('\\caption{Contrastive Learning Model Configuration\\label{tab:model}}\n')
-    tbfil.write('\\begin{tabular}{ccccccc}\n')
+    tbfil.write('\\begin{tabular}{ccccc}\n')
     tbfil.write('\\hline \n')
     tbfil.write('Name & Pre-processing & Augmentations & \\nfeature & $N_{99}$ \\\\ \n')
     tbfil.write('\\hline \n')
@@ -288,7 +304,6 @@ def mktab_model(outfile='tab_model.tex', sub=False, local=True):
     tbfil.write('flip = random horizontal/vertical flip; ')
     tbfil.write('rotate = random 90$^\\circ$ rotation; ')
     tbfil.write('noise $\\sigma$ = additive Gaussian noise with standard deviation $\\sigma$); ')
-    tbfil.write('\\textit{Model}: SSL method and backbone architecture; ')
     tbfil.write('$N_{\\rm f}$ = latent space dimensionality; ')
     tbfil.write('$N_{99}$ = PCA components needed for 99\\% variance.\n')
     tbfil.write('\\end{minipage}\n')
@@ -330,7 +345,7 @@ def mktab_analysis(outfile='tab_analysis.tex', sub=False, local=True,
     tbfil.write('\\begin{table*}\n')
     tbfil.write('\\centering\n')
     tbfil.write('\\caption{Power Spectrum and PCA Analysis\\label{tab:analysis}}\n')
-    tbfil.write('\\begin{tabular}{cccc}\n')
+    tbfil.write('\\begin{tabular}{ccc}\n')
     tbfil.write('\\hline \n')
     tbfil.write('Name & $\\beta$ & $f_{\\rm var,256}$ \\\\ \n')
     tbfil.write('\\hline \n')

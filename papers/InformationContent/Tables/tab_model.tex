@@ -1,7 +1,7 @@
 \begin{table*}
 \centering
 \caption{Contrastive Learning Model Configuration\label{tab:model}}
-\begin{tabular}{ccccccc}
+\begin{tabular}{ccccc}
 \hline 
 Name & Pre-processing & Augmentations & \nfeature & $N_{99}$ \\ 
 \hline 
@@ -12,8 +12,8 @@ Name & Pre-processing & Augmentations & \nfeature & $N_{99}$ \\
 \viirssub & ... & crop 40, jitter 5, flip, rotate & 256 & 83 \\ 
 \llcsst & ... & crop 40, jitter 5, flip, rotate & 256 & 76 \\ 
 \llcsstn & noise $\sigma$=0.039 & crop 40, jitter 5, flip, rotate & 256 & 57 \\ 
-\llcssh & ... & crop 40, jitter 5, flip, rotate & 256 & 76 \\ 
-\swot & ... & crop 110, jitter 10, flip, rotate & 256 & 89 \\ 
+\llcssh & ... & crop 40, jitter 5, flip, rotate & 256 & 70 \\ 
+\swot & ... & crop 54, jitter 8, flip, rotate & 256 & 132 \\ 
 \wnoise & ... & crop 40, jitter 5, flip, rotate & 256 & 11 \\ 
 \pktwo & ... & crop 40, jitter 5, flip, rotate & 256 & 24 \\ 
 \pkfour & ... & crop 40, jitter 5, flip, rotate & 256 & 42 \\ 
@@ -24,6 +24,6 @@ Name & Pre-processing & Augmentations & \nfeature & $N_{99}$ \\
 \\ 
 \begin{minipage}{0.9\textwidth}
 \small
-\textbf{Column descriptions:} \textit{Pre-processing}: transformations applied to satellite/model data before training ($N$x$N$ = original cutout size in pixels; downsample $M$x$M$ = spatial downsampling factor; median $M$x$N$ = median filter kernel size; $X$\% clear = minimum cloud-free threshold; noise $\sigma$ = synthetic noise added to simulations); \textit{Augmentations}: random transformations applied during contrastive learning (jitter $M$ = random spatial shift up to $M$ pixels; flip = random horizontal/vertical flip; rotate = random 90$^\circ$ rotation; noise $\sigma$ = additive Gaussian noise with standard deviation $\sigma$); \textit{Model}: SSL method and backbone architecture; $N_{\rm f}$ = latent space dimensionality; $N_{99}$ = PCA components needed for 99\% variance.
+\textbf{Column descriptions:} \textit{Pre-processing}: transformations applied to satellite/model data before training ($N$x$N$ = original cutout size in pixels; downsample $M$x$M$ = spatial downsampling factor; median $M$x$N$ = median filter kernel size; $X$\% clear = minimum cloud-free threshold; noise $\sigma$ = synthetic noise added to simulations); \textit{Augmentations}: random transformations applied during contrastive learning (jitter $M$ = random spatial shift up to $M$ pixels; flip = random horizontal/vertical flip; rotate = random 90$^\circ$ rotation; noise $\sigma$ = additive Gaussian noise with standard deviation $\sigma$); $N_{\rm f}$ = latent space dimensionality; $N_{99}$ = PCA components needed for 99\% variance.
 \end{minipage}
 \end{table*} 

@@ -189,7 +189,7 @@ def fig_pca_noise_res(outfile:str='fig_pca_noise_res.png',
     noise (left) and resolution (right) effects.
 
     Panel 1 (left): Noise - LLC_SSTa_nonoise vs LLC_SSTa_noise
-        plus Remote Sensing (MODIS_SSTa, VIIRS_SSTa, SWOT_L3)
+        plus Remote Sensing (MODIS_SSTa, VIIRS_SSTa; SWOT removed)
     Panel 2 (right): Resolution - VIIRS_SSTa_2km vs VIIRS_SSTa
         vs LLC_SSTa_noise
 
@@ -205,7 +205,9 @@ def fig_pca_noise_res(outfile:str='fig_pca_noise_res.png',
     noise_datasets = info_defs.primary_remote_datasets + [
         'LLC_SSTa_nonoise', 'LLC_SSTa_noise']
     # Remove SWOT
-    noise_datasets.remove('SWOT_L3')
+    for swot in ['SWOT_L2', 'SWOT_L3']:
+        if swot in noise_datasets:
+            noise_datasets.remove(swot)
 
     # Datasets for resolution panel
     resolution_datasets = ['VIIRS_SSTa_2km', 'VIIRS_SSTa',
@@ -725,8 +727,8 @@ def fig_example_images(outfile:str='fig_example_images.png',
         outfile (str): The output file path for the saved plot.
         idx (int): Index of the image to show from each dataset.
     """
-    datasets = ['VIIRS_SST', 'SWOT_L3', 'ImageNet']
-    titles = ['VIIRS SST', 'SWOT L3', 'ImageNet']
+    datasets = ['VIIRS_SSTa', 'SWOT_L2', 'ImageNet']
+    titles = ['VIIRS SST', 'SWOT L2', 'ImageNet']
     cmaps = ['jet', 'RdBu_r', 'gray']#, 'jet']  # gray for ImageNet if single-channel
     cbar_labels = ['SSTa (K)', 'SSHa (m)', 'Intensity']#, 'SSTa (K)']
     if fourth == 'LLC':
@@ -744,11 +746,11 @@ def fig_example_images(outfile:str='fig_example_images.png',
 
     # Physical scales (km) - from info_defs
     # VIIRS: 0.75 km/pixel, 64 pixels -> 48 km
-    # SWOT: 0.25 km/pixel, 64 pixels -> 16 km
+    # SWOT L2: 0.843 km/pixel, 64 pixels -> ~54 km
     # LLC: 144/64 km/pixel, 64 pixels -> 144 km
     scales = {
-        'VIIRS_SST': 0.75 * 192,  # 48 km
-        'SWOT_L3': 0.25 * 128,    # 16 km
+        'VIIRS_SSTa': 0.75 * 192,  # 144 km
+        'SWOT_L2': 0.843 * 64,    # ~54 km
         'LLC_SST_nonoise': (144./64) * 64,  # 144 km
         'ImageNet': None,
         'Pk4': None

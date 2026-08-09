@@ -385,3 +385,26 @@ UPDATE 2026-08-09 (fifth session): PHASE 1 COMPLETE.
 - Phase 1 DONE. Next: Phase 2 (figures/tables) -- note tab_analysis {cccc}
   vs 3-col mismatch and tab_model fixes are still Phase 2 items; in-text
   LLC/SWOT numbers get fixed in Phase 3 with the new values.
+
+UPDATE 2026-08-09 (sixth session): PHASE 2 COMPLETE (figures + tables).
+- Executed via two parallel Fable agents (figures track, tables track) +
+  main-session manuscript edits, per final_steps_2.md.
+- All 7 paper figures regenerated SWOT_L2-sourced (figs_nenya_dim.py fixes:
+  fig_example_images L3->L2 + VIIRS_SSTa rename; fig_pca_noise_res SWOT
+  removal fix). NEW figures in the manuscript: fig:eigenmodes
+  (fig_eigenmodes_remote_sensing.png, first generation), fig:learning
+  (fig_learning_curves.png finally included), fig:pca_noise_res (INCLUDED
+  after evaluation). Architecture fig relabelled fig:architecture with a
+  real caption.
+- All 3 tables regenerated: column declarations fixed, tab_datasets gained
+  Year+Coverage columns, 2km dx fallback fixed (2.20/2.25; shifts those
+  betas to 3.44/3.62), tab_model footnote 'Model' sentence dropped.
+  CAVEAT: SWOT year/coverage inferred (2023-2024, +-78 deg), verify against
+  Iury's SWOT section when it lands.
+- Manuscript: new \pca Results subsection (sec:pca_res) with intro text and
+  a Phase-3 expansion marker; full captions everywhere; stray [t] x2 gone;
+  Pk caption placeholder resolved.
+- ToDO.txt C/D/F/H updated; Overleaf pushed (8d59f0f). Work log added at
+  the bottom of final_steps.md (author request: log there).
+- Phase 2 DONE. Next: Phase 3 (Results text -> Conclusions -> Intro ->
+  Abstract; bibliography; macros; back matter).

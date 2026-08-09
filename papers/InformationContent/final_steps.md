@@ -1,12 +1,20 @@
 # Final Steps — Information Content Paper
 
 Created: 2026-08-02 (Claude Fable 5)
-Last edited: 2026-08-02
+Last edited: 2026-08-09
 
 Implementation plan to carry the paper from its current state (Methods ~80%,
 Results ~20%, front/back matter unwritten) to a submission-ready draft.
 Derived from the Overleaf `ToDO.txt` (sections A–H) and the author's
 2026-08-02 answers to the Section G open questions.
+
+## Prompts
+
+1. Run Phase 0
+2. Run Phase 1
+3. Run Phase 2
+4. Run Phase 3
+5. Run Phase 4
 
 ## Decisions now locked in
 
@@ -89,28 +97,41 @@ Operational notes (from the PAB Nautilus experience):
 
 ## Phase 2 — Figures and tables (local, `ocean14`)
 
-- [ ] **Eigenmodes figure** (ToDO C, P2, code done): run
+**DONE 2026-08-09 — all figures/tables regenerated SWOT_L2-sourced; see the
+work log at the bottom of this file.** Overleaf push `8d59f0f`.
+
+- [x] **Eigenmodes figure** (ToDO C, P2, code done): run
       `Figures/py/figs_nenya_dim.py` with `flg==53`
       (`fig_eigenmodes_remote_sensing()`: MODIS_SSTa, VIIRS_SSTa, SWOT_L2).
       The PNG does not exist yet. Generate it, copy to Overleaf `Figures/`,
       add figure environment + caption + in-text discussion.
-- [ ] **Learning-curve figure** (ToDO C, P1; decision: BOTH): add a new
+      → generated + `fig:eigenmodes` env in new `sec:pca_res` subsection.
+- [x] **Learning-curve figure** (ToDO C, P1; decision: BOTH): add a new
       figure environment for `fig_learning_curves.png` (already in Overleaf
       `Figures/`), and fix the architecture figure: relabel (it is currently
       `fig:learning`), write a real caption (now bare "Architecture"), and
       point the text at the right labels.
-- [ ] **PCA figure captions** (ToDO C, P2): expand `fig_true_pca` and
-      `fig_pca_2panel` captions.
-- [ ] **Pk_all_datasets caption** (ToDO C, P3): replace the bracketed
-      remote-sensing placeholder (line ~584).
-- [ ] **Table fixes** (ToDO D):
+      → `fig:architecture` (workflow caption + in-text ref) and a real
+      `fig:learning` env; PNG regenerated (SWOT_L2 curve).
+- [x] **PCA figure captions** (ToDO C, P2): expand `fig_true_pca` and
+      `fig_pca_2panel` captions. → full captions, verified against the
+      regenerated PNGs.
+- [x] **Pk_all_datasets caption** (ToDO C, P3): replace the bracketed
+      remote-sensing placeholder (line ~584). → done.
+- [x] **Table fixes** (ToDO D):
       - Column-count mismatches: `tab_analysis.tex` ({cccc} vs 3 cols),
         `tab_model.tex` ({ccccccc} vs 5 cols).
       - Add year + geographic-coverage columns to `tab_datasets` via
         `Tables/py/tables_info.py` (MODIS=2021, VIIRS/NOAA-21=2024, LLC days
         per text) and regenerate.
       - Reconcile the `tab_model` footnote with its actual columns.
-- [ ] Optionally include `fig_pca_noise_res.png` if it adds value (ToDO C, P3).
+      → all fixed in the generator + info_defs (also true dx for the 2km
+      rows: 2.20/2.25); three tables regenerated. SWOT year/coverage
+      (2023-2024, ±78°) awaits text verification when Iury's section lands.
+- [x] Optionally include `fig_pca_noise_res.png` if it adds value (ToDO C, P3).
+      → INCLUDED as `fig:pca_noise_res` (only figure isolating noise vs
+      resolution with controlled pairs); code fixed to drop SWOT from its
+      SST panels.
 
 ## Phase 3 — Manuscript text (Overleaf `information_content.tex`)
 
@@ -155,3 +176,48 @@ Order matters: Results → Conclusions → Introduction → Abstract (last).
 - SWOT dataset description — waiting on Iury (ToDO A, [B]).
 - PR / RankMe integration — on hold per author (ToDO D/E, [H]).
 - Journal choice / bibliography style / abstract length — open (ToDO H, [?]).
+
+## Work log
+
+### 2026-08-09 — Phase 2 executed (Claude Fable 5; two parallel Fable agents)
+
+Prompt 3 ("Run Phase 2") per `claude/final_steps_2.md`. Two Fable agents ran
+the compute tracks (figures; tables) while the main session edited the
+manuscript. Details:
+
+- **Figures agent**: fixed `figs_nenya_dim.py` — `fig_example_images()`
+  SWOT_L3→SWOT_L2 (title 'SWOT L2', 54 km scale bar; also VIIRS_SST→
+  VIIRS_SSTa, which would have crashed first) and `fig_pca_noise_res()`
+  (defensive SWOT removal; list now carries SWOT_L2). Generated all 7 PNGs
+  (flg 53, 1, 2, 3, 4, 5, 8) with no missing inputs and copied them to
+  Overleaf `Figures/`. New: `fig_eigenmodes_remote_sensing.png` (2×3: modes
+  1–2 × MODIS/VIIRS/SWOT-L2; SST leading modes = orthogonal large-scale
+  gradients; SWOT mode 1 = near-uniform mean-like mode, mode 2 = cross-track
+  gradient).
+- **Tables agent**: `info_defs.py` gained explicit dx for the 2km datasets
+  (2.20/2.25) plus `year`/`coverage` entries per dataset; `tables_info.py`
+  column declarations fixed (analysis {ccc}, model {ccccc}, datasets
+  {ccccccc} with Year+Coverage), 'Model' footnote sentence removed. All
+  three tables regenerated + copied to Overleaf. NOTE: SWOT year/coverage
+  (2023-2024, ±78°) are inferred, not text-verified — reconcile with Iury's
+  SWOT section. tab_analysis betas for the 2km rows shifted slightly
+  (3.43→3.44, 3.60→3.62) because the dx fix changes the fit window.
+- **Manuscript** (`information_content.tex`): architecture figure relabelled
+  `fig:architecture` with a real workflow caption + in-text ref; new
+  `fig:learning` environment (learning curves, 8 datasets); Pk caption
+  placeholder replaced; full captions for `fig:pca_true` and
+  `fig:pca_latent`; stray "[t]" ×2 removed; new Results subsection `\pca`
+  (`sec:pca_res`) with brief intro text (Phase 3 expands, marker comment in
+  place) hosting `fig:eigenmodes` and — decision: INCLUDE — 
+  `fig:pca_noise_res` (isolates noise vs resolution effects with controlled
+  pairs). All captions verified against the regenerated PNGs.
+- **Deployed**: Overleaf push `8d59f0f` (12 files: tex, 3 tables, 7 PNGs,
+  ToDO.txt sections C/D/F/H updated). nenya committed/pushed alongside this
+  log.
+- **Left for Phase 3/4**: \swot macro reads "SWOT/SSHa" while L2 figure
+  legends read "SWOT/SSHa-L2" (align in Phase 3); tab_model footnote still
+  defines two notations no row uses (from commented-out generator code);
+  LLC noise sigma 0.09 vs 0.04 K conflict still open (author call).
+
+
+## Logs
