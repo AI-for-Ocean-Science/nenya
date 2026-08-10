@@ -298,9 +298,11 @@ Results/Conclusions/Abstract, owning final consistency. Details:
   Section I ("FINAL AUTHOR ITEMS" per final_steps_4.md); SWOT section still
   blocked on Iury.
 
-### 2026-08-10 — Phase 4 executed (Claude Fable 5; one Fable audit agent)
+### 2026-08-10 — Phase 4 + author Q&A executed (Claude Fable 5; one Fable audit agent)
 
-Prompt 5 ("Run Phase 4") per `claude/final_steps_4.md`. A Fable agent did an
+Prompts 5 ("act on the CLAUDE-QUESTION answers") and 6 ("Run Phase 4") per
+`claude/final_steps_4.md` — the author's inline answers landed on Overleaf
+mid-phase and were incorporated in the same pass. A Fable agent did an
 exhaustive consistency read-through (numbers vs tables, naming, placeholders,
 structure — ~30 findings) while the main session ran the compile-warning and
 cross-reference audits, then fixed everything and closed out. Details:
