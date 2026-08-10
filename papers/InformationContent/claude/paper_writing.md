@@ -432,3 +432,20 @@ UPDATE 2026-08-10 (seventh session): PHASE 3 COMPLETE (manuscript text).
   description still [B]locked on Iury), Section E noise flag RESOLVED.
 - Phase 3 DONE. Next: Phase 4 final pass (read-through, cross-ref audit,
   ToDO Section I "FINAL AUTHOR ITEMS" from the CLAUDE-QUESTION comments).
+
+UPDATE 2026-08-10 (eighth session): PHASE 4 COMPLETE -- FINAL PASS DONE.
+- Fable agent consistency read-through (~30 findings) + main-session
+  compile/cross-ref audits. All findings fixed (see final_steps.md work
+  log): number fixes (dx 2.25, N99 range, k-lambda), hedged overclaims,
+  macro misuse (\llcsst vs \llcsstn), skimage (not sklearn), grammar,
+  caption fixes, table order swap, \llcsstn -> "+noise" convention,
+  fig_example_images + fig_learning_curves regenerated with proper labels,
+  tab_model footnote rebuilt.
+- Author answered all 10 CLAUDE-QUESTIONs inline on Overleaf mid-phase;
+  rebased over their commit and acted on 3 (priority claim softened, SWOT
+  eigenimage future-work sentence added, Dryad archiving statement).
+- Compile: zero errors/warnings/undefined/overfull (settled chain).
+- ToDO.txt: Section I "FINAL AUTHOR ITEMS" added + updated with answers.
+- Overleaf pushed (6eb4934 rebased + 5e3a630). ALL FIVE PHASES COMPLETE;
+  draft is submission-ready pending Section I items (Iury SWOT section,
+  PMC/Dimitris inputs, journal choice, Dryad DOI, dates/affiliations).

@@ -24,6 +24,6 @@ Name & Pre-processing & Augmentations & \nfeature & $N_{99}$ \\
 \\ 
 \begin{minipage}{0.9\textwidth}
 \small
-\textbf{Column descriptions:} \textit{Pre-processing}: transformations applied to satellite/model data before training ($N$x$N$ = original cutout size in pixels; downsample $M$x$M$ = spatial downsampling factor; median $M$x$N$ = median filter kernel size; $X$\% clear = minimum cloud-free threshold; noise $\sigma$ = synthetic noise added to simulations); \textit{Augmentations}: random transformations applied during contrastive learning (jitter $M$ = random spatial shift up to $M$ pixels; flip = random horizontal/vertical flip; rotate = random 90$^\circ$ rotation; noise $\sigma$ = additive Gaussian noise with standard deviation $\sigma$); $N_{\rm f}$ = latent space dimensionality; $N_{99}$ = PCA components needed for 99\% variance.
+\textbf{Column descriptions:} \textit{Pre-processing}: transformations applied to satellite/model data before training (downsample $M$x$M$ = spatial downsampling factor; median $M$x$N$ = median filter kernel size; noise $\sigma$ = per-pixel Gaussian noise, in K, added to the simulated cutouts); \textit{Augmentations}: random transformations applied during contrastive learning (crop $M$ = random crop to $M$ pixels; jitter $M$ = random spatial shift up to $M$ pixels; flip = random horizontal/vertical flip; rotate = random 90$^\circ$ rotation); $N_{\rm f}$ = latent space dimensionality; $N_{99}$ = PCA components needed for 99\% variance.
 \end{minipage}
 \end{table*} 

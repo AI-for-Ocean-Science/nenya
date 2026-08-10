@@ -14,7 +14,8 @@ Derived from the Overleaf `ToDO.txt` (sections A–H) and the author's
 2. Run Phase 1
 3. Run Phase 2
 4. Run Phase 3
-5. Run Phase 4
+5. I have answered all the CLAUDE-QUESTION items in the tex file.  Please read those and edit accordingly.
+6. Run Phase 4
 
 ## Decisions now locked in
 
@@ -187,11 +188,19 @@ Order matters: Results → Conclusions → Introduction → Abstract (last).
 
 ## Phase 4 — Final pass
 
-- [ ] Clean compile of `information_content.tex`; check every figure/table is
+**DONE 2026-08-10 — submission-ready draft; see the work log at the bottom
+of this file.** Overleaf pushes `ca9f04e`→rebased `6eb4934` + `5e3a630`.
+
+- [x] Clean compile of `information_content.tex`; check every figure/table is
       referenced in the text and vice versa.
-- [ ] One full read-through for consistency (SWOT_L2 naming, dx values,
+      → zero errors/warnings/undefined/overfull; all 8 figures + 3 tables
+      labeled and referenced; tables reordered to citation order.
+- [x] One full read-through for consistency (SWOT_L2 naming, dx values,
       dataset counts vs. macros).
-- [ ] Push Overleaf; update `ToDO.txt` statuses and the change log.
+      → Fable agent audit: ~30 findings, all fixed or handed off (see log).
+- [x] Push Overleaf; update `ToDO.txt` statuses and the change log.
+      → pushed (incl. a rebase over the author's inline answers, which were
+      acted on); ToDO gained Section I "FINAL AUTHOR ITEMS".
 
 ## Blocked / deferred (do NOT work these)
 
@@ -288,6 +297,57 @@ Results/Conclusions/Abstract, owning final consistency. Details:
   cross-reference audit; collect the % CLAUDE-QUESTION items into ToDO
   Section I ("FINAL AUTHOR ITEMS" per final_steps_4.md); SWOT section still
   blocked on Iury.
+
+### 2026-08-10 — Phase 4 executed (Claude Fable 5; one Fable audit agent)
+
+Prompt 5 ("Run Phase 4") per `claude/final_steps_4.md`. A Fable agent did an
+exhaustive consistency read-through (numbers vs tables, naming, placeholders,
+structure — ~30 findings) while the main session ran the compile-warning and
+cross-reference audits, then fixed everything and closed out. Details:
+
+- **Compile/cross-ref audits (main session)**: full pdflatex+bibtex cycle —
+  zero errors, zero warnings, zero undefined refs/citations, zero overfull
+  boxes. All 8 figures + 3 tables labeled and referenced; only unreferenced
+  labels are section labels (harmless).
+- **Fixes from the agent's findings** (two batches in the tex, plus code):
+  VIIRS-2km dx 2.2→2.25; intro N99 range 70–110→65–110; k↔λ range 3–50 km;
+  "tracks across all 14"→"largely tracks" and "nearly identical/similar
+  slopes"→"comparable" (MNIST vs P2(k) overclaims); SSH-deficit hedging
+  harmonized; \llcsstn used where \llcsst was wrong (2×); \citep{nenya}→
+  proper \citep with reworded MODIS-only sentence; Gallmeier noise estimate
+  attributed to "VIIRS data" not our \viirs dataset; sklearn→**skimage**;
+  duplicate "(2)"→(3); "spectra has"→"have"; broken "and as" clause;
+  duplicated "random"; example-images caption ("several"→four, duplication
+  trimmed); \cite→\citep in Pk caption; learning-curve caption + methods
+  note WNoise trained 100 epochs; pca_latent caption no longer claims
+  Nf=256 for all; "natural-image datasets"→"reference datasets" in captions;
+  section refs unified to Sect.~; eigenimage count reworded + false "We
+  present in Results" promise removed; 150000→150,000; LLC-SSHa "global
+  ocean"→model domain −78°..+57°; tables \input order swapped (model=Table 2
+  cited first); \llcsstn macro → "LLC/SSTa+noise" (matches figure legends).
+- **Figure regens**: fig_example_images (titles "VIIRS/SSTa"/"SWOT/SSHa-L2")
+  and fig_learning_curves (legend uses pdict label, no "MODIS_SSTa
+  validation") — verified visually. tab_model footnote rebuilt (stale NxN /
+  %-clear notations dropped; noise σ documented under Pre-processing;
+  crop added to Augmentations).
+- **Deliberate non-changes**: N99=76 convention kept (table is internally
+  consistent; the 77 in phase1_report is the first-≥99% convention — now an
+  author item); P(k) PSD units question (K²km vs K²km⁻¹) → author item, not
+  silently changed.
+- **Author interaction mid-phase**: the author answered all 10
+  CLAUDE-QUESTIONs inline on Overleaf ("% A. ..."), adding
+  \label{sec:conclusions} themselves. Rebased over their commit and ACTED
+  on three answers: priority claim softened; SWOT-N99 future-work sentence
+  added (eigenimage test); \codedataavailability now states Dryad archiving
+  with DOI-to-be-minted marker. Remaining Q&A markers converted to
+  % RESOLVED notes.
+- **ToDO.txt**: new Section I "FINAL AUTHOR ITEMS" (blocked-on-people: Iury
+  SWOT section, PMC digitization, Dimitris amplitude offset; decisions:
+  journal choice, N99 convention, PSD units; housekeeping: Dryad DOI,
+  marmorino2017 key rename, dates/affiliations). Updated same-day with the
+  author's answers.
+- **Deployed**: Overleaf `6eb4934` (rebased) + `5e3a630`; nenya committed
+  alongside this log. THE DRAFT IS SUBMISSION-READY pending Section I.
 
 
 ## Logs

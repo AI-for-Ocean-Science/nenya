@@ -585,7 +585,7 @@ def fig_learning_curves(outfile:str='fig_learning_curves.png',
 
         # Plot
         if ss == 0:
-            lbl0 = f'{dataset} validation'
+            lbl0 = pdict['label']
             lbl1 = f'{dataset} training'
         else:
             lbl0 = pdict['label']
@@ -728,7 +728,7 @@ def fig_example_images(outfile:str='fig_example_images.png',
         idx (int): Index of the image to show from each dataset.
     """
     datasets = ['VIIRS_SSTa', 'SWOT_L2', 'ImageNet']
-    titles = ['VIIRS SST', 'SWOT L2', 'ImageNet']
+    titles = ['VIIRS/SSTa', 'SWOT/SSHa-L2', 'ImageNet']
     cmaps = ['jet', 'RdBu_r', 'gray']#, 'jet']  # gray for ImageNet if single-channel
     cbar_labels = ['SSTa (K)', 'SSHa (m)', 'Intensity']#, 'SSTa (K)']
     if fourth == 'LLC':
