@@ -1,7 +1,7 @@
 # Final Steps — Information Content Paper
 
 Created: 2026-08-02 (Claude Fable 5)
-Last edited: 2026-08-09
+Last edited: 2026-08-10
 
 Implementation plan to carry the paper from its current state (Methods ~80%,
 Results ~20%, front/back matter unwritten) to a submission-ready draft.
@@ -135,33 +135,55 @@ work log at the bottom of this file.** Overleaf push `8d59f0f`.
 
 ## Phase 3 — Manuscript text (Overleaf `information_content.tex`)
 
+**DONE 2026-08-10 — full draft complete and compiling clean (zero errors,
+zero undefined refs/citations); see the work log at the bottom of this
+file.** Overleaf push `4a1acd0`.
+
 Order matters: Results → Conclusions → Introduction → Abstract (last).
 
-- [ ] **PCA Results text** (largest gap): write the discussion for
+- [x] **PCA Results text** (largest gap): write the discussion for
       `fig_true_pca` and `fig_pca_2panel` (lines ~654–666).
-- [ ] **P(k) Results placeholders** (lines ~597–652): fill "$k \approx XX$",
+      → full `sec:pca_res` discussion incl. eigenmodes, MNIST-vs-P2(k) key
+      result, resolution/noise sensitivities, SWOT N99=132 caveat, Nf caveat.
+- [x] **P(k) Results placeholders** (lines ~597–652): fill "$k \approx XX$",
       exponents (use `tab_analysis` betas: MODIS 2.90, VIIRS 3.06, LLC 3.80 —
       update if Phase 1 reruns change them), the LLC noise sigma
       ($\sigma(T)$ = 0.04 K), the SSH "we find XXX"; resolve the four
       bracketed editorial notes ([PMC...], [Ask Dimitris!], [is the LLC SST
       higher??], MNIST note).
-- [ ] **Conclusions**, then **Introduction** (frame: information content of
+      → all filled. NOTE: measured the injected noise directly from the
+      preproc files — it is **0.09 K, not 0.04 K**; text + tab_model fixed,
+      CLAUDE-QUESTION left for the author. Editorial notes resolved with
+      drafted text + CLAUDE-QUESTION comments (PMC, Dimitris).
+- [x] **Conclusions**, then **Introduction** (frame: information content of
       remote-sensing imagery; contrastive learning; pull citations from
       `claude_brainstorming.tex`), then **Abstract**.
-- [ ] **Bibliography** (ToDO B, P1): replace the stub `thebibliography` with a
+      → Conclusions (5 paragraphs), Introduction (7 paragraphs, ~1000 words,
+      25 citations; drafted by a Fable agent, integrated + verified),
+      Abstract (~230 words, written last).
+- [x] **Bibliography** (ToDO B, P1): replace the stub `thebibliography` with a
       `.bib` file (+ `copernicus.bst` for now, per Decision 4); resolve all
       undefined keys (llc, nenya, viirs, ecco, gallmeier2023, ulmo, pae,
       nenya_doi, field1987 [unify caps], archer2025, llc_res); fix the
       `gallmeiter2023` typo (line ~364); import DOIs from
       `claude_brainstorming.tex`.
-- [ ] **Macros**: populate or remove \nocean, \ndataset, \nother ("XXX",
+      → `references.bib`: 61 CrossRef-verified entries (Fable agent);
+      nenya_doi = real Zenodo record 10.5281/zenodo.21730571. All keys
+      resolve; typo gone (sentence rewritten).
+- [x] **Macros**: populate or remove \nocean, \ndataset, \nother ("XXX",
       lines 96–98) and \powmnist ("-XX", line 126).
-- [ ] **Back matter** (P3): code/data availability (nenya is open source —
+      → first three unused → removed; \powmnist = −1.4.
+- [x] **Back matter** (P3): code/data availability (nenya is open source —
       cite the nenya DOI), author contributions, competing interests,
       acknowledgements.
-- [ ] **LaTeX fixes** (ToDO F): remove stray "[t]" after `\end{figure*}`
+      → drafted minimally with CLAUDE-QUESTION markers (archiving, co-author
+      list, funding); template appendix stubs removed.
+- [x] **LaTeX fixes** (ToDO F): remove stray "[t]" after `\end{figure*}`
       (lines ~659, ~666); then a clean compile with zero undefined
       references/citations.
+      → [t]s were removed in Phase 2; full pdflatex+bibtex cycle now
+      compiles with zero errors and zero undefined refs/citations
+      (\runningauthor had to be set — required by copernicus.cls).
 
 ## Phase 4 — Final pass
 
@@ -218,6 +240,54 @@ manuscript. Details:
   legends read "SWOT/SSHa-L2" (align in Phase 3); tab_model footnote still
   defines two notations no row uses (from commented-out generator code);
   LLC noise sigma 0.09 vs 0.04 K conflict still open (author call).
+
+### 2026-08-10 — Phase 3 executed (Claude Fable 5; two parallel Fable agents)
+
+Prompt 4 ("Run Phase 3") per `claude/final_steps_3.md`. Two Fable agents
+(bibliography; Introduction draft) ran in parallel with a shared
+citation-key manifest while the main session verified numbers and wrote the
+Results/Conclusions/Abstract, owning final consistency. Details:
+
+- **Numeric verification first**: (1) the LLC injected noise measured
+  directly from the v2 preproc files: std(noise−nonoise) = **0.090 K** — the
+  manuscript's σ²=0.0016 K² (0.04 K) claim and tab_model's 0.039 were both
+  wrong; text + generator + tab_model now say 0.09 K, with a CLAUDE-QUESTION
+  for the author (the 0.04 K remains referenced as the gallmeier2023 VIIRS
+  estimate). (2) The N99=77-vs-76 discrepancy (phase1_report vs tab_model)
+  is a convention difference (first-mode-≥99% vs closest-to-99%); the text
+  quotes tab_model values for internal consistency.
+- **Results written** (main session): P(k) placeholders filled (k = 0.02–0.3
+  cyc/km, β = 2.90/3.06, σ(T) = 0.09 K, SWOT/SSH paragraph incl. noise
+  floor + zhang2025swot); the four editorial notes resolved with drafted
+  text + CLAUDE-QUESTION comments for PMC (digitization) and Dimitris (LLC
+  amplitude offset); "[is the LLC SST higher??]" — it is LOWER, text fixed.
+  PCA Results: full sec:pca_res discussion (image-space ≈ P(k) recap;
+  eigenmodes; synthetic monotonicity broken by MNIST — the key
+  beyond-second-order result; resolution −30–40%, noise −25%;
+  model≈satellite N99 at matched 2-km sampling; SWOT N99=132 partly noise;
+  Nf caveat). MODIS dx "XX" → 1.1 km with the span corrected to ≈141 km².
+- **Conclusions** (5 paragraphs) → **Introduction** (Fable agent, 7
+  paragraphs/~1000 words/25 citations, integrated verbatim after review) →
+  **Abstract** (~230 words, last). \swot macro → "SWOT/SSHa-L2".
+- **Bibliography** (Fable agent): `references.bib`, 61 entries,
+  CrossRef-verified. nenya_doi = Zenodo 10.5281/zenodo.21730571 (real).
+  Choices: llc=Rocha 2016, ecco=Menemenlis 2008, viirs=Petrenko 2014,
+  pae=Böhm & Seljak 2022, llc_res=Soufflet 2016. Flag: marmorino2017's DOI
+  actually resolves to Castro et al. 2017 (same topic) — rename before
+  submission. Stub thebibliography → \bibliographystyle{copernicus} +
+  \bibliography{references}.
+- **Macros/back matter**: \nocean/\ndataset/\nother unused → removed;
+  \powmnist = −1.4; \codedataavailability + authorcontribution +
+  competinginterests + acknowledgements (NRP/Nautilus + Claude) drafted with
+  CLAUDE-QUESTION markers; empty appendix stubs removed; \runningauthor set.
+- **Compile**: full pdflatex+bibtex cycle — ZERO errors, ZERO undefined
+  references/citations (Phase 4's compile goal pre-achieved).
+- **Deployed**: Overleaf `4a1acd0` (tex, references.bib, tab_model, ToDO.txt
+  A/B/E updated); nenya committed alongside this log.
+- **Left for Phase 4**: consistency read-through; figure/table
+  cross-reference audit; collect the % CLAUDE-QUESTION items into ToDO
+  Section I ("FINAL AUTHOR ITEMS" per final_steps_4.md); SWOT section still
+  blocked on Iury.
 
 
 ## Logs

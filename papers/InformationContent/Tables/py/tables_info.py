@@ -210,7 +210,13 @@ def mktab_model(outfile='tab_model.tex', sub=False, local=True):
 
                 # Noise (for LLC simulations)
                 if 'noise' in ulmo_opts and ulmo_opts['noise'] > 0:
-                    preproc_parts.append(f'noise $\\sigma$={ulmo_opts["noise"]:.3f}')
+                    noise_val = ulmo_opts['noise']
+                    # The legacy ulmo json holds sigma=0.039, but the dataset was
+                    # built by extract_llc.py add_noise(noise=0.09); verified
+                    # numerically against the preproc h5 files (2026-08-10).
+                    if dataset == 'LLC_SSTa_noise':
+                        noise_val = 0.09
+                    preproc_parts.append(f'noise $\\sigma$={noise_val:.3f}')
 
                 if preproc_parts:
                     preproc_str = ', '.join(preproc_parts)

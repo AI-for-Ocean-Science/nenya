@@ -408,3 +408,27 @@ UPDATE 2026-08-09 (sixth session): PHASE 2 COMPLETE (figures + tables).
   the bottom of final_steps.md (author request: log there).
 - Phase 2 DONE. Next: Phase 3 (Results text -> Conclusions -> Intro ->
   Abstract; bibliography; macros; back matter).
+
+UPDATE 2026-08-10 (seventh session): PHASE 3 COMPLETE (manuscript text).
+- Executed via two parallel Fable agents (references.bib: 61 CrossRef-
+  verified entries, nenya Zenodo DOI 10.5281/zenodo.21730571 found;
+  Introduction: 7 paragraphs/25 citations from a shared key manifest) with
+  the main session writing P(k)+PCA Results, Conclusions, Abstract, macros,
+  back matter, and owning consistency.
+- KEY DATA FIX: injected LLC noise measured from the v2 preproc files =
+  0.090 K (NOT the 0.04 K in the text nor tab_model's 0.039 from the stale
+  ulmo json). Text, tables_info.py, and tab_model updated; CLAUDE-QUESTION
+  left for the author. Also: N99 76-vs-77 was a threshold-convention
+  difference; the text quotes tab_model.
+- All placeholders gone: Abstract/Intro/Conclusions written; P(k) section
+  numbers filled; four editorial notes resolved (PMC + Dimitris questions
+  now % CLAUDE-QUESTION comments); MODIS dx=1.1 km + 141 km^2 span fix;
+  \powmnist=-1.4; unused count macros removed; \swot -> "SWOT/SSHa-L2";
+  back matter drafted (codedata availability cites the Zenodo DOI).
+- Bibliography: thebibliography stub -> copernicus.bst + references.bib.
+  COMPILES CLEAN: zero errors, zero undefined refs/citations (pdflatex x3 +
+  bibtex). \runningauthor{Prochaska} was required by copernicus.cls.
+- Overleaf pushed (4a1acd0); ToDO.txt Sections A + B all [x] (SWOT
+  description still [B]locked on Iury), Section E noise flag RESOLVED.
+- Phase 3 DONE. Next: Phase 4 final pass (read-through, cross-ref audit,
+  ToDO Section I "FINAL AUTHOR ITEMS" from the CLAUDE-QUESTION comments).
